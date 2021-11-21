@@ -5,8 +5,8 @@
     ],
     "baseUrl": "./src",
     "paths": {
-      "@core": ["core"],
-      "@core/*": ["core/*"],
+      "~/*": ["./*", "../dist/*"],
+      "@core/*": ["./core/*", "../dist/core/*"],
     },
     "target": "es6",
     "skipLibCheck": true,

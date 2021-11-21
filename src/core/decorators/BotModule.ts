@@ -1,13 +1,19 @@
-const moduleDataSymbol = Symbol("moduleData");
+import { Service, Constructable } from "typedi";
 
-export type ModuleData = {
-  discordController?: void;
+const symbol = Symbol("moduleData");
+
+export type BotModuleData<T> = {
+  discordAdapter?: Constructable<T>;
 };
 
-export function BotModule(moduleData: ModuleData = {}): ClassDecorator {
-  return (target) => Reflect.defineMetadata(moduleDataSymbol, moduleData, target);
+export function BotModule(data: BotModuleData<any> = {}): ClassDecorator {
+  const service = Service();
+  return (target) => {
+    Reflect.defineMetadata(symbol, data, target);
+    service(target);
+  };
 }
 
-export function getModuleData(target: any): ModuleData | undefined {
-  return Reflect.getMetadata(moduleDataSymbol, target);
+export function getModuleData(target: any): BotModuleData<any> | undefined {
+  return Reflect.getMetadata(symbol, target);
 }

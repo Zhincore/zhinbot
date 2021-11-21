@@ -1,0 +1,79 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// #### MAIN ####
+
+model Guild {
+  id     String @id
+  prefix String
+
+  reactRoles ReactRolesItem[]
+  effects    EffectItem[]
+  alerts     AlertsItem[]
+}
+
+// #### MODULES ####
+
+// ## Alerts ##
+model AlertsItem {
+  guild     Guild   @relation(references: [id], fields: [guildId])
+  guildId   String
+  type      String
+  name      String
+  channelId String
+  roleId    String?
+
+  @@id([guildId, type, name])
+}
+
+// ## Effects ##
+model EffectItem {
+  id        Int     @default(autoincrement())
+  guild     Guild   @relation(references: [id], fields: [guildId])
+  guildId   String
+  order     Int     @default(0)
+  pattern   String
+  response  String
+  transform String?
+
+  @@id([id, guildId])
+}
+
+// ## React-roles ##
+model ReactRolesItem {
+  id        Int    @default(autoincrement())
+  guild     Guild  @relation(references: [id], fields: [guildId])
+  guildId   String
+  channelId String
+  messageId String @default("")
+
+  color       Int     @default(0)
+  title       String  @default("Choose your role")
+  description String  @default("")
+  message     String  @default("")
+  showHelp    Boolean @default(true)
+  showId      Boolean @default(false)
+  showRoles   Boolean @default(true)
+
+  roles ReactRolesRole[]
+
+  @@id([id, guildId])
+}
+
+model ReactRolesRole {
+  id          Int            @default(autoincrement())
+  emoji       String         @default("")
+  role        String
+  description String         @default("")
+  item        ReactRolesItem @relation(references: [id, guildId], fields: [itemId, guildId])
+  itemId      Int
+  guildId     String
+
+  @@id([id, itemId, guildId])
+}

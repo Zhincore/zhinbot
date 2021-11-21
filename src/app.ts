@@ -1,15 +1,16 @@
 import "reflect-metadata";
 import { config as dotenv } from "dotenv";
-import { Bot } from "@core";
+import { Bot } from "@core/Bot";
 import { Config } from "./Config";
-import { TestModule } from "./modules/TestModule";
+import modules from "./modules";
 
 dotenv();
 
 async function main() {
-  const config = new Config();
-  const bot: Bot = module.hot?.data?.bot ?? new Bot();
-  bot.registerModules([TestModule]);
+  const bot: Bot = new Bot();
+  const config = bot.container.get(Config);
+  bot.owners = config.owners;
+  bot.modules.register(modules);
 
   const killHandler = () => {
     bot.destroy();
@@ -22,14 +23,7 @@ async function main() {
     process.on("SIGTERM", killHandler);
   });
 
-  if (!bot.isReady()) await bot.login(config.auth.discord.token).catch((err) => console.error("Boot failed", err));
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose((data) => {
-      data.bot = bot;
-    });
-  }
+  await bot.login(config.auth.discord.token).catch((err) => console.error("Boot failed", err));
 }
 
 main();
