@@ -3,7 +3,7 @@ import { Service, Constructable } from "typedi";
 const symbol = Symbol("moduleData");
 
 export type BotModuleData<T> = {
-  discordAdapter?: Constructable<T>;
+  discordAdapters?: Constructable<T>[];
 };
 
 export function BotModule(data: BotModuleData<any> = {}): ClassDecorator {

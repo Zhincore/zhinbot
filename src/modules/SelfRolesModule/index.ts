@@ -1,9 +1,9 @@
-import { Snowflake, TextChannel, MessageEmbed, Message, Guild, Role, Emoji } from "discord.js";
-import { ReactRolesItem, ReactRolesRole } from "@prisma/client";
+import { Snowflake, TextChannel, MessageEmbed, Message, MessageOptions, Guild, Role } from "discord.js";
+import { SelfRolesItem, SelfRolesRole } from "@prisma/client";
 import { BotModule } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { PrismaService } from "~/services/PrismaService";
-import { ReactRolesDiscordAdapter } from "./ReactRoles.discord";
+import { SelfRolesDiscordAdapter, ROLE_ASSIGN_ID } from "./SelfRoles.discord";
 import { editableFields } from "./editableFields";
 
 export type ItemPreview = {
@@ -13,26 +13,9 @@ export type ItemPreview = {
   channelName: string;
 };
 
-@BotModule({ discordAdapter: ReactRolesDiscordAdapter })
-export class ReactRolesModule {
-  private readonly messages = new Map<string, number>();
-
-  constructor(private readonly prisma: PrismaService, private readonly bot: Bot) {
-    // Fetch and cache existing reactroles
-    prisma.reactRolesItem
-      .findMany({
-        select: { messageId: true, id: true, channelId: true },
-        where: { NOT: [{ messageId: undefined }] },
-      })
-      .then((items) => {
-        for (const { messageId, id, channelId } of items) {
-          this.messages.set(messageId, id);
-
-          // TODO
-          bot.fetchMessage(channelId, messageId).catch(console.error);
-        }
-      });
-  }
+@BotModule({ discordAdapters: [SelfRolesDiscordAdapter] })
+export class SelfRolesModule {
+  constructor(private readonly prisma: PrismaService, private readonly bot: Bot) {}
 
   private _updated(guildId: Snowflake) {
     guildId;
@@ -40,7 +23,7 @@ export class ReactRolesModule {
   }
 
   async list(guildId: Snowflake) {
-    const items = await this.prisma.reactRolesItem.findMany({
+    const items = await this.prisma.selfRolesItem.findMany({
       where: { guildId },
       select: { id: true, title: true, color: true, channelId: true },
     });
@@ -57,7 +40,7 @@ export class ReactRolesModule {
 
   async get(guildId: Snowflake, id: number) {
     if (!id) return null;
-    return this.prisma.reactRolesItem.findUnique({
+    return this.prisma.selfRolesItem.findUnique({
       where: { id_guildId: { id, guildId } },
       include: { roles: true },
     });
@@ -67,7 +50,7 @@ export class ReactRolesModule {
     if (!(field in editableFields)) return false;
 
     if (field === "messageId") {
-      await this.prisma.reactRolesItem
+      await this.prisma.selfRolesItem
         .findUnique({
           where: { id_guildId: { id, guildId } },
           select: { messageId: true, channelId: true },
@@ -75,13 +58,12 @@ export class ReactRolesModule {
         })
         .then(async ({ messageId, channelId }) => {
           if (messageId === value) return;
-          this.messages.delete(messageId);
           const message = await this.bot.fetchMessage(channelId, messageId);
           if (message) message.delete().catch(() => null);
         });
     }
 
-    return this.prisma.reactRolesItem
+    return this.prisma.selfRolesItem
       .update({
         where: { id_guildId: { id, guildId } },
         data: { [field]: value },
@@ -89,7 +71,6 @@ export class ReactRolesModule {
       })
       .then(({ messageId }) => {
         if (messageId) this.render(guildId, id);
-        if (field === "messageId") this.messages.set(messageId, id);
         return true;
       })
       .finally(() => {
@@ -97,8 +78,8 @@ export class ReactRolesModule {
       });
   }
 
-  async create(guildId: Snowflake, { id: channelId }: TextChannel) {
-    const item = await this.prisma.reactRolesItem.create({
+  async create(guildId: Snowflake, channelId: Snowflake) {
+    const item = await this.prisma.selfRolesItem.create({
       data: {
         channelId,
         guild: { connect: { id: guildId } },
@@ -118,7 +99,7 @@ export class ReactRolesModule {
       if (message) message.delete();
     }
 
-    await this.prisma.reactRolesItem.delete({
+    await this.prisma.selfRolesItem.delete({
       where: { id_guildId: { id, guildId } },
     });
 
@@ -126,7 +107,7 @@ export class ReactRolesModule {
   }
 
   async conditionalRender(guildId: Snowflake, id: number) {
-    return this.prisma.reactRolesItem
+    return this.prisma.selfRolesItem
       .findUnique({
         where: { id_guildId: { id, guildId } },
         select: { messageId: true },
@@ -146,50 +127,55 @@ export class ReactRolesModule {
     const _message = await this.bot.fetchMessage(channel, item.messageId);
     let message = _message;
     if (!channel) return false;
-    if (item.messageId && !message) this.messages.delete(item.messageId);
 
     const guild = await this.bot.guilds.fetch(guildId);
+    const { embed, roles } = this.generateEmbed(item, guild);
+    const messageData: MessageOptions = {
+      embeds: [embed],
+      content: item.message,
+      components: [
+        {
+          type: "ACTION_ROW",
+          components: [
+            {
+              type: "SELECT_MENU",
+              customId: ROLE_ASSIGN_ID + ":" + id,
+              options: roles
+                .filter((r) => r.role)
+                .map((role) => ({
+                  label: role.role!.name,
+                  value: role.role!.id,
+                  description: role.description,
+                  emoji: role.emoji ?? undefined,
+                })),
+            },
+          ],
+        },
+      ],
+    };
 
-    const { embed, roles } = this.generateMessage(item, guild);
-    const messageData = { embeds: [embed], content: item.message };
-    if (message) message.edit(messageData);
-    else {
+    if (message) {
+      message.edit(messageData);
+    } else {
       message = (await channel.send(messageData)) as Message;
 
-      await this.prisma.reactRolesItem.update({
+      await this.prisma.selfRolesItem.update({
         where: { id_guildId: { id, guildId } },
         data: { messageId: message.id },
         select: { id: true },
       });
-      this.messages.set(message.id, id);
       this._updated(guildId);
-    }
-
-    // remove obsolete reactions
-    for (const reaction of message.reactions.cache.values()) {
-      if (!roles.some(({ emoji }) => emoji?.identifier === reaction.emoji.identifier)) {
-        reaction.remove();
-      }
-    }
-
-    // add all reactions
-    let reactionPromise = Promise.resolve();
-    for (const { emoji } of roles) {
-      if (!emoji) continue;
-      reactionPromise = reactionPromise.then(() => {
-        message.react(emoji.identifier);
-      });
     }
 
     return true;
   }
 
-  private generateMessage(item: ReactRolesItem & { roles: ReactRolesRole[] }, guild: Guild) {
+  private generateEmbed(item: SelfRolesItem & { roles: SelfRolesRole[] }, guild: Guild) {
     const roles = item.roles
       .filter((i) => i.emoji)
       .map((role) => ({
         ...role,
-        emoji: this.bot.resolveEmoji(role.emoji),
+        emoji: role.emoji,
         role: this.bot.resolveRole(role.role, guild),
       }));
 
@@ -214,11 +200,11 @@ export class ReactRolesModule {
     return { embed, roles };
   }
 
-  async addRole(guildId: Snowflake, id: number, role: Role) {
-    return this.prisma.reactRolesRole
+  async addRole(guildId: Snowflake, id: number, role: Snowflake) {
+    return this.prisma.selfRolesRole
       .create({
         data: {
-          role: role.id,
+          role,
           item: { connect: { id_guildId: { id, guildId } } },
         },
         select: { id: true },
@@ -232,14 +218,14 @@ export class ReactRolesModule {
       });
   }
 
-  async setRole(guildId: Snowflake, id: number, roleId: number, role: Role, emoji: Emoji, ...description: string[]) {
-    return this.prisma.reactRolesRole
+  async setRole(guildId: Snowflake, id: number, roleId: number, role: Role, emoji: string, ...description: string[]) {
+    return this.prisma.selfRolesRole
       .update({
         where: {
           id_itemId_guildId: { id: roleId, itemId: id, guildId },
         },
         data: {
-          emoji: (emoji && (emoji.url ? emoji.id : emoji.name)) || undefined,
+          emoji: emoji || undefined,
           role: role.id,
           description: description.join(" "),
         },
@@ -255,7 +241,7 @@ export class ReactRolesModule {
   }
 
   async removeRole(guildId: Snowflake, id: number, roleId: number) {
-    return this.prisma.reactRolesRole
+    return this.prisma.selfRolesRole
       .delete({
         where: {
           id_itemId_guildId: { id: roleId, itemId: id, guildId },

@@ -1,4 +1,4 @@
-import { TestModule } from "./TestModule";
-import { ReactRolesModule } from "./ReactRolesModule";
+import { BaseModule } from "./BaseModule";
+import { SelfRolesModule } from "./SelfRolesModule";
 
-export default [TestModule, ReactRolesModule];
+export default [BaseModule, SelfRolesModule];

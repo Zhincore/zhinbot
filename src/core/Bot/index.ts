@@ -1,4 +1,4 @@
-import { Client, Channel, TextChannel, Snowflake, Message, Emoji, Guild } from "discord.js";
+import { Client, Channel, TextChannel, Snowflake, Message, EmojiIdentifierResolvable, Guild } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
 import { ModuleManager } from "./ModuleManager";
@@ -55,19 +55,6 @@ export class Bot extends Client {
     const channel = await (typeof channelOrId === "string" ? this.fetchChannel<TextChannel>(channelOrId) : channelOrId);
     if (!channel?.isText()) throw new Error("Channel not found");
     return channel.messages.fetch(messageId);
-  }
-
-  resolveEmoji(str: string | { id: string; name: string }) {
-    if (!str) return null;
-    if (typeof str === "object") str = str.id || str.name;
-
-    const customEmojiID = (str.match(/^(?:<:.+:)?(\d+)>?$/) || [])[1];
-    if (customEmojiID) return this.emojis.resolve(customEmojiID);
-
-    const defaultEmoji = (str.match(emojiRegex()) || [])[0];
-    if (defaultEmoji) return { animated: false, name: defaultEmoji } as Emoji;
-
-    return null;
   }
 
   resolveRole(str: string, guild: Guild) {

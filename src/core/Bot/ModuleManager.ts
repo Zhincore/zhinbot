@@ -11,41 +11,62 @@ import {
   BotModuleData,
   getDiscordCommands,
   getDiscordSubcommands,
+  getDiscordHandlers,
   getDiscordAdapterData,
   IDiscordCommand,
+  IDiscordHandler,
   DiscordAdapterData,
 } from "../decorators";
+import { IInteractionHandler } from "../decorators/utils";
 import { Bot } from "./";
 
 export class ModuleManager {
   private readonly modules = new Set<BotModuleData<any>>();
   private readonly commands = new Map<string, IDiscordCommand>();
+  private readonly handlers = new Map<string, IDiscordHandler>();
+
+  private commandDataList: ApplicationCommandData[] = [];
 
   constructor(private readonly bot: Bot) {
-    bot.once("ready", (bot) => {
-      bot.guilds.cache.forEach(this.registerCommands.bind(this));
-    });
-
     bot.on("guildCreate", (guild) => {
       this.registerCommands(guild);
     });
 
+    bot.once("ready", (bot) => {
+      bot.guilds.cache.forEach(this.registerCommands.bind(this));
+    });
+
     bot.on("interactionCreate", async (interaction) => {
-      if (!interaction.isApplicationCommand()) return;
+      let handler: IInteractionHandler<any> | undefined;
+
+      if (interaction.isMessageComponent()) {
+        handler = this.handlers.get(interaction.customId.split(":")[0]);
+      } else if (interaction.isApplicationCommand()) {
+        handler = this.commands.get(interaction.commandName);
+      }
 
       try {
-        const command = this.commands.get(interaction.commandName);
-        if (!command) throw new Error("Recieved unexpected interaction");
+        if (!handler) throw new Error("Recieved unexpected interaction");
 
-        await command.execute(interaction, command.commandData);
+        await handler.execute(interaction);
       } catch (err) {
         console.error(err);
-        interaction.reply({ content: String(err), ephemeral: true });
+
+        if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
+          try {
+            if (!interaction.replied) await interaction.reply({ content: String(err), ephemeral: true });
+            else await interaction.followUp({ content: String(err), ephemeral: true });
+          } catch (err) {
+            console.error("Failed to send error:", err);
+          }
+        }
       }
     });
   }
 
   register(modules: Constructable<any>[]) {
+    this.commandDataList.length = 0;
+
     for (const BotModule of modules) {
       const moduleData = getModuleData(BotModule);
       if (!moduleData) {
@@ -53,24 +74,21 @@ export class ModuleManager {
         continue;
       }
 
-      this.modules.add(moduleData);
-    }
-  }
+      for (const DiscordAdapter of moduleData.discordAdapters ?? []) {
+        const discordAdapter = this.bot.container.get(DiscordAdapter);
+        const adapterData = getDiscordAdapterData(DiscordAdapter);
+        const commands = getDiscordCommands(discordAdapter);
+        const handlers = getDiscordHandlers(discordAdapter);
 
-  private async registerCommands(guild: Guild) {
-    const commands: ApplicationCommandData[] = [];
-
-    // Generate command list
-    for (const module of this.modules) {
-      if (module.discordAdapter) {
-        const discordAdapter = this.bot.container.get(module.discordAdapter);
-        const adapterData = getDiscordAdapterData(module.discordAdapter);
-        const adapterCommands = getDiscordCommands(discordAdapter);
+        for (const handler of handlers ?? []) {
+          this.handlers.set(handler.id, { ...handler, execute: handler.execute.bind(discordAdapter) });
+        }
 
         const mainCommand = adapterData ? this.createMainCommand(adapterData, discordAdapter) : undefined;
 
-        commands.push(
-          ...([...(adapterCommands ?? []), mainCommand].filter(Boolean) as IDiscordCommand[]).map((adapterCommand) => {
+        // Generate command list
+        this.commandDataList.push(
+          ...([...(commands ?? []), mainCommand].filter(Boolean) as IDiscordCommand[]).map((adapterCommand) => {
             this.commands.set(adapterCommand.commandData.name, {
               ...adapterCommand,
               execute: adapterCommand.execute.bind(discordAdapter),
@@ -80,11 +98,15 @@ export class ModuleManager {
           }),
         );
       }
-    }
 
+      this.modules.add(moduleData);
+    }
+  }
+
+  private async registerCommands(guild: Guild) {
     try {
       // Set commands
-      const result = await guild.commands.set(commands);
+      const result = await guild.commands.set(this.commandDataList);
 
       // Generate permission list for each
       const fullPermissions: GuildApplicationCommandPermissionData[] = [];
@@ -122,11 +144,11 @@ export class ModuleManager {
           ...adapterData.supercomand,
           options: adapterSubcommands.map((subcmd) => subcmd.commandData),
         },
-        execute: (interaction: CommandInteraction, cmdData) => {
-          const subcommand = interaction.options.getSubcommandGroup() || interaction.options.getSubcommand(true);
+        execute: function (interaction: CommandInteraction) {
+          const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
           const command = adapterSubcommands.find((subcmd) => subcmd.commandData.name == subcommand);
-          if (command) return command.execute(interaction, cmdData);
+          if (command) return command.execute.apply(this, [interaction]);
         },
       } as IDiscordCommand;
     }
