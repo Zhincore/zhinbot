@@ -17,6 +17,7 @@ specifiers:
   discord-api-types: ^0.24.0
   discord.js: ^13.3.1
   dotenv: ^10.0.0
+  emoji-regex: ^10.0.0
   erlpack: github:discord/erlpack
   eslint: ~7.30.0
   eslint-config-prettier: ^8.3.0
@@ -50,6 +51,7 @@ dependencies:
   discord-api-types: 0.24.0
   discord.js: 13.3.1_5971b5a749a91823f5467a6d31a2f8b3
   dotenv: 10.0.0
+  emoji-regex: 10.0.0
   erlpack: github.com/discord/erlpack/f7d730debe32c416d1b55b4217f8aef2ade05874
   moment: 2.29.1
   reflect-metadata: 0.1.13
@@ -1003,6 +1005,10 @@ packages:
   /electron-to-chromium/1.4.11:
     resolution: {integrity: sha512-2OhsaYgsWGhWjx2et8kaUcdktPbBGjKM2X0BReUCKcSCPttEY+hz2zie820JLbttU8jwL92+JJysWwkut3wZgA==}
     dev: true
+
+  /emoji-regex/10.0.0:
+    resolution: {integrity: sha512-KmJa8l6uHi1HrBI34udwlzZY1jOEuID/ft4d8BSSEdRyap7PwBEt910453PJa5MuGvxkLqlt4Uvhu7tttFHViw==}
+    dev: false
 
   /emoji-regex/8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
