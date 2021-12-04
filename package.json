@@ -8,7 +8,7 @@
   "license": "GPLV3 OR LATER",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "db": "prisma db push --skip-generate",
+    "db": "prisma db push",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node -r tsconfig-paths/register --enable-source-maps .",
     "dev": "tsc -b -w --preserveWatchOutput",
@@ -29,15 +29,19 @@
     "emoji-regex": "^10.0.0",
     "erlpack": "github:discord/erlpack",
     "moment": "^2.29.1",
+    "ms": "^2.1.3",
     "reflect-metadata": "^0.1.13",
+    "sodium": "^3.0.2",
     "text-table": "^0.2.0",
     "typedi": "^0.10.0",
     "utf-8-validate": "^5.0.7",
+    "youtube-dl-exec": "^2.0.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
     "@types/color": "^3.0.2",
     "@types/express": "^4.17.13",
+    "@types/ms": "^0.7.31",
     "@types/node": "^16.11.11",
     "@types/text-table": "^0.2.2",
     "@types/webpack": "^5.28.0",

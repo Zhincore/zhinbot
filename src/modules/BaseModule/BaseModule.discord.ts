@@ -1,4 +1,4 @@
-import { BaseCommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import { DiscordAdapter, DiscordCommand, Inject } from "@core/decorators";
 import { BaseModule } from "./";
 
@@ -7,18 +7,18 @@ export class BaseModuleDiscordAdapter {
   constructor(@Inject(() => BaseModule) private readonly service: BaseModule) {}
 
   @DiscordCommand({ description: 'Replies with "Pong!"' })
-  ping(interaction: BaseCommandInteraction) {
+  ping(interaction: CommandInteraction) {
     return interaction.reply(this.service.ping());
   }
 
   @DiscordCommand({ description: "Measures the roundtrip latency between Discord and the bot" })
-  async latency(interaction: BaseCommandInteraction) {
+  async latency(interaction: CommandInteraction) {
     const sent = (await interaction.reply({ content: "Pinging...", fetchReply: true })) as Message;
     return interaction.editReply(`Roundtrip latency: \`${sent.createdTimestamp - interaction.createdTimestamp}ms\``);
   }
 
   @DiscordCommand({ description: "Sends some numbers about the bot" })
-  async status(interaction: BaseCommandInteraction) {
+  async status(interaction: CommandInteraction) {
     const sent = (await interaction.reply({ content: "Measuring...", fetchReply: true })) as Message;
 
     const uptime = process.uptime();

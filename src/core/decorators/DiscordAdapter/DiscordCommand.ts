@@ -1,9 +1,12 @@
-import { ApplicationCommandData, BaseCommandInteraction } from "discord.js";
+import { ApplicationCommandData, ChatInputApplicationCommandData, BaseCommandInteraction } from "discord.js";
 import { pushToMetaArray, IInteractionHandler } from "./utils";
 
 const symbol = Symbol("commands");
 
-export type DiscordCommandData = Omit<ApplicationCommandData, "name"> & {
+type CommandDataWithType = Omit<ApplicationCommandData, "name">;
+type CommandDataWithoutType = Omit<ChatInputApplicationCommandData, "name" | "type">;
+
+export type DiscordCommandData = (CommandDataWithoutType | CommandDataWithType) & {
   name?: string;
   description: string;
 };
@@ -23,6 +26,7 @@ export function DiscordCommand(data: DiscordCommandData): MethodDecorator {
     const commandmethod: IDiscordCommand = {
       commandData: {
         ...data,
+        type: "type" in data ? data.type : "CHAT_INPUT",
         name: data.name ?? method.toString(),
       },
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,

@@ -1,10 +1,10 @@
-import { ButtonInteraction } from "discord.js";
+import { MessageComponentInteraction } from "discord.js";
 import { pushToMetaArray, IInteractionHandler } from "./utils";
 
 const symbol = Symbol("handlers");
 
-export type DiscordHandlerExecutor = (interaction: ButtonInteraction) => Promise<void>;
-export interface IDiscordHandler extends IInteractionHandler<ButtonInteraction> {
+export type DiscordHandlerExecutor = (interaction: MessageComponentInteraction) => Promise<void>;
+export interface IDiscordHandler extends IInteractionHandler<MessageComponentInteraction> {
   id: string;
   execute: DiscordHandlerExecutor;
 }

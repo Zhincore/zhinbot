@@ -12,37 +12,40 @@ generator client {
 model Guild {
   id String @id
 
-  reactRoles SelfRolesItem[]
-  effects    EffectItem[]
-  alerts     AlertsItem[]
+  // Player
+  playerUpdatesChannel String?
+
+  selfRoles SelfRolesItem[]
+  // effects    EffectItem[]
+  // alerts     AlertsItem[]
 }
 
 // #### MODULES ####
 
 // ## Alerts ##
-model AlertsItem {
-  guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-  guildId   String
-  type      String
-  name      String
-  channelId String
-  roleId    String?
-
-  @@id([guildId, type, name])
-}
+// model AlertsItem {
+//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
+//   guildId   String
+//   type      String
+//   name      String
+//   channelId String
+//   roleId    String?
+//
+//   @@id([guildId, type, name])
+// }
 
 // ## Effects ##
-model EffectItem {
-  id        Int     @default(autoincrement())
-  guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-  guildId   String
-  order     Int     @default(0)
-  pattern   String
-  response  String
-  transform String?
-
-  @@id([id, guildId])
-}
+// model EffectItem {
+//   id        Int     @default(autoincrement())
+//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
+//   guildId   String
+//   order     Int     @default(0)
+//   pattern   String
+//   response  String
+//   transform String?
+//
+//   @@id([id, guildId])
+// }
 
 // ## Self-roles ##
 model SelfRolesItem {

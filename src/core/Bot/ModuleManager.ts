@@ -132,7 +132,7 @@ export class ModuleManager {
         permissions: perms,
       });
     }
-    console.log(fullPermissions);
+
     // Apply the permissions
     await guild.commands.permissions.set({ fullPermissions });
   }
