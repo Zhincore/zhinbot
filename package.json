@@ -7,14 +7,14 @@
   "private": true,
   "license": "GPLV3 OR LATER",
   "scripts": {
-    "build:db": "prisma generate",
-    "build:js": "tsc -p tsconfig.build.json",
-    "build": "npm run build:db && npm run build:js",
+    "build": "tsc -p tsconfig.build.json",
+    "db": "prisma db push --skip-generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node -r tsconfig-paths/register --enable-source-maps .",
     "dev": "tsc -b -w --preserveWatchOutput",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "preinstall": "npx only-allow pnpm"
+    "postinstall": "prisma generate",
+    "preinstall": "only-allow pnpm"
   },
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",

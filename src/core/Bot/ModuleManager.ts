@@ -1,11 +1,4 @@
-import {
-  Guild,
-  DiscordAPIError,
-  CommandInteraction,
-  Interaction,
-  ApplicationCommandData,
-  GuildApplicationCommandPermissionData,
-} from "discord.js";
+import Discord, { DiscordAPIError } from "discord.js";
 import { Constructable } from "typedi";
 import * as Decorators from "../decorators";
 import { Bot } from "./";
@@ -15,16 +8,14 @@ export class ModuleManager {
   private readonly commands = new Map<string, Decorators.IDiscordCommand>();
   private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
 
-  private commandDataList: ApplicationCommandData[] = [];
+  private commandDataList: Discord.ApplicationCommandData[] = [];
 
   constructor(private readonly bot: Bot) {
-    bot.on("guildCreate", (guild) => {
-      this.updateGuildCommands(guild);
-    });
+    bot.on("guildCreate", (guild) => this.updateGuildCommands(guild));
 
-    bot.once("ready", (bot) => {
-      bot.guilds.cache.forEach(this.updateGuildCommands.bind(this));
-    });
+    bot.on("roleUpdate", (role) => this.updateGuildCommandPermissions(role.guild));
+
+    bot.once("ready", (bot): Promise<any> => Promise.all(bot.guilds.cache.map(this.updateGuildCommands.bind(this))));
 
     bot.on("interactionCreate", async (interaction) => {
       let handler: Decorators.IInteractionHandler<any> | undefined;
@@ -46,7 +37,7 @@ export class ModuleManager {
     });
   }
 
-  private async sendError(interaction: Interaction, err: any) {
+  private async sendError(interaction: Discord.Interaction, err: any) {
     if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
       try {
         if (!interaction.replied) {
@@ -99,36 +90,51 @@ export class ModuleManager {
     }
   }
 
-  private async updateGuildCommands(guild: Guild) {
+  private async updateGuildCommands(guild: Discord.Guild) {
     try {
-      // Set commands
-      const result = await guild.commands.set(this.commandDataList);
-
-      // Generate permission list for each
-      const fullPermissions: GuildApplicationCommandPermissionData[] = [];
-      const onwersPerms = this.bot.owners.map((id) => ({
-        id,
-        type: "USER" as const,
-        permission: true,
-      }));
-
-      for (const command of result.values()) {
-        if (command.defaultPermission) continue;
-
-        fullPermissions.push({
-          id: command.id,
-          permissions: [...onwersPerms],
-        });
-      }
-
-      // Set permissions
-      await guild.commands.permissions.set({ fullPermissions });
+      // Apply commands
+      await guild.commands.set(this.commandDataList);
+      // Update command permissions
+      await this.updateGuildCommandPermissions(guild);
     } catch (err) {
       if (err instanceof DiscordAPIError && err.message == "Missing Access") {
         guild.leave();
       }
       console.error(err);
     }
+  }
+
+  private async updateGuildCommandPermissions(guild: Discord.Guild) {
+    // Generate perms for owners
+    const owners = this.bot.owners.map((id) => ({
+      id,
+      type: "USER" as const,
+      permission: true,
+    }));
+    // Generate perms for admins
+    const admins = Array.from(guild.roles.cache.values())
+      .filter((role) => role.permissions.has("ADMINISTRATOR"))
+      .map(({ id }) => ({
+        id,
+        type: "ROLE" as const,
+        permission: true,
+      }));
+    // Merge above perms
+    const perms = [...owners, ...admins];
+
+    // Generate perms of all admin commands
+    const fullPermissions: Discord.GuildApplicationCommandPermissionData[] = [];
+    for (const command of guild.commands.cache.values()) {
+      if (command.defaultPermission) continue;
+
+      fullPermissions.push({
+        id: command.id,
+        permissions: perms,
+      });
+    }
+    console.log(fullPermissions);
+    // Apply the permissions
+    await guild.commands.permissions.set({ fullPermissions });
   }
 
   private createMainCommand(adapterData: Decorators.IDiscordAdapter) {
@@ -138,7 +144,7 @@ export class ModuleManager {
           ...adapterData.supercomand,
           options: adapterData.subcommands.map((subcmd) => subcmd.commandData),
         },
-        execute: function (interaction: CommandInteraction) {
+        execute: function (interaction: Discord.CommandInteraction) {
           const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
           const command = adapterData.subcommands!.find((subcmd) => subcmd.commandData.name == subcommand);

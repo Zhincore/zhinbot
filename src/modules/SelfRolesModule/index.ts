@@ -185,6 +185,7 @@ export class SelfRolesModule {
       })
       .then(({ messageId }) => {
         if (messageId) return this.render(guildId, id);
+        return true;
       });
   }
 
