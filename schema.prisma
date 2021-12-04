@@ -21,7 +21,7 @@ model Guild {
 
 // ## Alerts ##
 model AlertsItem {
-  guild     Guild   @relation(references: [id], fields: [guildId])
+  guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
   guildId   String
   type      String
   name      String
@@ -34,7 +34,7 @@ model AlertsItem {
 // ## Effects ##
 model EffectItem {
   id        Int     @default(autoincrement())
-  guild     Guild   @relation(references: [id], fields: [guildId])
+  guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
   guildId   String
   order     Int     @default(0)
   pattern   String
@@ -46,34 +46,29 @@ model EffectItem {
 
 // ## Self-roles ##
 model SelfRolesItem {
-  id        Int    @default(autoincrement())
-  guild     Guild  @relation(references: [id], fields: [guildId])
+  id        Int    @id @default(autoincrement())
+  guild     Guild  @relation(references: [id], fields: [guildId], onDelete: Cascade)
   guildId   String
   channelId String
-  messageId String @default("")
+  messageId String? @unique
 
   color       Int     @default(0)
   title       String  @default("Choose your role")
-  description String  @default("")
-  message     String  @default("")
+  description String?
+  message     String?
   showHelp    Boolean @default(true)
   showId      Boolean @default(false)
   showRoles   Boolean @default(true)
-  maxRoles    Int     @default(0)
 
   roles SelfRolesRole[]
-
-  @@id([id, guildId])
 }
 
 model SelfRolesRole {
-  id          Int           @default(autoincrement())
   emoji       String        @default("")
-  role        String
+  roleId      String
   description String        @default("")
-  item        SelfRolesItem @relation(references: [id, guildId], fields: [itemId, guildId])
+  item        SelfRolesItem @relation(references: [id], fields: [itemId], onDelete: Cascade)
   itemId      Int
-  guildId     String
 
-  @@id([id, itemId, guildId])
+  @@id([itemId, roleId])
 }

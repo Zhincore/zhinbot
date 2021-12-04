@@ -14,6 +14,6 @@ export function BotModule(data: BotModuleData<any> = {}): ClassDecorator {
   };
 }
 
-export function getModuleData(target: any): BotModuleData<any> | undefined {
+export function getModuleData(target: Constructable<any>): BotModuleData<any> | undefined {
   return Reflect.getMetadata(symbol, target);
 }

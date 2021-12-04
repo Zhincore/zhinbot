@@ -27,6 +27,7 @@ export class BaseModuleDiscordAdapter {
       [
         `Process uptime: \`${uptime * 1000} ms\``,
         `Connection uptime: \`${interaction.client.uptime} ms\``,
+        `Ping: \`${interaction.client.ws.ping} ms\``,
         `Latency: \`${sent.createdTimestamp - interaction.createdTimestamp}ms\``,
       ].join("\n"),
     );

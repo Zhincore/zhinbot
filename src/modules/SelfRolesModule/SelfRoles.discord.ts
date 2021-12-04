@@ -15,7 +15,6 @@ const ID_ARG: Discord.ApplicationCommandChoicesOption & { min_value?: number } =
   required: true,
   min_value: 0,
 };
-console.log(Object.values(editableFields));
 
 @DiscordAdapter({
   supercomand: {
@@ -27,37 +26,10 @@ console.log(Object.values(editableFields));
 export class SelfRolesDiscordAdapter {
   constructor(@Inject(() => SelfRolesModule) private readonly service: SelfRolesModule, private readonly bot: Bot) {}
 
-  @DiscordHandler(ROLE_ASSIGN_ID)
-  async assignButton(interaction: Discord.SelectMenuInteraction) {
-    await interaction.deferReply({ ephemeral: true });
-    const id = +interaction.customId.split(":")[1];
-
-    // Fetch the guild
-    const guild = await this.bot.guilds.fetch(interaction.guildId);
-
-    // Fetch the item and the memeber
-    const [item, member] = await Promise.all([
-      this.service.get(guild.id, id),
-      guild.members.fetch(interaction.member.user.id),
-    ]);
-    if (!item) throw new Error("Item not found");
-
-    // Roles that user should have
-    const addRoles = interaction.values;
-    // Roles that shouldn't have
-    const removeRoles = item.roles.map(({ role }) => role).filter((role) => !addRoles.includes(role));
-
-    // Apply changes
-    await Promise.all([member.roles.add(addRoles), member.roles.remove(removeRoles)]);
-
-    // Reply
-    return interaction.reply({ content: "Your roles have been updated", ephemeral: true });
-  }
-
   @DiscordSubcommand({ description: "Get all self-roles of the guild" })
   async list(interaction: Discord.CommandInteraction) {
     const result = await this.service.list(interaction.guildId);
-    return interaction.reply(table(result));
+    return interaction.reply({ content: table(result), ephemeral: true });
   }
 
   @DiscordSubcommand({ description: "Get info about a self-roles item", options: [ID_ARG] })
@@ -83,9 +55,8 @@ export class SelfRolesDiscordAdapter {
           result.roles
             .map((role) =>
               [
-                `  - id: ${role.id}`,
-                `    emoji: <:_:${role.emoji}>`,
-                `    role: ${this.bot.resolveRole(role.role, guild)}`,
+                `  - role: ${this.bot.resolveRole(role.roleId, guild)}`,
+                `    emoji: ${role.emoji}`,
                 `    description: ${role.description}`,
               ].join("\n"),
             )
@@ -115,7 +86,7 @@ export class SelfRolesDiscordAdapter {
   async create(interaction: Discord.CommandInteraction) {
     const channel = interaction.options.getChannel("channel", true);
     const id = await this.service.create(interaction.guildId, channel.id);
-    return interaction.reply({ content: `Created new selfroles item with ID ${id}!`, ephemeral: true });
+    return interaction.reply({ content: `Created new selfroles item with ID \`${id}\`!`, ephemeral: true });
   }
 
   @DiscordSubcommand({
@@ -149,33 +120,75 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    description: "Update or create self-roles item's message",
+    description: "Make the bot re-send/edit the self-roles item's message",
     options: [ID_ARG],
   })
   async render(interaction: Discord.CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
     const id = interaction.options.getInteger("id", true);
     const result = await this.service.render(interaction.guildId, id);
 
-    return interaction.reply({
-      content: result ? "Successfully (re)rendered item" : "Failed (re)rendering item",
-      ephemeral: true,
-    });
+    return interaction.editReply(result ? "Successfully (re)rendered item" : "Failed (re)rendering item");
   }
 
   @DiscordSubcommand({
-    description: "Add a role to a self-roles item",
+    name: "role",
+    description: "Edit roles of a self-roles item",
     type: "SUB_COMMAND_GROUP",
-    options: [],
+    options: [
+      {
+        name: "set",
+        description: "Add or change a role of a self-roles item",
+        type: "SUB_COMMAND",
+        options: [
+          ID_ARG,
+          { name: "role", type: "ROLE", description: "The role to add/change", required: true },
+          { name: "emoji", type: "STRING", description: "Emoji to assign to this role" },
+          { name: "description", type: "STRING", description: "Description for this role" },
+        ],
+      },
+      {
+        name: "remove",
+        description: "Remove a role of a self-roles item",
+        type: "SUB_COMMAND",
+        options: [ID_ARG, { name: "role", type: "ROLE", description: "The role to remove", required: true }],
+      },
+    ],
   })
-  async seRole(interaction: Discord.CommandInteraction) {
-    const id = interaction.options.getInteger("id", true);
+  async role(interaction: Discord.CommandInteraction) {
+    const cmd = interaction.options.getSubcommand(true);
+    const itemId = interaction.options.getInteger("id", true);
     const role = interaction.options.getRole("role", true);
-    const result = await this.service.addRole(interaction.guildId, id, role.id);
 
-    return interaction.reply({ content: result ? "Role added" : "Failed to add role", ephemeral: true });
+    if (cmd === "set") {
+      await interaction.deferReply({ ephemeral: true });
+      let emoji = interaction.options.getString("emoji", false);
+      if (emoji) {
+        emoji = this.bot.serializeEmoji(emoji);
+        if (!emoji) throw "The provided emoji is not valid";
+      }
+
+      const description = interaction.options.getString("description", false);
+      const result = await this.service.setRole(
+        interaction.guildId,
+        itemId,
+        role.id,
+        emoji || undefined,
+        description ?? undefined,
+      );
+
+      return interaction.editReply(result ? "Role added/changed" : "Failed to add/change role");
+    } else if (cmd === "remove") {
+      await interaction.deferReply({ ephemeral: true });
+      const result = await this.service.removeRole(interaction.guildId, itemId, role.id);
+      return interaction.editReply(result ? "Role removed" : "Failed to remove role");
+    }
+
+    return interaction.reply({ content: "Unknown subcommand", ephemeral: true });
   }
 
   @DiscordSubcommand({
+    name: "edit",
     description: "Edit a react-roles item",
     type: "SUB_COMMAND_GROUP",
     options: Object.values(editableFields).map((field) => ({
@@ -186,6 +199,7 @@ export class SelfRolesDiscordAdapter {
     })),
   })
   async edit(interaction: Discord.CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
     const fieldName = interaction.options.getSubcommand(true);
     const dbfield = editableFieldNameToField[fieldName];
     const field = editableFields[dbfield];
@@ -205,9 +219,6 @@ export class SelfRolesDiscordAdapter {
 
     const result = await this.service.edit(interaction.guildId, id, dbfield, _value);
 
-    return interaction.reply({
-      content: result ? "Successfully edited" : "Editing failed",
-      ephemeral: true,
-    });
+    return interaction.editReply(result ? "Successfully edited" : "Editing failed");
   }
 }

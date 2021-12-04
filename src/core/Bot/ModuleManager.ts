@@ -2,42 +2,32 @@ import {
   Guild,
   DiscordAPIError,
   CommandInteraction,
+  Interaction,
   ApplicationCommandData,
   GuildApplicationCommandPermissionData,
 } from "discord.js";
 import { Constructable } from "typedi";
-import {
-  getModuleData,
-  BotModuleData,
-  getDiscordCommands,
-  getDiscordSubcommands,
-  getDiscordHandlers,
-  getDiscordAdapterData,
-  IDiscordCommand,
-  IDiscordHandler,
-  DiscordAdapterData,
-} from "../decorators";
-import { IInteractionHandler } from "../decorators/utils";
+import * as Decorators from "../decorators";
 import { Bot } from "./";
 
 export class ModuleManager {
-  private readonly modules = new Set<BotModuleData<any>>();
-  private readonly commands = new Map<string, IDiscordCommand>();
-  private readonly handlers = new Map<string, IDiscordHandler>();
+  private readonly modules = new Set<Decorators.BotModuleData<any>>();
+  private readonly commands = new Map<string, Decorators.IDiscordCommand>();
+  private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
 
   private commandDataList: ApplicationCommandData[] = [];
 
   constructor(private readonly bot: Bot) {
     bot.on("guildCreate", (guild) => {
-      this.registerCommands(guild);
+      this.updateGuildCommands(guild);
     });
 
     bot.once("ready", (bot) => {
-      bot.guilds.cache.forEach(this.registerCommands.bind(this));
+      bot.guilds.cache.forEach(this.updateGuildCommands.bind(this));
     });
 
     bot.on("interactionCreate", async (interaction) => {
-      let handler: IInteractionHandler<any> | undefined;
+      let handler: Decorators.IInteractionHandler<any> | undefined;
 
       if (interaction.isMessageComponent()) {
         handler = this.handlers.get(interaction.customId.split(":")[0]);
@@ -51,59 +41,65 @@ export class ModuleManager {
         await handler.execute(interaction);
       } catch (err) {
         console.error(err);
-
-        if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
-          try {
-            if (!interaction.replied) await interaction.reply({ content: String(err), ephemeral: true });
-            else await interaction.followUp({ content: String(err), ephemeral: true });
-          } catch (err) {
-            console.error("Failed to send error:", err);
-          }
-        }
+        await this.sendError(interaction, err);
       }
     });
+  }
+
+  private async sendError(interaction: Interaction, err: any) {
+    if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
+      try {
+        if (!interaction.replied) {
+          if (interaction.deferred) await interaction.editReply({ content: String(err) });
+          else await interaction.reply({ content: String(err), ephemeral: true });
+        } else await interaction.followUp({ content: String(err), ephemeral: true });
+      } catch (err) {
+        console.error("Failed to send error:", err);
+      }
+    }
   }
 
   register(modules: Constructable<any>[]) {
     this.commandDataList.length = 0;
 
     for (const BotModule of modules) {
-      const moduleData = getModuleData(BotModule);
+      const moduleData = Decorators.getModuleData(BotModule);
       if (!moduleData) {
-        console.error(BotModule.name + " is missing the BotModule decorator");
+        console.error(`Class ${BotModule.name} is missing the BotModule decorator`);
         continue;
       }
 
-      for (const DiscordAdapter of moduleData.discordAdapters ?? []) {
-        const discordAdapter = this.bot.container.get(DiscordAdapter);
-        const adapterData = getDiscordAdapterData(DiscordAdapter);
-        const commands = getDiscordCommands(discordAdapter);
-        const handlers = getDiscordHandlers(discordAdapter);
-
-        for (const handler of handlers ?? []) {
-          this.handlers.set(handler.id, { ...handler, execute: handler.execute.bind(discordAdapter) });
-        }
-
-        const mainCommand = adapterData ? this.createMainCommand(adapterData, discordAdapter) : undefined;
-
-        // Generate command list
-        this.commandDataList.push(
-          ...([...(commands ?? []), mainCommand].filter(Boolean) as IDiscordCommand[]).map((adapterCommand) => {
-            this.commands.set(adapterCommand.commandData.name, {
-              ...adapterCommand,
-              execute: adapterCommand.execute.bind(discordAdapter),
-            });
-
-            return adapterCommand.commandData;
-          }),
-        );
-      }
-
+      if (moduleData.discordAdapters) moduleData.discordAdapters.forEach(this.parseAdapterCommands.bind(this));
       this.modules.add(moduleData);
     }
   }
 
-  private async registerCommands(guild: Guild) {
+  private parseAdapterCommands(DiscordAdapter: Constructable<any>) {
+    const discordAdapter = this.bot.container.get(DiscordAdapter);
+    const adapterData = Decorators.getDiscordAdapterData(discordAdapter);
+    if (!adapterData) {
+      console.error(`Class ${DiscordAdapter.name} is missing the DiscordAdapter decorator`);
+      this.bot.container.remove(DiscordAdapter);
+      return;
+    }
+
+    for (const handler of adapterData.handlers ?? []) {
+      this.handlers.set(handler.id, { ...handler, execute: handler.execute.bind(discordAdapter) });
+    }
+
+    // Generate command list
+    const mainCommand = adapterData ? this.createMainCommand(adapterData) : undefined;
+    const commands = [...(adapterData.commands ?? []), mainCommand].filter(Boolean) as Decorators.IDiscordCommand[];
+    for (const { commandData, execute } of commands) {
+      this.commands.set(commandData.name, {
+        commandData,
+        execute: execute.bind(discordAdapter),
+      });
+      this.commandDataList.push(commandData);
+    }
+  }
+
+  private async updateGuildCommands(guild: Guild) {
     try {
       // Set commands
       const result = await guild.commands.set(this.commandDataList);
@@ -135,22 +131,20 @@ export class ModuleManager {
     }
   }
 
-  private createMainCommand(adapterData: DiscordAdapterData, discordAdapter: any) {
-    const adapterSubcommands = getDiscordSubcommands(discordAdapter);
-
-    if (adapterData && adapterData.supercomand && adapterSubcommands) {
+  private createMainCommand(adapterData: Decorators.IDiscordAdapter) {
+    if (adapterData && adapterData.supercomand && adapterData.subcommands) {
       return {
         commandData: {
           ...adapterData.supercomand,
-          options: adapterSubcommands.map((subcmd) => subcmd.commandData),
+          options: adapterData.subcommands.map((subcmd) => subcmd.commandData),
         },
         execute: function (interaction: CommandInteraction) {
           const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
-          const command = adapterSubcommands.find((subcmd) => subcmd.commandData.name == subcommand);
+          const command = adapterData.subcommands!.find((subcmd) => subcmd.commandData.name == subcommand);
           if (command) return command.execute.apply(this, [interaction]);
         },
-      } as IDiscordCommand;
+      } as Decorators.IDiscordCommand;
     }
   }
 }

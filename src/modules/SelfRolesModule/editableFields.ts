@@ -40,13 +40,6 @@ export const editableFields: Partial<
     name: "showroles",
     required: true,
   },
-  maxRoles: {
-    type: "INTEGER",
-    min_value: 0,
-    description: "Maximum number of roles a user can choose from this self-roles item",
-    name: "maxroles",
-    required: true,
-  } as ApplicationCommandChoicesData,
   showId: {
     type: "BOOLEAN",
     description: "Show ID of the self-roles item in embed",
