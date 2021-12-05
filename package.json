@@ -16,10 +16,8 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.6.0",
     "@prisma/client": "^3.6.0",
-    "@types/webpack-env": "^1.16.3",
     "bufferutil": "^4.0.5",
     "color": "^4.1.0",
     "discord-api-types": "^0.24.0",
@@ -36,7 +34,8 @@
     "typedi": "^0.10.0",
     "utf-8-validate": "^5.0.7",
     "youtube-dl-exec": "^2.0.0",
-    "zlib-sync": "^0.1.7"
+    "zlib-sync": "^0.1.7",
+    "typescript": "^4.5.2"
   },
   "devDependencies": {
     "@types/color": "^3.0.2",
@@ -44,22 +43,13 @@
     "@types/ms": "^0.7.31",
     "@types/node": "^16.11.11",
     "@types/text-table": "^0.2.2",
-    "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "~7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-sonarjs": "^0.10.0",
-    "node-dev": "^7.1.0",
     "prettier": "^2.5.1",
-    "run-script-webpack-plugin": "^0.0.11",
-    "ts-loader": "^9.2.6",
     "tsconfig-paths": "^3.12.0",
-    "tsconfig-paths-webpack-plugin": "^3.5.2",
-    "typescript": "^4.5.2",
-    "webpack": "^5.64.4",
-    "webpack-cli": "^4.9.1",
-    "webpack-node-externals": "^3.0.0"
   }
 }
