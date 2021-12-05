@@ -1,4 +1,5 @@
 import { TextChannel, Snowflake, MessageEmbed } from "discord.js";
+import moment from "moment";
 import { BotModule } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { Cache } from "~/utils/Cache";
@@ -21,8 +22,8 @@ export class PlayerModule {
         let updateChannel: TextChannel | null = null;
 
         const guildData = await this.prisma.guild.findUnique({ where: { id: guildId } });
-        if (guildData && guildData.playerUpdatesChannel) {
-          updateChannel = await this.getUpdateChannel(guildData.playerUpdatesChannel);
+        if (guildData && guildData.playerChannel) {
+          updateChannel = await this.getUpdateChannel(guildData.playerChannel);
         }
 
         if (!updateChannel && updateChannelId) updateChannel = await this.getUpdateChannel(updateChannelId);
@@ -51,7 +52,7 @@ export class PlayerModule {
 
   async changeUpdateChannel(guildId: Snowflake, channelId: Snowflake) {
     const channel = await this.getUpdateChannel(channelId);
-    if (!channel) throw "Failed to get update channel";
+    if (!channel) throw "Invalid update channel";
 
     try {
       const entry = await this.getGuild(guildId, channelId);
@@ -61,7 +62,7 @@ export class PlayerModule {
       throw err;
     }
 
-    await this.prisma.guild.update({ where: { id: guildId }, data: { playerUpdatesChannel: channelId } });
+    await this.prisma.guild.update({ where: { id: guildId }, data: { playerChannel: channelId } });
     return true;
   }
 
@@ -86,7 +87,7 @@ export class PlayerModule {
     return () => {
       const item = this.players.get(guildId);
       if (!item) return;
-      console.log("a");
+
       const embed = new MessageEmbed().setTitle("Reached end of the music queue").setColor("#00afff");
       item.updateChannel.send({ embeds: [embed] }).catch(console.error);
     };
@@ -102,11 +103,34 @@ export class PlayerModule {
       let description = song.description ?? "*No description*";
       if (description.length > 256) description = description.slice(0, 256 - 3) + "...";
 
+      let upload_date;
+      if (song.upload_date) {
+        const d = song.upload_date;
+        upload_date = `${d.slice(-2)}. ${d.slice(-4, -2)}. ${d.slice(0, 4)}`;
+      }
+
       const embed = new MessageEmbed()
         .setColor("#00afff")
         .setTitle(song.title)
         .setDescription(description)
-        .setURL(song.webpage_url || song.url);
+        .setURL(song.webpage_url || song.url)
+        .setFooter(
+          [
+            song.is_live && "🔴 LIVE",
+            song.duration && getDurationString(song.duration),
+            [
+              song.like_count && `👍 ${song.like_count.toLocaleString("en")}`,
+              song.dislike_count && `👎 ${song.dislike_count.toLocaleString("en")}`,
+            ]
+              .filter((v) => v)
+              .join("  "),
+            song.view_count && `👁️ ${song.view_count.toLocaleString("en")}`,
+            upload_date,
+            song.extractor_key,
+          ]
+            .filter((v) => v)
+            .join(" ︱ "),
+        );
 
       if (song.thumbnail) embed.setThumbnail(song.thumbnail);
       if (song.uploader) embed.setAuthor(song.uploader, undefined, song.uploader_url);
@@ -144,4 +168,15 @@ export class PlayerModule {
     const { player } = await this.getGuild(guildId, textChannelId);
     return player;
   }
+}
+
+function getDurationString(length: number, float = false) {
+  const hours = Math.trunc(length / 3600);
+  const minutes = Math.trunc((length - hours * 3600) / 60);
+  const seconds = length - minutes * 60 - hours * 3600;
+
+  return [minutes && hours, minutes || "00", float ? seconds : Math.round(seconds)]
+    .filter((v) => v)
+    .map((v) => String(v).padStart(2, "0"))
+    .join(":");
 }

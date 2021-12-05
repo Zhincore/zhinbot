@@ -50,6 +50,17 @@ export class PlayerModuleDiscordAdapter {
     return interaction.editReply("Player is ready, no songs added");
   }
 
+  @DiscordCommand({
+    description: "Change the channel where the players sends currently playing songs",
+    defaultPermission: false,
+    options: [{ name: "channel", type: "CHANNEL", description: "The channel for updates" }],
+  })
+  async playerchannel(interaction: CommandInteraction) {
+    const channel = interaction.options.getChannel("channel", false);
+    await this.service.changeUpdateChannel(interaction.guildId, channel?.id ?? interaction.channelId);
+    return interaction.reply("Player channel updated");
+  }
+
   @DiscordCommand({ description: "Pause the music player" })
   async pause(interaction: CommandInteraction) {
     const player = await this.getPlayer(interaction);
@@ -152,7 +163,7 @@ export class PlayerModuleDiscordAdapter {
       .addFields(
         queue.slice(page * 25, (page + 1) * 25).map((song, i) => ({
           name: page + i ? page * 25 + i + "." : "Current song",
-          value: song ? `[${song.title}](${song.webpage_url})` : "Nothing",
+          value: song ? (song.is_live ? "🔴 " : "") + `[${song.title}](${song.webpage_url})` : "Nothing",
         })),
       )
       .setFooter(

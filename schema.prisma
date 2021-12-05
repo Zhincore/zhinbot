@@ -13,7 +13,7 @@ model Guild {
   id String @id
 
   // Player
-  playerUpdatesChannel String?
+  playerChannel String?
 
   selfRoles SelfRolesItem[]
   // effects    EffectItem[]

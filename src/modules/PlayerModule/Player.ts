@@ -49,6 +49,7 @@ export class Player extends EventEmitter {
   }
 
   private playNext() {
+    if (this.destroyed || this.player.state.status !== "idle") return;
     const _playNext = () => {
       const started = this.playNextResource();
       // If no song available start the timeout
