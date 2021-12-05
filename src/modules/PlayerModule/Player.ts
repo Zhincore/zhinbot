@@ -1,25 +1,30 @@
 import EventEmitter from "events";
+import ms from "ms";
 import { BaseGuildVoiceChannel } from "discord.js";
-import { VoiceConnection, DiscordGatewayAdapterCreator, NoSubscriberBehavior, StreamType } from "@discordjs/voice";
+import { VoiceConnection, DiscordGatewayAdapterCreator, NoSubscriberBehavior } from "@discordjs/voice";
 import * as Voice from "@discordjs/voice";
 import youtubedl, { YtResponse } from "youtube-dl-exec";
 import { Config } from "~/Config";
 import { Cache } from "~/utils/Cache";
 
-export type SongResponse = YtResponse | { _type: "playlist"; entries: YtResponse[] };
+const SONG_DELAY = ms("5s");
+
+export type YTQueryResponse = YtResponse | { _type: "playlist"; entries: YtResponse[] };
 
 export class Player extends EventEmitter {
   private readonly player = Voice.createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
   private connection?: VoiceConnection;
   private fetchPromise: Promise<any> = Promise.resolve();
   private timeout?: NodeJS.Timeout;
+  private lastSongTimestamp = 0;
+  private preloadedResource?: Voice.AudioResource<YtResponse>;
   readonly queue: Readonly<YtResponse>[] = [];
   loop = false;
   destroyed = false;
   timedout = false;
   currentSong?: YtResponse;
 
-  constructor(private readonly config: Config, private readonly cache: Cache<Promise<SongResponse>>) {
+  constructor(private readonly config: Config, private readonly cache: Cache<Promise<YTQueryResponse>>) {
     super();
 
     this.player.on("error", console.error);
@@ -31,20 +36,35 @@ export class Player extends EventEmitter {
       }
 
       if (state.status === "idle") {
-        if (this.destroyed) {
-          return this.connection?.destroy();
-        }
-
         if (this.loop && this.currentSong) this.queue.push(this.currentSong);
         this.currentSong = undefined;
 
-        if (!this.startQueue()) this.startTimeout();
+        this.playNext();
       } else if (state.status === "playing") {
         this.emit("playing", this.currentSong);
       } else if (state.status === "paused") {
         this.startTimeout();
       }
     });
+  }
+
+  private playNext() {
+    const _playNext = () => {
+      const started = this.playNextResource();
+      // If no song available start the timeout
+      if (!started) {
+        this.startTimeout();
+        this.emit("queueEnd");
+      }
+      // elseway a new song is playing and we save current timestamp
+      else this.lastSongTimestamp = Date.now();
+      return started;
+    };
+
+    // Prevent playing a new song sooner than SONG_DELAY after starting the previous
+    const delta = Date.now() - this.lastSongTimestamp;
+    if (delta < SONG_DELAY) return setTimeout(_playNext, SONG_DELAY - delta);
+    return _playNext();
   }
 
   get paused() {
@@ -58,8 +78,9 @@ export class Player extends EventEmitter {
   startTimeout() {
     if (this.destroyed) return;
     if (this.timeout) return;
+
     this.timeout = setTimeout(() => {
-      this.emit("timout");
+      this.emit("timeout");
       this.timedout = true;
       this.destroy();
     }, this.config.player.timeout).unref();
@@ -77,19 +98,45 @@ export class Player extends EventEmitter {
     this.emit("destroyed");
 
     this.clearTimeout();
-    this.player.stop();
-    // Destroying continues in onStateChange to idle
+    this.player.stop(true);
+    this.connection?.destroy();
   }
 
-  private startQueue() {
+  private playNextResource() {
     if (this.destroyed || this.player.state.status !== "idle") return false;
 
     const song = (this.currentSong = this.queue.shift());
     if (!song) return false;
 
-    const resource = Voice.createAudioResource(song.url, { inputType: StreamType.OggOpus });
+    const resource = this.loadSong(song);
     this.player.play(resource);
+
+    this.preloadNextSong();
+
     return true;
+  }
+
+  private preloadNextSong() {
+    // Get next song in queue or the current one if queue is empty and looping is on
+    const nextSong = this.queue[0] ?? this.loop ? this.currentSong : undefined;
+    // Preload next song if it exists
+    if (nextSong) {
+      this.preloadedResource = this.loadSong(nextSong);
+    } else {
+      this.preloadedResource = undefined;
+    }
+  }
+
+  private loadSong(song: YtResponse) {
+    if (this.preloadedResource && this.preloadedResource.metadata.url === song.url) {
+      // Use preloaded resource if suitable
+      return this.preloadedResource;
+    }
+    // Otherwise load new one
+    return Voice.createAudioResource<YtResponse>(song.url, {
+      inputType: Voice.StreamType.WebmOpus,
+      metadata: song,
+    });
   }
 
   skip() {
@@ -145,7 +192,7 @@ export class Player extends EventEmitter {
             markWatched: false,
             geoBypass: true,
             cookies: "./.player-cookies.txt",
-          }) as Promise<SongResponse>;
+          }) as Promise<YTQueryResponse>;
           this.cache.set(query, promise);
         }
         return promise;
@@ -161,12 +208,16 @@ export class Player extends EventEmitter {
     } else {
       this.addSong(song);
     }
-    setImmediate(() => this.startQueue());
+    setImmediate(() => this.playNext());
 
     return song;
   }
 
-  private addSong(entry: YtResponse) {
-    if (entry && "url" in entry) this.queue.push(entry);
+  private addSong(song: YtResponse) {
+    if (!song || !("url" in song) || !song.url || song.acodec === "none") return;
+
+    const wasEmpty = !this.queue.length;
+    this.queue.push(song);
+    if (wasEmpty) this.preloadNextSong();
   }
 }

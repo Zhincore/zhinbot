@@ -4,12 +4,12 @@ import { Bot } from "@core/Bot";
 import { Cache } from "~/utils/Cache";
 import { PrismaService } from "~/services/PrismaService";
 import { Config } from "~/Config";
-import { Player, SongResponse } from "./Player";
+import { Player, YTQueryResponse } from "./Player";
 import { PlayerModuleDiscordAdapter, getPlayerControls } from "./PlayerModule.discord";
 
 @BotModule({ discordAdapters: [PlayerModuleDiscordAdapter] })
 export class PlayerModule {
-  private readonly songCache = new Cache<Promise<SongResponse>>(16_000, 64);
+  private readonly songCache = new Cache<Promise<YTQueryResponse>>(16_000, 64);
   private readonly players = new Map<string, { player: Player; updateChannel: TextChannel }>();
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
@@ -31,6 +31,7 @@ export class PlayerModule {
         const player = new Player(this.config, this.songCache)
           .on("destroyed", this.getDestroyHandler(guildId))
           .on("timeout", this.getTimeoutHandler(guildId))
+          .on("queueEnd", this.getQueueEndHandler(guildId))
           .on("playing", this.getSongHandler(guildId));
 
         this.players.set(guildId, (entry = { player, updateChannel }));
@@ -48,6 +49,22 @@ export class PlayerModule {
     return null;
   }
 
+  async changeUpdateChannel(guildId: Snowflake, channelId: Snowflake) {
+    const channel = await this.getUpdateChannel(channelId);
+    if (!channel) throw "Failed to get update channel";
+
+    try {
+      const entry = await this.getGuild(guildId, channelId);
+      entry.updateChannel = channel;
+    } catch (err) {
+      if (err === "The player is not currently playing") return;
+      throw err;
+    }
+
+    await this.prisma.guild.update({ where: { id: guildId }, data: { playerUpdatesChannel: channelId } });
+    return true;
+  }
+
   private getDestroyHandler(guildId: Snowflake) {
     return () => this.players.delete(guildId);
   }
@@ -61,6 +78,16 @@ export class PlayerModule {
         .setTitle("Player was left idle for too long")
         .setDescription("Queue deleted and voice channel left")
         .setColor("#00afff");
+      item.updateChannel.send({ embeds: [embed] }).catch(console.error);
+    };
+  }
+
+  private getQueueEndHandler(guildId: Snowflake) {
+    return () => {
+      const item = this.players.get(guildId);
+      if (!item) return;
+      console.log("a");
+      const embed = new MessageEmbed().setTitle("Reached end of the music queue").setColor("#00afff");
       item.updateChannel.send({ embeds: [embed] }).catch(console.error);
     };
   }
@@ -84,24 +111,12 @@ export class PlayerModule {
       if (song.thumbnail) embed.setThumbnail(song.thumbnail);
       if (song.uploader) embed.setAuthor(song.uploader, undefined, song.uploader_url);
 
-      item.updateChannel.send({ embeds: [embed], content: "**Now playing:**", components: [getPlayerControls(true)] });
+      item.updateChannel.send({
+        embeds: [embed],
+        content: "**Now playing:**",
+        components: [getPlayerControls("queue")],
+      });
     };
-  }
-
-  async changeUpdateChannel(guildId: Snowflake, channelId: Snowflake) {
-    const channel = await this.getUpdateChannel(channelId);
-    if (!channel) throw "Failed to get update channel";
-
-    try {
-      const entry = await this.getGuild(guildId, channelId);
-      entry.updateChannel = channel;
-    } catch (err) {
-      if (err === "The player is not currently playing") return;
-      throw err;
-    }
-
-    await this.prisma.guild.update({ where: { id: guildId }, data: { playerUpdatesChannel: channelId } });
-    return true;
   }
 
   async getVoice(guildId: Snowflake, authorId: Snowflake) {

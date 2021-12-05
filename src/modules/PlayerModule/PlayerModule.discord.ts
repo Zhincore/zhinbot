@@ -9,6 +9,8 @@ const controlReplies = {
   resume: "Player resumed",
   pause: "Player paused",
   skip: "Current song skipped",
+  loopOn: "The player queue now **will** loop",
+  loopOff: "The player queue now **won't** loop",
 };
 
 @DiscordAdapter()
@@ -118,7 +120,7 @@ export class PlayerModuleDiscordAdapter {
     const player = await this.getPlayer(interaction);
     const state = interaction.options.getBoolean("loop", false);
     player.loop = state ?? !player.loop;
-    return interaction.reply(`The player queue now **${player.loop ? "will" : "won't"}** loop`);
+    return interaction.reply(controlReplies[player.loop ? "loopOn" : "loopOff"]);
   }
 
   @DiscordCommand({
@@ -180,7 +182,7 @@ export class PlayerModuleDiscordAdapter {
             }),
           ],
         }),
-        getPlayerControls(),
+        getPlayerControls("loop"),
       ],
     });
   }
@@ -211,13 +213,16 @@ export class PlayerModuleDiscordAdapter {
         player.pause();
         reply = controlReplies.pause;
       }
+    } else if (cmd === "loop") {
+      player.loop = !player.loop;
+      reply = controlReplies[player.loop ? "loopOn" : "loopOff"];
     } else throw "Unknown control command";
 
     return interaction.reply(reply);
   }
 }
 
-export const getPlayerControls = (withQueue = false) =>
+export const getPlayerControls = (extra?: "queue" | "loop") =>
   new MessageActionRow({
     components: [
       new MessageButton({
@@ -238,13 +243,22 @@ export const getPlayerControls = (withQueue = false) =>
         emoji: "⏭️",
         style: "SECONDARY",
       }),
-      ...(withQueue
+      ...(extra
         ? [
-            new MessageButton({
-              customId: QUEUE_PAGE_ID,
-              label: "Show queue",
-              style: "SECONDARY",
-            }),
+            new MessageButton(
+              extra === "queue"
+                ? {
+                    customId: QUEUE_PAGE_ID,
+                    label: "Show queue",
+                    style: "SECONDARY",
+                  }
+                : {
+                    customId: CONTROL_ID + ":" + "loop",
+                    label: "Toggle looping",
+                    emoji: "🔁",
+                    style: "SECONDARY",
+                  },
+            ),
           ]
         : []),
     ],
