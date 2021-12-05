@@ -38,6 +38,11 @@ specifiers:
 dependencies:
   '@discordjs/voice': 0.6.0_5971b5a749a91823f5467a6d31a2f8b3
   '@prisma/client': 3.6.0_prisma@3.6.0
+  '@types/color': 3.0.2
+  '@types/express': 4.17.13
+  '@types/ms': 0.7.31
+  '@types/node': 16.11.11
+  '@types/text-table': 0.2.2
   bufferutil: 4.0.5
   color: 4.1.0
   discord-api-types: 0.24.0
@@ -47,10 +52,12 @@ dependencies:
   erlpack: github.com/discord/erlpack/f7d730debe32c416d1b55b4217f8aef2ade05874
   moment: 2.29.1
   ms: 2.1.3
+  prettier: 2.5.1
   prisma: 3.6.0
   reflect-metadata: 0.1.13
   sodium: 3.0.2
   text-table: 0.2.0
+  tsconfig-paths: 3.12.0
   typedi: 0.10.0
   typescript: 4.5.2
   utf-8-validate: 5.0.7
@@ -58,19 +65,12 @@ dependencies:
   zlib-sync: 0.1.7
 
 devDependencies:
-  '@types/color': 3.0.2
-  '@types/express': 4.17.13
-  '@types/ms': 0.7.31
-  '@types/node': 16.11.11
-  '@types/text-table': 0.2.2
   '@typescript-eslint/eslint-plugin': 4.33.0_b62b6aba9e367f6591d98c982bcf871c
   '@typescript-eslint/parser': 4.33.0_eslint@7.30.0+typescript@4.5.2
   eslint: 7.30.0
   eslint-config-prettier: 8.3.0_eslint@7.30.0
   eslint-plugin-prettier: 4.0.0_da7c2d6e208799242984c73559327ba8
   eslint-plugin-sonarjs: 0.10.0_eslint@7.30.0
-  prettier: 2.5.1
-  tsconfig-paths: 3.12.0
 
 packages:
 
@@ -228,29 +228,29 @@ packages:
     dependencies:
       '@types/connect': 3.4.35
       '@types/node': 16.11.11
-    dev: true
+    dev: false
 
   /@types/color-convert/2.0.0:
     resolution: {integrity: sha512-m7GG7IKKGuJUXvkZ1qqG3ChccdIM/qBBo913z+Xft0nKCX4hAU/IxKwZBU4cpRZ7GS5kV4vOblUkILtSShCPXQ==}
     dependencies:
       '@types/color-name': 1.1.1
-    dev: true
+    dev: false
 
   /@types/color-name/1.1.1:
     resolution: {integrity: sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==}
-    dev: true
+    dev: false
 
   /@types/color/3.0.2:
     resolution: {integrity: sha512-INiJl6sfNn8iyC5paxVzqiVUEj2boIlFki02uRTAkKwAj++7aAF+ZfEv/XrIeBa0XI/fTZuDHW8rEEcEVnON+Q==}
     dependencies:
       '@types/color-convert': 2.0.0
-    dev: true
+    dev: false
 
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
       '@types/node': 16.11.11
-    dev: true
+    dev: false
 
   /@types/express-serve-static-core/4.17.26:
     resolution: {integrity: sha512-zeu3tpouA043RHxW0gzRxwCHchMgftE8GArRsvYT0ByDMbn19olQHx5jLue0LxWY6iYtXb7rXmuVtSkhy9YZvQ==}
@@ -258,7 +258,7 @@ packages:
       '@types/node': 16.11.11
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
-    dev: true
+    dev: false
 
   /@types/express/4.17.13:
     resolution: {integrity: sha512-6bSZTPaTIACxn48l50SR+axgrqm6qXFIxrdAKaG6PaJk3+zuUr35hBlgT7vOmJcum+OEaIBLtHV/qloEAFITeA==}
@@ -267,7 +267,7 @@ packages:
       '@types/express-serve-static-core': 4.17.26
       '@types/qs': 6.9.7
       '@types/serve-static': 1.13.10
-    dev: true
+    dev: false
 
   /@types/json-schema/7.0.9:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
@@ -275,15 +275,15 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha1-7ihweulOEdK4J7y+UnC86n8+ce4=}
-    dev: true
+    dev: false
 
   /@types/mime/1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
-    dev: true
+    dev: false
 
   /@types/ms/0.7.31:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
-    dev: true
+    dev: false
 
   /@types/node-fetch/2.5.12:
     resolution: {integrity: sha512-MKgC4dlq4kKNa/mYrwpKfzQMB5X3ee5U6fSprkKpToBqBmX4nFZL9cW5jl6sWn+xpRJ7ypWh2yyqqr8UUCstSw==}
@@ -294,25 +294,26 @@ packages:
 
   /@types/node/16.11.11:
     resolution: {integrity: sha512-KB0sixD67CeecHC33MYn+eYARkqTheIRNuu97y2XMjR7Wu3XibO1vaY6VBV6O/a89SPI81cEUIYT87UqUWlZNw==}
+    dev: false
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
-    dev: true
+    dev: false
 
   /@types/range-parser/1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
-    dev: true
+    dev: false
 
   /@types/serve-static/1.13.10:
     resolution: {integrity: sha512-nCkHGI4w7ZgAdNkrEu0bv+4xNV/XDqW+DydknebMOQwkpDGx8G+HTlj7R7ABI8i8nKxVw0wtKPi1D+lPOkh4YQ==}
     dependencies:
       '@types/mime': 1.3.2
       '@types/node': 16.11.11
-    dev: true
+    dev: false
 
   /@types/text-table/0.2.2:
     resolution: {integrity: sha512-dGoI5Af7To0R2XE8wJuc6vwlavWARsCh3UKJPjWs1YEqGUqfgBI/j/4GX0yf19/DsDPPf0YAXWAp8psNeIehLg==}
-    dev: true
+    dev: false
 
   /@types/ws/7.4.7:
     resolution: {integrity: sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==}
@@ -1140,7 +1141,7 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.5
-    dev: true
+    dev: false
 
   /levn/0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -1211,7 +1212,7 @@ packages:
 
   /minimist/1.2.5:
     resolution: {integrity: sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==}
-    dev: true
+    dev: false
 
   /mkdirp/1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
@@ -1341,7 +1342,7 @@ packages:
     resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
     engines: {node: '>=10.13.0'}
     hasBin: true
-    dev: true
+    dev: false
 
   /prism-media/1.3.2:
     resolution: {integrity: sha512-L6UsGHcT6i4wrQhFF1aPK+MNYgjRqR2tUoIqEY+CG1NqVkMjPRKzS37j9f8GiYPlD6wG9ruBj+q5Ax+bH8Ik1g==}
@@ -1493,7 +1494,7 @@ packages:
   /strip-bom/3.0.0:
     resolution: {integrity: sha1-IzTBjpx1n3vdVv3vfprj1YjmjtM=}
     engines: {node: '>=4'}
-    dev: true
+    dev: false
 
   /strip-final-newline/2.0.0:
     resolution: {integrity: sha512-BrpvfNAE3dcvq7ll3xVumzjKjZQ5tI1sEUIKr3Uoks0XUl45St3FlatVqef9prk4jRDzhW6WZg+3bk93y6pLjA==}
@@ -1559,7 +1560,7 @@ packages:
       json5: 1.0.1
       minimist: 1.2.5
       strip-bom: 3.0.0
-    dev: true
+    dev: false
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
