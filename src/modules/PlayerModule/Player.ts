@@ -9,6 +9,7 @@ import { Cache } from "~/utils/Cache";
 
 const SONG_DELAY = ms("5s");
 
+export type { YtResponse };
 export type YTQueryResponse = YtResponse | { _type: "playlist"; entries: YtResponse[] };
 
 export class Player extends EventEmitter {
@@ -19,10 +20,10 @@ export class Player extends EventEmitter {
   private lastSongTimestamp = 0;
   private preloadedResource?: Voice.AudioResource<YtResponse>;
   readonly queue: Readonly<YtResponse>[] = [];
-  loop = false;
-  destroyed = false;
-  timedout = false;
   currentSong?: YtResponse;
+  destroyed = false;
+  loop = false;
+  alone = false;
 
   constructor(private readonly config: Config, private readonly cache: Cache<Promise<YTQueryResponse>>) {
     super();
@@ -31,9 +32,7 @@ export class Player extends EventEmitter {
     this.player.on("stateChange", (oldState, state) => {
       if (oldState === state) return;
 
-      if (state.status !== "idle") {
-        this.clearTimeout();
-      }
+      this.cancelTimeoutIfInactive();
 
       if (state.status === "idle") {
         if (this.loop && this.currentSong) this.queue.push(this.currentSong);
@@ -42,10 +41,22 @@ export class Player extends EventEmitter {
         this.playNext();
       } else if (state.status === "playing") {
         this.emit("playing", this.currentSong);
-      } else if (state.status === "paused") {
+      } else if (state.status === "paused" || state.status === "autopaused") {
         this.startTimeout();
       }
     });
+  }
+
+  get voiceId() {
+    return this.connection?.joinConfig.channelId;
+  }
+
+  get paused() {
+    return this.player.state.status === "paused";
+  }
+
+  get connected() {
+    return !!this.connection;
   }
 
   private playNext() {
@@ -68,27 +79,32 @@ export class Player extends EventEmitter {
     return _playNext();
   }
 
-  get paused() {
-    return this.player.state.status === "paused";
+  setAlone(alone: boolean) {
+    this.alone = alone;
+    if (alone) this.startTimeout();
+    else this.cancelTimeoutIfInactive();
   }
 
-  get connected() {
-    return !!this.connection;
+  private cancelTimeoutIfInactive() {
+    const { status } = this.player.state;
+
+    if (!this.alone && !["idle", "paused", "autopaused"].includes(status)) {
+      this.clearTimeout();
+    }
   }
 
-  startTimeout() {
-    if (this.destroyed) return;
-    if (this.timeout) return;
+  private startTimeout() {
+    if (this.destroyed || this.timeout) return;
 
     this.timeout = setTimeout(() => {
       this.emit("timeout");
-      this.timedout = true;
       this.destroy();
     }, this.config.player.timeout).unref();
   }
 
-  clearTimeout() {
+  private clearTimeout() {
     if (!this.timeout) return;
+
     clearTimeout(this.timeout);
     this.timeout = undefined;
   }
@@ -129,11 +145,11 @@ export class Player extends EventEmitter {
   }
 
   private loadSong(song: YtResponse) {
-    if (this.preloadedResource && this.preloadedResource.metadata.url === song.url) {
+    if (this.preloadedResource && !this.preloadedResource.ended && this.preloadedResource.metadata.url === song.url) {
       // Use preloaded resource if suitable
       return this.preloadedResource;
     }
-    // Otherwise load new one
+    // Otherwise load a new one
     return Voice.createAudioResource<YtResponse>(song.url, {
       inputType: Voice.StreamType.WebmOpus,
       metadata: song,
@@ -163,6 +179,7 @@ export class Player extends EventEmitter {
       guildId: voice.guildId,
       adapterCreator: voice.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
     });
+
     this.connection.subscribe(this.player);
   }
 

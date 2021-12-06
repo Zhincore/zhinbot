@@ -4,21 +4,13 @@ import { PlayerModule } from "./";
 
 const QUEUE_PAGE_ID = "player.queue";
 const CONTROL_ID = "player";
-const controlReplies = {
-  stop: "Player stopped",
-  resume: "Player resumed",
-  pause: "Player paused",
-  skip: "Current song skipped",
-  loopOn: "The player queue now **will** loop",
-  loopOff: "The player queue now **won't** loop",
-};
 
 @DiscordAdapter()
 export class PlayerModuleDiscordAdapter {
   constructor(@Inject(() => PlayerModule) private readonly service: PlayerModule) {}
 
-  private getPlayer(interaction: CommandInteraction | ButtonInteraction) {
-    return this.service.getPlayer(interaction.guildId, interaction.channelId);
+  private getPlayer(interaction: CommandInteraction | ButtonInteraction, validate = true) {
+    return this.service.getPlayer(interaction.guildId, interaction.channelId, interaction.user.id, validate);
   }
 
   @DiscordCommand({
@@ -47,7 +39,7 @@ export class PlayerModuleDiscordAdapter {
       const songs = playlist.length === 1 ? `\`${playlist[0].title}\`` : playlist.length + " song(s)";
       return interaction.editReply(`Added ${songs} to queue`);
     }
-    return interaction.editReply("Player is ready, no songs added");
+    return interaction.editReply("Playing");
   }
 
   @DiscordCommand({
@@ -58,34 +50,46 @@ export class PlayerModuleDiscordAdapter {
   async playerchannel(interaction: CommandInteraction) {
     const channel = interaction.options.getChannel("channel", false);
     await this.service.changeUpdateChannel(interaction.guildId, channel?.id ?? interaction.channelId);
-    return interaction.reply("Player channel updated");
+    return interaction.reply({ content: "Player channel updated", ephemeral: true });
+  }
+
+  @DiscordCommand({ description: "Show the currently playing song" })
+  async playing(interaction: CommandInteraction) {
+    const player = await this.getPlayer(interaction);
+
+    if (!player.currentSong) throw "Nothing is currently playing";
+
+    return interaction.reply({
+      embeds: [this.service.createSongEmbed(player.currentSong)],
+      components: [getPlayerControls("queue")],
+    });
   }
 
   @DiscordCommand({ description: "Pause the music player" })
   async pause(interaction: CommandInteraction) {
     const player = await this.getPlayer(interaction);
     player.pause();
-    return interaction.reply(controlReplies.pause);
+    return interaction.reply("Player paused");
   }
 
   @DiscordCommand({ description: "Resume paused music player" })
   async resume(interaction: CommandInteraction) {
     const player = await this.getPlayer(interaction);
     player.resume();
-    return interaction.reply(controlReplies.resume);
+    return interaction.reply("Player resumed");
   }
 
   @DiscordCommand({ description: "Stop playing, leave the voice channel and forget the queue" })
   async stop(interaction: CommandInteraction) {
     const player = await this.getPlayer(interaction);
     player.destroy();
-    return interaction.reply(controlReplies.stop);
+    return interaction.reply("Player stopped");
   }
 
   @DiscordCommand({ description: "Skip currently playing song" })
   async skip(interaction: CommandInteraction) {
     const player = await this.getPlayer(interaction);
-    return interaction.reply(player.skip() ? controlReplies.skip : "Failed to skip song");
+    return interaction.reply(player.skip() ? "Current song skipped" : "Failed to skip song");
   }
 
   @DiscordCommand({
@@ -108,11 +112,12 @@ export class PlayerModuleDiscordAdapter {
 
   @DiscordCommand({ description: "Join a voice channel" })
   async join(interaction: CommandInteraction) {
-    const voice = await this.service.getVoice(interaction.guildId, interaction.user.id);
+    const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
     if (!voice) throw "You are not in a voice channel";
 
-    const player = await this.getPlayer(interaction);
+    const player = await this.getPlayer(interaction, false);
     player.join(voice);
+
     return interaction.reply("Joining voice channel");
   }
 
@@ -131,7 +136,7 @@ export class PlayerModuleDiscordAdapter {
     const player = await this.getPlayer(interaction);
     const state = interaction.options.getBoolean("loop", false);
     player.loop = state ?? !player.loop;
-    return interaction.reply(controlReplies[player.loop ? "loopOn" : "loopOff"]);
+    return interaction.reply(`The player queue now **${player.loop ? "will" : "won't"}** loop`);
   }
 
   @DiscordCommand({
@@ -209,27 +214,27 @@ export class PlayerModuleDiscordAdapter {
     const cmd = interaction.customId.split(":")[1];
     const player = await this.getPlayer(interaction);
 
-    let reply = "";
+    let activity = "";
     if (cmd === "stop") {
       player.destroy();
-      reply = controlReplies.stop;
+      activity = "stopped the player";
     } else if (cmd === "skip") {
       player.skip();
-      reply = controlReplies.skip;
+      activity = "skipped the current song";
     } else if (cmd === "play") {
       if (player.paused) {
         player.resume();
-        reply = controlReplies.resume;
+        activity = "resumed the player";
       } else {
         player.pause();
-        reply = controlReplies.pause;
+        activity = "paused the player";
       }
     } else if (cmd === "loop") {
       player.loop = !player.loop;
-      reply = controlReplies[player.loop ? "loopOn" : "loopOff"];
+      activity = `turned queue looping ${player.loop ? "on" : "off"}`;
     } else throw "Unknown control command";
 
-    return interaction.reply(reply);
+    return interaction.reply(`${interaction.user} ${activity}`);
   }
 }
 

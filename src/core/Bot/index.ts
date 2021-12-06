@@ -1,10 +1,10 @@
-import { Client, Channel, TextChannel, Snowflake, Message, Guild, GuildEmoji, DiscordAPIError } from "discord.js";
+import Discord, { Snowflake, DiscordAPIError } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
 import { ModuleManager } from "./ModuleManager";
 
 @Service()
-export class Bot extends Client {
+export class Bot extends Discord.Client {
   readonly isDev = process.env.NODE_ENV !== "production";
 
   readonly container = Container.of();
@@ -45,19 +45,28 @@ export class Bot extends Client {
 
   // utils
 
-  async fetchChannel<TChannel extends Channel = Channel>(channelId: Snowflake) {
+  isAdmin(memberOrRole: Discord.GuildMember | Discord.Role) {
+    return memberOrRole.permissions.has("ADMINISTRATOR");
+  }
+
+  async fetchMember(guildId: Snowflake, userId: Snowflake) {
+    const guild = this.guilds.resolve(guildId);
+    return guild!.members.fetch(userId);
+  }
+
+  async fetchChannel<TChannel extends Discord.Channel = Discord.Channel>(channelId: Snowflake) {
     return this.channels.fetch(channelId) as Promise<TChannel | null>;
   }
 
-  async fetchMessage(channel: TextChannel, messageId?: Snowflake | null): Promise<Message>;
-  async fetchMessage(channelId: Snowflake, messageId?: Snowflake | null): Promise<Message>;
-  async fetchMessage(channelOrId: Snowflake | TextChannel, messageId?: Snowflake | null) {
+  async fetchMessage(channel: Discord.TextChannel, messageId?: Snowflake | null): Promise<Discord.Message>;
+  async fetchMessage(channelId: Snowflake, messageId?: Snowflake | null): Promise<Discord.Message>;
+  async fetchMessage(channelOrId: Snowflake | Discord.TextChannel, messageId?: Snowflake | null) {
     if (!messageId) return;
     const channel = await (typeof channelOrId === "string" ? this.fetchChannel(channelOrId) : channelOrId);
-    if (!channel) throw new Error("Channel not found");
-    if (!channel.isText()) throw new Error("Channel is not textual");
+    if (!channel) throw new Error("Discord.Channel not found");
+    if (!channel.isText()) throw new Error("Discord.Channel is not textual");
     return channel.messages.fetch(messageId).catch((err) => {
-      if (err instanceof DiscordAPIError && err.message === "Unknown Message") return null;
+      if (err instanceof DiscordAPIError && err.message === "Unknown Discord.Message") return null;
       throw err;
     });
   }
@@ -81,11 +90,11 @@ export class Bot extends Client {
     return null;
   }
 
-  resolveEmoji(identifier: string | GuildEmoji) {
+  resolveEmoji(identifier: string | Discord.GuildEmoji) {
     return this.emojis.resolve(identifier) ?? identifier;
   }
 
-  resolveRole(str: string, guild: Guild) {
+  resolveRole(str: string, guild: Discord.Guild) {
     if (!str) return null;
     const roleID = (str.match(/(?:<@&)?(\d+)>?/) || [])[1];
     if (roleID) return guild.roles.resolve(roleID);

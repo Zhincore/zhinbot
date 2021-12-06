@@ -113,7 +113,7 @@ export class ModuleManager {
     }));
     // Generate perms for admins
     const admins = Array.from(guild.roles.cache.values())
-      .filter((role) => role.permissions.has("ADMINISTRATOR"))
+      .filter((role) => this.bot.isAdmin(role))
       .map(({ id }) => ({
         id,
         type: "ROLE" as const,

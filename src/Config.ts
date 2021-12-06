@@ -14,7 +14,7 @@ export class Config implements Readonly<Config> {
 
   player: PlayerConfig = {
     maxQueueLength: Number(process.env.PLAYER_QUEUE_LEN ?? 256),
-    timeout: ms(process.env.PLAYER_TIMEOUT ?? "10m"),
+    timeout: ms(process.env.PLAYER_TIMEOUT ?? "15m"),
     songCache: {
       ttl: ms(process.env.PLAYER_CACHE_TTL ?? "48h"),
       size: Number(process.env.PLAYER_CACHE_SIZE ?? 2048),
