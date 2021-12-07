@@ -82,6 +82,7 @@ export class ModuleManager {
     const mainCommand = adapterData ? this.createMainCommand(adapterData) : undefined;
     const commands = [...(adapterData.commands ?? []), mainCommand].filter(Boolean) as Decorators.IDiscordCommand[];
     for (const { commandData, execute } of commands) {
+      if (this.commands.has(commandData.name)) throw new Error(`Command '${commandData.name}' already exists`);
       this.commands.set(commandData.name, {
         commandData,
         execute: execute.bind(discordAdapter),
