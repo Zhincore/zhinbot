@@ -2,8 +2,8 @@ import Discord from "discord.js";
 import Color from "color";
 import { Bot } from "@core/Bot";
 import { table } from "@core/utils";
-import { Inject, DiscordAdapter, DiscordSubcommand, DiscordHandler } from "@core/decorators";
-import { SelfRolesModule } from "./";
+import { DiscordAdapter, DiscordSubcommand, DiscordHandler } from "@core/decorators";
+import { SelfRolesService } from "./SelfRolesService";
 import { editableFields, editableFieldNameToField } from "./editableFields";
 
 export const ROLE_ASSIGN_ID = "selfroles.assign";
@@ -24,7 +24,7 @@ const ID_ARG: Discord.ApplicationCommandChoicesOption & { min_value?: number } =
   },
 })
 export class SelfRolesDiscordAdapter {
-  constructor(@Inject(() => SelfRolesModule) private readonly service: SelfRolesModule, private readonly bot: Bot) {}
+  constructor(private readonly service: SelfRolesService, private readonly bot: Bot) {}
 
   @DiscordSubcommand({ description: "Get all self-roles of the guild" })
   async list(interaction: Discord.CommandInteraction) {

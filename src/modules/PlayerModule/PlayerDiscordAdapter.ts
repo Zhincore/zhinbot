@@ -1,13 +1,14 @@
 import { CommandInteraction, ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton } from "discord.js";
-import { DiscordAdapter, DiscordCommand, DiscordHandler, Inject } from "@core/decorators";
-import { PlayerModule } from "./";
+import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
+import { getDurationString } from "~/utils";
+import { PlayerService } from "./PlayerService";
 
 const QUEUE_PAGE_ID = "player.queue";
 const CONTROL_ID = "player";
 
 @DiscordAdapter()
-export class PlayerModuleDiscordAdapter {
-  constructor(@Inject(() => PlayerModule) private readonly service: PlayerModule) {}
+export class PlayerDiscordAdapter {
+  constructor(private readonly service: PlayerService) {}
 
   private getPlayer(interaction: CommandInteraction | ButtonInteraction, validate = true) {
     return this.service.getPlayer(interaction.guildId, interaction.channelId, interaction.user.id, validate);
@@ -168,7 +169,9 @@ export class PlayerModuleDiscordAdapter {
       .addFields(
         queue.slice(page * 25, (page + 1) * 25).map((song, i) => ({
           name: page + i ? page * 25 + i + "." : "Current song",
-          value: song ? (song.is_live ? "🔴 " : "") + `[${song.title}](${song.webpage_url})` : "Nothing",
+          value: song
+            ? `[${song.title}](${song.webpage_url}) — ${song.is_live ? "🔴 LIVE" : getDurationString(song.duration)}`
+            : "Nothing",
         })),
       )
       .setFooter(

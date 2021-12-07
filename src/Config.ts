@@ -1,9 +1,11 @@
+import { PermissionOverwriteOptions } from "discord.js";
 import ms from "ms";
 import { Service } from "@core/decorators";
+import type { ControlRoles } from "~/services/ModeratorService";
 
 @Service()
 export class Config implements Readonly<Config> {
-  auth: AuthConfig = {
+  auth = {
     discord: {
       token: process.env.DISCORD_TOKEN,
     },
@@ -12,7 +14,7 @@ export class Config implements Readonly<Config> {
   databaseUrl = process.env.DATABASE_URL;
   owners = (process.env.OWNERS ?? "").split(/[, ]+/).filter(Boolean);
 
-  player: PlayerConfig = {
+  player = {
     maxQueueLength: Number(process.env.PLAYER_QUEUE_LEN ?? 256),
     timeout: ms(process.env.PLAYER_TIMEOUT ?? "15m"),
     songCache: {
@@ -20,19 +22,21 @@ export class Config implements Readonly<Config> {
       size: Number(process.env.PLAYER_CACHE_SIZE ?? 2048),
     },
   };
-}
 
-interface AuthConfig {
-  discord: {
-    token?: string;
+  moderator: ModeratorConfig = {
+    minPunishmentDuration: ms("1m"),
+    rolePerms: {
+      muted: {
+        ADD_REACTIONS: false,
+        CONNECT: false,
+        SEND_MESSAGES: false,
+        SPEAK: false,
+      },
+    },
   };
 }
 
-interface PlayerConfig {
-  maxQueueLength: number;
-  timeout: number;
-  songCache: {
-    ttl: number;
-    size: number;
-  };
+interface ModeratorConfig {
+  minPunishmentDuration: number;
+  rolePerms: Record<ControlRoles, PermissionOverwriteOptions>;
 }

@@ -1,5 +1,5 @@
-import { BaseModule } from "./BaseModule";
 import { PlayerModule } from "./PlayerModule";
 import { SelfRolesModule } from "./SelfRolesModule";
+import { UtilsModule } from "./UtilsModule";
 
-export default [BaseModule, PlayerModule, SelfRolesModule];
+export default [PlayerModule, SelfRolesModule, UtilsModule];

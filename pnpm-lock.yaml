@@ -5,7 +5,7 @@ specifiers:
   '@prisma/client': ^3.6.0
   '@types/color': ^3.0.2
   '@types/ms': ^0.7.31
-  '@types/node': ^16.11.11
+  '@types/node': ^16.11.12
   '@types/text-table': ^0.2.2
   '@typescript-eslint/eslint-plugin': ^4.33.0
   '@typescript-eslint/parser': ^4.33.0
@@ -38,7 +38,7 @@ dependencies:
   '@prisma/client': 3.6.0_prisma@3.6.0
   '@types/color': 3.0.2
   '@types/ms': 0.7.31
-  '@types/node': 16.11.11
+  '@types/node': 16.11.12
   '@types/text-table': 0.2.2
   bufferutil: 4.0.5
   color: 4.1.0
@@ -250,12 +250,12 @@ packages:
   /@types/node-fetch/2.5.12:
     resolution: {integrity: sha512-MKgC4dlq4kKNa/mYrwpKfzQMB5X3ee5U6fSprkKpToBqBmX4nFZL9cW5jl6sWn+xpRJ7ypWh2yyqqr8UUCstSw==}
     dependencies:
-      '@types/node': 16.11.11
+      '@types/node': 16.11.12
       form-data: 3.0.1
     dev: false
 
-  /@types/node/16.11.11:
-    resolution: {integrity: sha512-KB0sixD67CeecHC33MYn+eYARkqTheIRNuu97y2XMjR7Wu3XibO1vaY6VBV6O/a89SPI81cEUIYT87UqUWlZNw==}
+  /@types/node/16.11.12:
+    resolution: {integrity: sha512-+2Iggwg7PxoO5Kyhvsq9VarmPbIelXP070HMImEpbtGCoyWNINQj4wzjbQCXzdHTRXnqufutJb5KAURZANNBAw==}
     dev: false
 
   /@types/text-table/0.2.2:
@@ -265,13 +265,13 @@ packages:
   /@types/ws/7.4.7:
     resolution: {integrity: sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==}
     dependencies:
-      '@types/node': 16.11.11
+      '@types/node': 16.11.12
     dev: false
 
-  /@types/ws/8.2.1:
-    resolution: {integrity: sha512-SqQ+LhVZaJi7c7sYVkjWALDigi/Wy7h7Iu72gkQp8Y8OWw/DddEVBrTSKu86pQftV2+Gm8lYM61hadPKqyaIeg==}
+  /@types/ws/8.2.2:
+    resolution: {integrity: sha512-NOn5eIcgWLOo6qW8AcuLZ7G8PycXu0xTxxkS6Q18VWFxgPUSOwV0pBj2a/4viNZVu25i7RIB7GttdkAIUUXOOg==}
     dependencies:
-      '@types/node': 16.11.11
+      '@types/node': 16.11.12
     dev: false
 
   /@typescript-eslint/eslint-plugin/4.33.0_b62b6aba9e367f6591d98c982bcf871c:
@@ -613,7 +613,7 @@ packages:
       '@discordjs/form-data': 3.0.1
       '@sapphire/async-queue': 1.1.9
       '@types/node-fetch': 2.5.12
-      '@types/ws': 8.2.1
+      '@types/ws': 8.2.2
       discord-api-types: 0.24.0
       node-fetch: 2.6.6
       ws: 8.3.0_5971b5a749a91823f5467a6d31a2f8b3

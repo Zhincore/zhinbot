@@ -4,8 +4,8 @@ import { BaseGuildVoiceChannel } from "discord.js";
 import { VoiceConnection, DiscordGatewayAdapterCreator, NoSubscriberBehavior } from "@discordjs/voice";
 import * as Voice from "@discordjs/voice";
 import youtubedl, { YtResponse } from "youtube-dl-exec";
-import { Config } from "~/Config";
 import { Cache } from "~/utils/Cache";
+import { Config } from "~/Config";
 
 const SONG_DELAY = ms("5s");
 
@@ -81,7 +81,12 @@ export class Player extends EventEmitter {
 
   setAlone(alone: boolean) {
     this.alone = alone;
-    if (alone) this.startTimeout();
+    if (alone) {
+      // If alone in VC and idle, leave; if playing then start timeout
+      if (this.player.state.status === "idle") this.destroy();
+      else this.startTimeout();
+    }
+    // If not alone anymore, cancel timeout if needed
     else this.cancelTimeoutIfInactive();
   }
 

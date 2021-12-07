@@ -1,14 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
-import { DiscordAdapter, DiscordCommand, Inject } from "@core/decorators";
-import { BaseModule } from "./";
+import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 
 @DiscordAdapter()
-export class BaseModuleDiscordAdapter {
-  constructor(@Inject(() => BaseModule) private readonly service: BaseModule) {}
-
+export class UtilsDiscordAdapter {
   @DiscordCommand({ description: 'Replies with "Pong!"' })
   ping(interaction: CommandInteraction) {
-    return interaction.reply(this.service.ping());
+    return interaction.reply("Pong!");
   }
 
   @DiscordCommand({ description: "Measures the roundtrip latency between Discord and the bot" })
