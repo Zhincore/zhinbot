@@ -9,7 +9,7 @@ import { Config } from "~/Config";
 export type ControlRole = "categ" | "muted";
 
 export const roleToRoleIdField: {
-  [role in ControlRole]: `${role}RoleId` extends keyof Prisma.Guild ? `${role}RoleId` : never;
+  [role in ControlRole]: `${role}RoleId` extends keyof Prisma.ModeratorConfig ? `${role}RoleId` : never;
 } = {
   categ: "categRoleId",
   muted: "mutedRoleId",
@@ -25,34 +25,36 @@ export class ModeratorService {
     this.initialize().catch(console.error);
   }
 
+  private getModConfig(guildId: Snowflake) {
+    return this.prisma.moderatorConfig.findUnique({ where: { guildId } });
+  }
+
   private async initialize() {
-    await this.prisma.initPromise;
+    const mutes = await this.prisma.mutes.findMany();
 
-    await this.prisma.mutes.findMany().then((mutes) =>
-      Promise.all(
-        mutes.map(async (mute) => {
-          const guildData = this.prisma.guildData.get(mute.guildId);
-          const guild = this.bot.guilds.resolve(mute.guildId);
-          if (!guild || !guildData || !guildData.mutedRoleId) return;
+    await Promise.all(
+      mutes.map(async (mute) => {
+        const modConfig = await this.getModConfig(mute.guildId);
+        const guild = this.bot.guilds.resolve(mute.guildId);
+        if (!guild || !modConfig?.mutedRoleId) return;
 
-          const duration = Date.now() - mute.end.valueOf();
-          if (duration <= 0) {
-            // Unmute overdue mutes
-            return this.unmute(mute.guildId, mute.userId);
-          } else {
-            // Re-mute mutes to ensure timeout
-            return this.mute(mute.guildId, mute.userId, duration);
-          }
-        }),
-      ),
+        const duration = mute.end.valueOf() - Date.now();
+        if (duration <= 0) {
+          // Unmute overdue mutes
+          return this.unmute(mute.guildId, mute.userId);
+        } else {
+          // Re-mute mutes to ensure timeout
+          return this.mute(mute.guildId, mute.userId, duration);
+        }
+      }),
     );
   }
 
   private async prepareRole(guild: Discord.Guild, roleName: ControlRole) {
     if (roleName === "categ") throw "This role cannot be assigned to users";
-    const guildData = this.prisma.guildData.get(guild.id);
-    const roleId = guildData ? guildData[roleToRoleIdField[roleName]] : null;
-    const categId = guildData?.categRoleId;
+    const modConfig = await this.getModConfig(guild.id);
+    const roleId = modConfig ? modConfig[roleToRoleIdField[roleName]] : null;
+    const categId = modConfig?.categRoleId;
 
     const channelsPromise = guild.channels.fetch();
     const [fetchedRole, categ] = await Promise.all([
@@ -108,22 +110,19 @@ export class ModeratorService {
     const field = roleToRoleIdField[roleName];
     return this.prisma.guild.update({
       where: { id: guildId },
-      data: { [field]: roleId },
+      data: { moderator: { update: { [field]: roleId } } },
     });
   }
 
   async updateModUpdatesChannel(guildId: Snowflake, channelId?: Snowflake) {
     return this.prisma.guild.update({
       where: { id: guildId },
-      data: { modUpdatesChannel: channelId },
+      data: { moderator: { update: { modUpdatesChannel: channelId } } },
     });
   }
 
   async mute(guildId: Snowflake, userId: Snowflake, duration?: number) {
-    const guildData = this.prisma.guildData.get(guildId);
-
     if (duration) duration = Math.max(this.config.moderator.minPunishmentDuration, duration);
-    else if (guildData?.defMuteDuration) duration = guildData.defMuteDuration;
 
     let guildTimeouts = this.guildMutes.get(guildId);
     const timeout = guildTimeouts?.get(userId);
@@ -148,8 +147,9 @@ export class ModeratorService {
         }),
     ]);
 
-    if (muted && guildData?.modUpdatesChannel) {
-      const channel = await this.bot.channels.fetch(guildData?.modUpdatesChannel);
+    const modConfig = await this.getModConfig(guildId);
+    if (muted && modConfig?.modUpdatesChannel) {
+      const channel = await this.bot.channels.fetch(modConfig?.modUpdatesChannel);
       if (channel?.isText()) {
         channel.send(
           `<@${userId}> has been muted ${duration ? "for " + ms(duration, { long: true }) : "indefinitely"}`,
@@ -161,9 +161,10 @@ export class ModeratorService {
   }
 
   async unmute(guildId: Snowflake, userId: Snowflake) {
-    const guildData = this.prisma.guildData.get(guildId);
+    const modConfig = await this.getModConfig(guildId);
+
     const guild = this.bot.guilds.resolve(guildId);
-    if (!guild || !guildData || !guildData.mutedRoleId) return;
+    if (!guild || !modConfig?.mutedRoleId) return;
 
     const guildTimeouts = this.guildMutes.get(guildId);
     const timeout = guildTimeouts?.get(userId);
@@ -174,17 +175,20 @@ export class ModeratorService {
       if (!guildTimeouts.size) this.guildMutes.delete(guildId);
     }
 
-    const deletePromise = this.prisma.mutes.delete({ where: { guildId_userId: { guildId, userId } } });
+    const muteQuery = { where: { guildId_userId: { guildId, userId } } };
+    const deletePromise = this.prisma.mutes
+      .findUnique(muteQuery)
+      .then((mute) => mute && this.prisma.mutes.delete(muteQuery));
 
     const member = await guild.members.fetch(userId);
-    const unmute = member?.roles.cache.has(guildData.mutedRoleId);
+    const unmute = member?.roles.cache.has(modConfig.mutedRoleId);
 
     await Promise.all([
-      unmute && member.roles.remove(guildData.mutedRoleId),
+      unmute && member.roles.remove(modConfig.mutedRoleId),
       unmute &&
-        guildData?.modUpdatesChannel &&
+        modConfig?.modUpdatesChannel &&
         this.bot.channels
-          .fetch(guildData?.modUpdatesChannel)
+          .fetch(modConfig.modUpdatesChannel)
           .then((channel): any => channel?.isText() && channel.send(`<@${userId}> has been unmuted`)),
       deletePromise,
     ]);

@@ -15,14 +15,8 @@ model Guild {
   // Player
   playerChannel String?
 
-  // Moderation
-  modUpdatesChannel String?
-  defMuteDuration Int?
-
-  categRoleId String?
-  mutedRoleId String?
-
-  mutes Mutes[]
+  // Services
+  moderator ModeratorConfig @relation(fields: [id], references: [guildId], onDelete: Cascade)
 
   // Modules
   selfRoles SelfRolesItem[]
@@ -32,11 +26,24 @@ model Guild {
 
 // #### SERVICES ####
 
+model ModeratorConfig {
+  guildId String @id
+  guild   Guild?
+
+  modUpdatesChannel String?
+
+  categRoleId String?
+  mutedRoleId String?
+
+  mutes Mutes[]
+}
+
 model Mutes {
   guildId String
   userId  String
   end     DateTime
-  guild   Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  mod     ModeratorConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
   @@id([guildId, userId])
 }
 
