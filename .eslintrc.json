@@ -6,7 +6,8 @@
   },
   "plugins": [
     "@typescript-eslint/eslint-plugin",
-    "sonarjs"
+    "sonarjs",
+    "prettier"
   ],
   "extends": [
     "plugin:@typescript-eslint/recommended",

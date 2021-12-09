@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "lib": [
-      "esnext"
+      "es2021"
     ],
     "baseUrl": "./src",
     "paths": {
       "~/*": ["./*", "../dist/*"],
       "@core/*": ["./core/*", "../dist/core/*"],
     },
-    "target": "es6",
+    "target": "es2021",
     "skipLibCheck": true,
     "strict": true,
     "alwaysStrict": true,

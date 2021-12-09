@@ -5,14 +5,16 @@ import type { ControlRole } from "~/services/ModeratorService";
 
 @Service()
 export class Config implements Readonly<Config> {
+  serviceName = process.env.SERVICE_NAME;
+
+  databaseUrl = process.env.DATABASE_URL;
+  owners = (process.env.OWNERS ?? "").split(/[, ]+/).filter(Boolean);
+
   auth = {
     discord: {
       token: process.env.DISCORD_TOKEN,
     },
   };
-
-  databaseUrl = process.env.DATABASE_URL;
-  owners = (process.env.OWNERS ?? "").split(/[, ]+/).filter(Boolean);
 
   player = {
     maxQueueLength: Number(process.env.PLAYER_QUEUE_LEN ?? 256),

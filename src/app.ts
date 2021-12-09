@@ -7,20 +7,13 @@ import modules from "./modules";
 dotenv();
 
 async function main() {
-  const bot: Bot = new Bot();
-  const config = bot.container.get(Config);
-  bot.owners = config.owners;
+  const config = new Config();
+  const bot: Bot = new Bot(config);
+  bot.container.set(Config, config);
   bot.modules.register(modules);
 
-  const killHandler = () => {
+  process.on("exit", () => {
     bot.destroy();
-    process.exit(1);
-  };
-
-  bot.once("ready", () => {
-    console.log("Ready");
-    process.on("SIGINT", killHandler);
-    process.on("SIGTERM", killHandler);
   });
 
   await bot.login(config.auth.discord.token).catch((err) => console.error("Boot failed", err));

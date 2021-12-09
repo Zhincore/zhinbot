@@ -22,7 +22,7 @@ export class ModeratorService {
   private readonly guildMutes = new Map<Snowflake, Map<Snowflake, NodeJS.Timeout>>();
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
-    this.initialize().catch(console.error);
+    bot.on("ready", this.initialize);
   }
 
   private getModConfig(guildId: Snowflake) {
@@ -130,10 +130,7 @@ export class ModeratorService {
 
     if (duration) {
       if (!guildTimeouts) this.guildMutes.set(guildId, (guildTimeouts = new Map()));
-      guildTimeouts.set(
-        userId,
-        setTimeout(() => this.unmute(guildId, userId), duration),
-      );
+      guildTimeouts.set(userId, setTimeout(() => this.unmute(guildId, userId), duration).unref());
     }
 
     const end = new Date(Date.now() + (duration ?? 0));

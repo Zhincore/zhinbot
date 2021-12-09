@@ -13,7 +13,7 @@ export type { YtResponse };
 export type YTQueryResponse = YtResponse | { _type: "playlist"; entries: YtResponse[] };
 
 export class Player extends EventEmitter {
-  private readonly player = Voice.createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
+  readonly player = Voice.createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
   private connection?: VoiceConnection;
   private fetchPromise: Promise<any> = Promise.resolve();
   private timeout?: NodeJS.Timeout;
@@ -28,7 +28,6 @@ export class Player extends EventEmitter {
   constructor(private readonly config: Config, private readonly cache: Cache<Promise<YTQueryResponse>>) {
     super();
 
-    this.player.on("error", console.error);
     this.player.on("stateChange", (oldState, state) => {
       if (oldState === state) return;
 
@@ -220,8 +219,7 @@ export class Player extends EventEmitter {
         }
         return promise;
       })
-      .catch((err) => {
-        console.error("Failed to load song", err);
+      .catch(() => {
         throw "Failed to load song";
       }));
 

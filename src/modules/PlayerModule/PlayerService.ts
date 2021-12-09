@@ -12,6 +12,7 @@ import { getPlayerControls } from "./PlayerDiscordAdapter";
 export class PlayerService {
   private readonly songCache = new Cache<Promise<YTQueryResponse>>(16_000, 64);
   private readonly players = new Map<string, { player: Player; updateChannel: TextChannel }>();
+  private readonly playerLogger = this.bot.getLogger("Player");
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
     bot.on("voiceStateUpdate", (oldState, newState) => {
@@ -50,6 +51,14 @@ export class PlayerService {
           .on("timeout", this.getTimeoutHandler(guildId))
           .on("queueEnd", this.getQueueEndHandler(guildId))
           .on("playing", this.getSongHandler(guildId));
+
+        player.player
+          .on("error", (err) => {
+            this.playerLogger.error(err);
+          })
+          .on("debug", (msg) => {
+            this.playerLogger.debug(msg);
+          });
 
         this.players.set(guildId, (entry = { player, updateChannel }));
       } else {

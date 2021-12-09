@@ -12,18 +12,20 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "node -r tsconfig-paths/register --enable-source-maps .",
     "dev": "tsc -b -w --preserveWatchOutput",
-    "lint": "eslint \"src/**/*.ts\" --fix"
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@discordjs/voice": "^0.6.0",
+    "@discordjs/voice": "^0.7.5",
     "@prisma/client": "^3.6.0",
     "@types/color": "^3.0.2",
     "@types/ms": "^0.7.31",
     "@types/node": "^16.11.12",
     "@types/text-table": "^0.2.2",
     "bufferutil": "^4.0.5",
+    "chalk": "^4.0.0",
     "color": "^4.1.0",
-    "discord-api-types": "^0.24.0",
+    "discord-api-types": "^0.25.2",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
     "emoji-regex": "^10.0.0",
@@ -37,16 +39,18 @@
     "typedi": "^0.10.0",
     "typescript": "^4.5.2",
     "utf-8-validate": "^5.0.7",
+    "winston": "^3.3.3",
+    "winston-journald3": "^0.1.2",
     "youtube-dl-exec": "^2.0.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "~7.30.0",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
+    "eslint": "^7.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-sonarjs": "^0.10.0",
+    "eslint-plugin-sonarjs": "^0.11.0",
     "prettier": "^2.5.1"
   }
 }

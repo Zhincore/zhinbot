@@ -1,30 +1,40 @@
 import Discord, { Snowflake, DiscordAPIError } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
+import { getLogger } from "./getLogger";
 import { ModuleManager } from "./ModuleManager";
+
+type BotSettings = {
+  owners: string[];
+  serviceName?: string;
+};
 
 @Service()
 export class Bot extends Discord.Client {
-  readonly isDev = process.env.NODE_ENV !== "production";
+  private readonly logger = getLogger();
 
   readonly container = Container.of();
   readonly modules = new ModuleManager(this);
 
   readonly readyPromise: Promise<void>;
-  /** Has to be set before calling `bot.modules.register` */
-  owners: string[] = [];
 
-  constructor() {
+  constructor(readonly settings: BotSettings) {
     super({
       intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILD_VOICE_STATES"],
     });
 
-    if (this.isDev) this.on("debug", console.log);
-    this.on("warn", console.warn);
-    this.on("error", console.error);
+    this.on("debug", (m) => {
+      this.logger.debug(m);
+    });
+    this.on("warn", (m) => {
+      this.logger.warn(m);
+    });
+    this.on("error", (m) => {
+      this.logger.error(m);
+    });
 
     this.once("ready", () => {
-      console.log("Logged in as %s", this.user!.tag);
+      this.logger.info("Logged in as %s", this.user!.tag);
     });
 
     this.readyPromise = new Promise((resolve) => this.once("ready", () => resolve()));
@@ -32,8 +42,12 @@ export class Bot extends Discord.Client {
     this.container.set(Bot, this);
   }
 
+  getLogger(module: string) {
+    return this.logger.child({ module });
+  }
+
   destroy() {
-    console.log("Logging out...");
+    this.logger.info("Logging out...");
     super.destroy();
   }
 

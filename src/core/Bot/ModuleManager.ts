@@ -107,7 +107,7 @@ export class ModuleManager {
 
   private async updateGuildCommandPermissions(guild: Discord.Guild) {
     // Generate perms for owners
-    const owners = this.bot.owners.map((id) => ({
+    const owners = this.bot.settings.owners.map((id) => ({
       id,
       type: "USER" as const,
       permission: true,

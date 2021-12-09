@@ -11,9 +11,7 @@ export class PrismaService extends PrismaClient {
       errorFormat: process.env.NODE_ENV === "production" ? "minimal" : undefined,
     });
 
-    bot.on("guildCreate", (guild) => {
-      this.createGuild(guild.id);
-    });
+    bot.on("guildCreate", (guild) => this.createGuild(guild.id));
 
     bot.once("ready", async (bot) => {
       await Promise.all(bot.guilds.cache.map((guild) => this.createGuild(guild.id)));
@@ -23,12 +21,10 @@ export class PrismaService extends PrismaClient {
   private async createGuild(id: string) {
     const link = { guildId: id };
 
-    return this.guild
-      .upsert({
-        where: { id },
-        create: { moderator: { create: link } },
-        update: { moderator: { connectOrCreate: { where: link, create: link } } },
-      })
-      .catch(console.error);
+    await this.guild.upsert({
+      where: { id },
+      create: { moderator: { create: link } },
+      update: { moderator: { upsert: { create: link, update: {} } } },
+    });
   }
 }
