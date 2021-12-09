@@ -12,8 +12,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "node -r tsconfig-paths/register --enable-source-maps .",
     "dev": "tsc -b -w --preserveWatchOutput",
-    "lint": "eslint \"src/**/*.ts\" --fix",
-    "postinstall": "prisma generate"
+    "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
     "@discordjs/voice": "^0.7.5",

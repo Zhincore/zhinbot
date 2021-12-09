@@ -7,6 +7,7 @@ export class ModuleManager {
   private readonly modules = new Set<Decorators.BotModuleData<any>>();
   private readonly commands = new Map<string, Decorators.IDiscordCommand>();
   private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
+  private readonly logger = this.bot.getLogger("ModuleManager");
 
   private commandDataList: Discord.ApplicationCommandData[] = [];
 
@@ -31,7 +32,7 @@ export class ModuleManager {
 
         await handler.execute(interaction);
       } catch (err) {
-        console.error(err);
+        if (typeof err !== "string") this.logger.error(err);
         await this.sendError(interaction, err);
       }
     });
@@ -45,7 +46,7 @@ export class ModuleManager {
           else await interaction.reply({ content: String(err), ephemeral: true });
         } else await interaction.followUp({ content: String(err), ephemeral: true });
       } catch (err) {
-        console.error("Failed to send error:", err);
+        this.logger.error("Failed to send error:", err);
       }
     }
   }
@@ -56,7 +57,7 @@ export class ModuleManager {
     for (const BotModule of modules) {
       const moduleData = Decorators.getModuleData(BotModule);
       if (!moduleData) {
-        console.error(`Class ${BotModule.name} is missing the BotModule decorator`);
+        this.logger.error(`Class ${BotModule.name} is missing the BotModule decorator`);
         continue;
       }
 
@@ -69,7 +70,7 @@ export class ModuleManager {
     const discordAdapter = this.bot.container.get(DiscordAdapter);
     const adapterData = Decorators.getDiscordAdapterData(discordAdapter);
     if (!adapterData) {
-      console.error(`Class ${DiscordAdapter.name} is missing the DiscordAdapter decorator`);
+      this.logger.error(`Class ${DiscordAdapter.name} is missing the DiscordAdapter decorator`);
       this.bot.container.remove(DiscordAdapter);
       return;
     }
@@ -101,7 +102,7 @@ export class ModuleManager {
       if (err instanceof DiscordAPIError && err.message == "Missing Access") {
         guild.leave();
       }
-      console.error(err);
+      this.logger.error(err);
     }
   }
 
