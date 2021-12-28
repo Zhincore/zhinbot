@@ -21,7 +21,7 @@ export class ModeratorConfigDiscordAdapter {
       { name: "role", type: "ROLE", description: "The new role for the given type" },
     ],
   })
-  async setrole(interaction: CommandInteraction) {
+  async setrole(interaction: CommandInteraction<"present">) {
     const roleName = interaction.options.getString("type", true);
     const role = interaction.options.getRole("role", false);
 
@@ -41,7 +41,7 @@ export class ModeratorConfigDiscordAdapter {
       },
     ],
   })
-  async updateschannel(interaction: CommandInteraction) {
+  async updateschannel(interaction: CommandInteraction<"present">) {
     const channel = interaction.options.getChannel("channel", false);
     if (channel && channel.type !== "GUILD_TEXT") throw "Updates channel must be a text channel";
 

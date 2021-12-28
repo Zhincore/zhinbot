@@ -1,15 +1,15 @@
-import {
-  ApplicationCommandChoicesData,
-  ApplicationCommandNonOptionsData,
-  ApplicationCommandChannelOptionData,
-} from "discord.js";
 import { Prisma } from "@prisma/client";
+import { CustomCommandOptionData } from "@core/decorators";
 
 type Field = Prisma.SelfRolesItemScalarFieldEnum;
 
-export const editableFields: Partial<
-  Record<Field, ApplicationCommandChoicesData | ApplicationCommandNonOptionsData | ApplicationCommandChannelOptionData>
-> = {
+export const editableFields: Partial<Record<Field, CustomCommandOptionData>> = {
+  name: {
+    type: "STRING",
+    description: "Name of the self-roles item (used as an id)",
+    name: "name",
+    required: true,
+  },
   title: {
     type: "STRING",
     description: "Title of the embed",
@@ -40,10 +40,10 @@ export const editableFields: Partial<
     name: "showroles",
     required: true,
   },
-  showId: {
+  showName: {
     type: "BOOLEAN",
     description: "Show ID of the self-roles item in embed",
-    name: "showid",
+    name: "showname",
     required: true,
   },
   channelId: {

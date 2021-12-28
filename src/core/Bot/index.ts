@@ -68,14 +68,14 @@ export class Bot extends Discord.Client {
     return guild!.members.fetch(userId);
   }
 
-  async fetchChannel<TChannel extends Discord.Channel = Discord.Channel>(channelId: Snowflake) {
-    return this.channels.fetch(channelId) as Promise<TChannel | null>;
+  async fetchChannel<TChannel extends Discord.Channel = Discord.Channel>(channelId?: Snowflake | null) {
+    return channelId ? (this.channels.fetch(channelId) as Promise<TChannel | null>) : null;
   }
 
-  async fetchMessage(channel: Discord.TextChannel, messageId?: Snowflake | null): Promise<Discord.Message>;
-  async fetchMessage(channelId: Snowflake, messageId?: Snowflake | null): Promise<Discord.Message>;
-  async fetchMessage(channelOrId: Snowflake | Discord.TextChannel, messageId?: Snowflake | null) {
-    if (!messageId) return;
+  async fetchMessage(channel?: Discord.TextChannel, messageId?: Snowflake | null): Promise<Discord.Message | null>;
+  async fetchMessage(channelId?: Snowflake | null, messageId?: Snowflake | null): Promise<Discord.Message | null>;
+  async fetchMessage(channelOrId?: Snowflake | Discord.TextChannel | null, messageId?: Snowflake | null) {
+    if (!messageId) return null;
     const channel = await (typeof channelOrId === "string" ? this.fetchChannel(channelOrId) : channelOrId);
     if (!channel) throw new Error("Discord.Channel not found");
     if (!channel.isText()) throw new Error("Discord.Channel is not textual");

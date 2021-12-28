@@ -15,7 +15,7 @@ export class ModeratorDiscordAdapter {
       { name: "duration", type: "STRING", description: "How long should the mute last (e.g. `15m` or `24h`)" },
     ],
   })
-  async mute(interaction: CommandInteraction) {
+  async mute(interaction: CommandInteraction<"present">) {
     const user = interaction.options.getUser("user", true);
     const inDuration = interaction.options.getString("duration", false);
 
@@ -32,7 +32,7 @@ export class ModeratorDiscordAdapter {
     defaultPermission: false,
     options: [{ name: "user", type: "USER", description: "The user to unmute", required: true }],
   })
-  async unmute(interaction: CommandInteraction) {
+  async unmute(interaction: CommandInteraction<"present">) {
     const user = interaction.options.getUser("user", true);
 
     const wasMuted = await this.service.unmute(interaction.guildId, user.id);

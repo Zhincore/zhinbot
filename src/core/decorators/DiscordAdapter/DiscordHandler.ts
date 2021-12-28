@@ -1,10 +1,13 @@
 import { MessageComponentInteraction } from "discord.js";
-import { pushToMetaArray, IInteractionHandler } from "./utils";
+import { pushToMetaArray, IInteractionHandler } from "./_utils";
 
 const symbol = Symbol("handlers");
 
 export type DiscordHandlerExecutor = (interaction: MessageComponentInteraction) => Promise<void>;
 export interface IDiscordHandler extends IInteractionHandler<MessageComponentInteraction> {
+  /**
+   * customId of the MessageComponent to handle, it's up to you to make it unique across the whole bot
+   */
   id: string;
   execute: DiscordHandlerExecutor;
 }

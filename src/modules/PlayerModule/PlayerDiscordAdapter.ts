@@ -10,7 +10,7 @@ const CONTROL_ID = "player";
 export class PlayerDiscordAdapter {
   constructor(private readonly service: PlayerService) {}
 
-  private getPlayer(interaction: CommandInteraction | ButtonInteraction, validate = true) {
+  private getPlayer(interaction: CommandInteraction<"present"> | ButtonInteraction<"present">, validate = true) {
     return this.service.getPlayer(interaction.guildId, interaction.channelId, interaction.user.id, validate);
   }
 
@@ -24,7 +24,7 @@ export class PlayerDiscordAdapter {
       },
     ],
   })
-  async play(interaction: CommandInteraction) {
+  async play(interaction: CommandInteraction<"present">) {
     await interaction.deferReply();
 
     const query = interaction.options.getString("query", false);
@@ -48,14 +48,14 @@ export class PlayerDiscordAdapter {
     defaultPermission: false,
     options: [{ name: "channel", type: "CHANNEL", description: "The channel for updates" }],
   })
-  async playerchannel(interaction: CommandInteraction) {
+  async playerchannel(interaction: CommandInteraction<"present">) {
     const channel = interaction.options.getChannel("channel", false);
     await this.service.changeUpdateChannel(interaction.guildId, channel?.id ?? interaction.channelId);
     return interaction.reply({ content: "Player channel updated", ephemeral: true });
   }
 
   @DiscordCommand({ description: "Show the currently playing song" })
-  async playing(interaction: CommandInteraction) {
+  async playing(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
 
     if (!player.currentSong) throw "Nothing is currently playing";
@@ -67,28 +67,28 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({ description: "Pause the music player" })
-  async pause(interaction: CommandInteraction) {
+  async pause(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     player.pause();
     return interaction.reply("Player paused");
   }
 
   @DiscordCommand({ description: "Resume paused music player" })
-  async resume(interaction: CommandInteraction) {
+  async resume(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     player.resume();
     return interaction.reply("Player resumed");
   }
 
   @DiscordCommand({ description: "Stop playing, leave the voice channel and forget the queue" })
-  async stop(interaction: CommandInteraction) {
+  async stop(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     player.destroy();
     return interaction.reply("Player stopped");
   }
 
   @DiscordCommand({ description: "Skip currently playing song" })
-  async skip(interaction: CommandInteraction) {
+  async skip(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     return interaction.reply(player.skip() ? "Current song skipped" : "Failed to skip song");
   }
@@ -104,7 +104,7 @@ export class PlayerDiscordAdapter {
       },
     ],
   })
-  async remove(interaction: CommandInteraction) {
+  async remove(interaction: CommandInteraction<"present">) {
     const position = Math.min(1, interaction.options.getInteger("position", true));
     const player = await this.getPlayer(interaction);
     const [song] = player.queue.splice(position - 1, 1);
@@ -112,7 +112,7 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({ description: "Join a voice channel" })
-  async join(interaction: CommandInteraction) {
+  async join(interaction: CommandInteraction<"present">) {
     const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
     if (!voice) throw "You are not in a voice channel";
 
@@ -123,7 +123,7 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({ description: "Leave the current voice chat (remembers the queue for a while)" })
-  async leave(interaction: CommandInteraction) {
+  async leave(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     player.leave();
     return interaction.reply("Voice channel left");
@@ -133,7 +133,7 @@ export class PlayerDiscordAdapter {
     description: "Toggle looping of the current player queue",
     options: [{ name: "loop", type: "BOOLEAN", description: "Whether the queue should loop" }],
   })
-  async loop(interaction: CommandInteraction) {
+  async loop(interaction: CommandInteraction<"present">) {
     const player = await this.getPlayer(interaction);
     const state = interaction.options.getBoolean("loop", false);
     player.loop = state ?? !player.loop;
@@ -150,13 +150,13 @@ export class PlayerDiscordAdapter {
       },
     ],
   })
-  async queue(interaction: CommandInteraction) {
+  async queue(interaction: CommandInteraction<"present">) {
     const page = Math.max(0, (interaction.options.getInteger("page", false) ?? 1) - 1);
 
     return this.sendQueue(interaction, page);
   }
 
-  private async sendQueue(interaction: CommandInteraction | ButtonInteraction, page = 0) {
+  private async sendQueue(interaction: CommandInteraction<"present"> | ButtonInteraction<"present">, page = 0) {
     const player = await this.getPlayer(interaction);
 
     const queue = [player.currentSong, ...player.queue];
@@ -207,13 +207,13 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordHandler(QUEUE_PAGE_ID)
-  async queueButtons(interaction: ButtonInteraction) {
+  async queueButtons(interaction: ButtonInteraction<"present">) {
     const page = +(interaction.customId.split(":")[1] || 0);
     return this.sendQueue(interaction, page);
   }
 
   @DiscordHandler(CONTROL_ID)
-  async controlButtons(interaction: ButtonInteraction) {
+  async controlButtons(interaction: ButtonInteraction<"present">) {
     const cmd = interaction.customId.split(":")[1];
     const player = await this.getPlayer(interaction);
 

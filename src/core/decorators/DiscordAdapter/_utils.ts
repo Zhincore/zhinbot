@@ -1,7 +1,7 @@
 import { Interaction } from "discord.js";
 
 export type IInteractionHandler<TInteraction extends Interaction> = {
-  execute: (interaction: TInteraction) => Promise<void>;
+  execute: (interaction: TInteraction) => any | Promise<any>;
 };
 
 export function pushToMetaArray(symbol: symbol, item: any, target: any) {

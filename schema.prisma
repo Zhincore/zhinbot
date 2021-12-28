@@ -76,10 +76,10 @@ model Mutes {
 
 // ## Self-roles ##
 model SelfRolesItem {
-  id        Int     @id @default(autoincrement())
-  guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
+  name      String
+  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId   String
-  channelId String
+  channelId String?
   messageId String? @unique
 
   color       Int     @default(0)
@@ -87,18 +87,21 @@ model SelfRolesItem {
   description String?
   message     String?
   showHelp    Boolean @default(true)
-  showId      Boolean @default(false)
+  showName    Boolean @default(false)
   showRoles   Boolean @default(true)
 
   roles SelfRolesRole[]
+  @@id([guildId, name])
 }
 
 model SelfRolesRole {
-  emoji       String        @default("")
   roleId      String
-  description String        @default("")
-  item        SelfRolesItem @relation(references: [id], fields: [itemId], onDelete: Cascade)
-  itemId      Int
+  emoji       String?
+  description String?
 
-  @@id([itemId, roleId])
+  item     SelfRolesItem @relation(fields: [guildId, itemName], references: [guildId, name], onDelete: Cascade)
+  guildId  String
+  itemName String
+
+  @@id([guildId, itemName, roleId])
 }

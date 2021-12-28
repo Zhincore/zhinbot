@@ -4,18 +4,18 @@ import chalk from "chalk";
 
 const levelColors: LevelColors = {
   error: {
-    level: chalk.red,
+    level: chalk.red.bold,
     message: chalk.redBright,
   },
   warn: {
-    level: chalk.yellowBright,
+    level: chalk.yellowBright.bold,
     message: chalk.yellow,
   },
   http: {
-    message: chalk.cyan,
+    message: chalk.cyanBright,
   },
   info: {
-    level: chalk.cyanBright,
+    level: chalk.greenBright,
     message: chalk.whiteBright,
   },
   silly: {
@@ -55,9 +55,10 @@ const maxLevelLength = Math.max(...Object.keys(Winston.config.npm.levels).map((l
 
 function printfTemplateFunction(info: Winston.Logform.TransformableInfo) {
   const prefix = info.module ? `[${info.module}]` : "";
+  const msg = info.message.split("\n");
 
   let level = info.level.toUpperCase().padEnd(maxLevelLength, " ");
-  let message = `${prefix} ${info.message}`;
+  let message = `${prefix} ${msg.shift()}${msg.map((v) => " ".repeat(level.length) + v).join("\n")}`;
 
   const colors = levelColors[info.level];
   if (colors) {

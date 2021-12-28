@@ -5,6 +5,7 @@ import { Bot } from "./";
 
 export class ModuleManager {
   private readonly modules = new Set<Decorators.BotModuleData<any>>();
+  private readonly autocompleters = new Map<string, Decorators.IAutocompleter>();
   private readonly commands = new Map<string, Decorators.IDiscordCommand>();
   private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
   private readonly logger = this.bot.getLogger("ModuleManager");
@@ -25,6 +26,16 @@ export class ModuleManager {
         handler = this.handlers.get(interaction.customId.split(":")[0]);
       } else if (interaction.isApplicationCommand()) {
         handler = this.commands.get(interaction.commandName);
+      } else if (interaction.isAutocomplete()) {
+        const subcmdGroup = interaction.options.getSubcommandGroup(false);
+        const subcmd = interaction.options.getSubcommand(false);
+        const id = Decorators.getAutocompleterId(
+          subcmdGroup ?? subcmd ?? interaction.commandName,
+          interaction.options.getFocused(true).name,
+          subcmd ? interaction.commandName : undefined,
+          subcmd ?? undefined,
+        );
+        handler = this.autocompleters.get(id);
       }
 
       try {
@@ -39,15 +50,20 @@ export class ModuleManager {
   }
 
   private async sendError(interaction: Discord.Interaction, err: any) {
-    if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
-      try {
+    try {
+      if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
         if (!interaction.replied) {
           if (interaction.deferred) await interaction.editReply({ content: String(err) });
           else await interaction.reply({ content: String(err), ephemeral: true });
         } else await interaction.followUp({ content: String(err), ephemeral: true });
-      } catch (err) {
-        this.logger.error("Failed to send error:", err);
+      } else if (interaction.isAutocomplete()) {
+        if (interaction.responded) throw "AutocompleteInteraction was already responded to";
+        await interaction.respond([]);
+      } else {
+        throw "Cannot respond to this interaction";
       }
+    } catch (_err) {
+      this.logger.error("While sending error another error was thrown:", _err);
     }
   }
 
@@ -75,6 +91,26 @@ export class ModuleManager {
       return;
     }
 
+    for (const autocompleteMapping of adapterData.autocompleteMappings ?? []) {
+      const autocompleter = adapterData.autocompleters?.find((item) => item.id === autocompleteMapping.id);
+      const id = Decorators.getAutocompleterId(
+        autocompleteMapping.commandName,
+        autocompleteMapping.optionName,
+        adapterData.supercomand?.name,
+        autocompleteMapping.subcommandName,
+      );
+
+      if (!autocompleter) {
+        this.logger.error("Autocomplete " + DiscordAdapter.name + "." + id + " has no handler");
+        continue;
+      }
+
+      this.autocompleters.set(id, {
+        ...autocompleter,
+        execute: autocompleter.execute.bind(discordAdapter),
+      });
+    }
+
     for (const handler of adapterData.handlers ?? []) {
       this.handlers.set(handler.id, { ...handler, execute: handler.execute.bind(discordAdapter) });
     }
@@ -100,7 +136,7 @@ export class ModuleManager {
       await this.updateGuildCommandPermissions(guild);
     } catch (err) {
       if (err instanceof DiscordAPIError && err.message == "Missing Access") {
-        guild.leave();
+        await guild.leave();
       }
       this.logger.error(err);
     }

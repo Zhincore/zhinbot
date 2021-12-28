@@ -6,7 +6,7 @@ import { PrismaService } from "~/services/PrismaService";
 import { editableFields } from "./editableFields";
 
 export type ItemPreview = {
-  id: number;
+  name: string;
   title: string;
   color: number;
   channelName: string;
@@ -59,15 +59,14 @@ export class SelfRolesService {
               // If message doesn't exist, remove it's Id from DB
               if (!message) {
                 return this.prisma.selfRolesItem.update({
-                  where: { id: item.id },
+                  where: { guildId_name: item },
                   data: { messageId: null },
-                  select: { id: true },
                 });
               }
             } catch (err) {
               // If the channel wasn't found, delete the item
               if (err instanceof Error && err.message === "Channel not found") {
-                return this.prisma.selfRolesItem.delete({ where: { id: item.id }, select: { id: true } });
+                return this.prisma.selfRolesItem.delete({ where: { guildId_name: item } });
               }
               throw err;
             }
@@ -86,7 +85,7 @@ export class SelfRolesService {
   async list(guildId: Snowflake) {
     const items = await this.prisma.selfRolesItem.findMany({
       where: { guildId },
-      select: { id: true, title: true, color: true, channelId: true },
+      select: { name: true, title: true, color: true, channelId: true },
     });
 
     const output: ItemPreview[] = [];
@@ -99,10 +98,10 @@ export class SelfRolesService {
     return output;
   }
 
-  async get(guildId: Snowflake, id: number) {
-    if (!id) return null;
+  async get(guildId: Snowflake, name: string) {
+    if (!name) return null;
     const item = await this.prisma.selfRolesItem.findUnique({
-      where: { id },
+      where: { guildId_name: { guildId, name } },
       include: { roles: true },
     });
     if (item && item.guildId !== guildId) return null;
@@ -113,13 +112,25 @@ export class SelfRolesService {
     return item;
   }
 
-  async edit(guildId: Snowflake, id: number, field: keyof typeof editableFields, value: any) {
+  async search(guildId: Snowflake, name: string) {
+    return this.prisma.selfRolesItem.findMany({
+      where: {
+        guildId,
+        name: {
+          contains: name,
+        },
+      },
+      select: { name: true, color: true },
+    });
+  }
+
+  async edit(guildId: Snowflake, name: string, field: keyof typeof editableFields, value: any) {
     if (!(field in editableFields)) return false;
 
     if (field === "messageId") {
       await this.prisma.selfRolesItem
         .findUnique({
-          where: { id },
+          where: { guildId_name: { guildId, name } },
           select: { messageId: true, channelId: true },
           rejectOnNotFound: true,
         })
@@ -133,12 +144,12 @@ export class SelfRolesService {
 
     return this.prisma.selfRolesItem
       .update({
-        where: { id },
+        where: { guildId_name: { guildId, name } },
         data: { [field]: value },
         select: { messageId: true },
       })
       .then(({ messageId }) => {
-        if (messageId) this.render(guildId, id);
+        if (messageId) this.render(guildId, name);
         return true;
       })
       .finally(() => {
@@ -146,20 +157,19 @@ export class SelfRolesService {
       });
   }
 
-  async create(guildId: Snowflake, channelId: Snowflake) {
+  async create(guildId: Snowflake, name: string) {
     const item = await this.prisma.selfRolesItem.create({
       data: {
-        channelId,
+        name,
         guild: { connect: { id: guildId } },
       },
-      select: { id: true },
     });
     this._updated(guildId);
-    return item.id;
+    return item.name;
   }
 
-  async destroy(guildId: Snowflake, id: number) {
-    const item = await this.get(guildId, id);
+  async destroy(guildId: Snowflake, name: string) {
+    const item = await this.get(guildId, name);
     if (!item) return null;
 
     if (item.channelId && item.messageId) {
@@ -167,32 +177,29 @@ export class SelfRolesService {
       if (message) message.delete();
     }
 
-    await this.prisma.selfRolesItem.delete({
-      where: { id },
-      select: { id: true },
-    });
+    await this.prisma.selfRolesItem.delete({ where: { guildId_name: { guildId, name } } });
 
     return true;
   }
 
-  async conditionalRender(guildId: Snowflake, id: number) {
+  async conditionalRender(guildId: Snowflake, name: string) {
     return this.prisma.selfRolesItem
       .findUnique({
-        where: { id },
+        where: { guildId_name: { guildId, name } },
         select: { messageId: true },
         rejectOnNotFound: true,
       })
       .then(({ messageId }) => {
-        if (messageId) return this.render(guildId, id);
+        if (messageId) return this.render(guildId, name);
         return true;
       });
   }
 
-  async render(guildId: Snowflake, id: number) {
-    const item = await this.get(guildId, id);
+  async render(guildId: Snowflake, name: string) {
+    const item = await this.get(guildId, name);
     if (!item) return null;
 
-    const channel = await this.bot.fetchChannel<Discord.TextChannel>(item.channelId);
+    const channel = item.channelId && (await this.bot.fetchChannel<Discord.TextChannel>(item.channelId));
     if (!channel) throw new Error("Channel not found");
     const _message = await this.bot.fetchMessage(channel, item.messageId ?? undefined);
     let message = _message;
@@ -231,9 +238,8 @@ export class SelfRolesService {
       message = (await channel.send(messageData)) as Discord.Message;
 
       await this.prisma.selfRolesItem.update({
-        where: { id },
+        where: { guildId_name: { guildId, name } },
         data: { messageId: message.id },
-        select: { id: true },
       });
       this.messages.set(message.id, item);
       this._updated(guildId);
@@ -253,7 +259,7 @@ export class SelfRolesService {
 
     let reactPromise: Promise<any> = Promise.resolve();
     for (const emoji of addReacts) {
-      reactPromise = reactPromise.then(() => message.react(emoji));
+      reactPromise = reactPromise.then(() => message!.react(emoji!));
     }
     await reactPromise;
 
@@ -282,18 +288,18 @@ export class SelfRolesService {
             ? roles
                 .map(
                   ({ emoji, role, description }) =>
-                    `${this.bot.resolveEmoji(emoji)} - ${role}` + (description ? ` - ${description}` : ""),
+                    `${this.bot.resolveEmoji(emoji!)} - ${role}` + (description ? ` - ${description}` : ""),
                 )
                 .join("\n")
             : "") +
           "",
       )
-      .setFooter(item.showId ? `Id: ${item.id}` : "");
+      .setFooter(item.showName ? `Name: ${item.name}` : "");
 
     return { embed, roles };
   }
 
-  async setRole(guildId: Snowflake, itemId: number, roleId: Snowflake, emoji?: string, description?: string) {
+  async setRole(guildId: Snowflake, itemName: string, roleId: Snowflake, emoji?: string, description?: string) {
     const data = {
       emoji: emoji,
       roleId,
@@ -303,25 +309,25 @@ export class SelfRolesService {
     return this.prisma.selfRolesRole
       .upsert({
         where: {
-          itemId_roleId: { itemId, roleId },
+          guildId_itemName_roleId: { guildId, itemName, roleId },
         },
         create: {
           ...data,
-          item: { connect: { id: itemId } },
+          item: { connect: { guildId_name: { guildId, name: itemName } } },
         },
         update: data,
         select: { roleId: true },
       })
-      .then(() => this.conditionalRender(guildId, itemId))
+      .then(() => this.conditionalRender(guildId, itemName))
       .finally(() => {
         this._updated(guildId);
       });
   }
 
-  async removeRole(guildId: Snowflake, itemId: number, roleId: Snowflake) {
+  async removeRole(guildId: Snowflake, itemName: string, roleId: Snowflake) {
     return this.prisma.selfRolesRole
-      .delete({ where: { itemId_roleId: { itemId, roleId } } })
-      .then(() => this.conditionalRender(guildId, itemId))
+      .delete({ where: { guildId_itemName_roleId: { guildId, itemName, roleId } } })
+      .then(() => this.conditionalRender(guildId, itemName))
       .finally(() => {
         this._updated(guildId);
       });
