@@ -1,7 +1,5 @@
-import { PermissionOverwriteOptions } from "discord.js";
 import ms from "ms";
 import { Service } from "@core/decorators";
-import type { ControlRole } from "~/services/ModeratorService";
 
 @Service()
 export class Config implements Readonly<Config> {
@@ -24,21 +22,4 @@ export class Config implements Readonly<Config> {
       size: Number(process.env.PLAYER_CACHE_SIZE ?? 2048),
     },
   };
-
-  moderator: ModeratorConfig = {
-    minPunishmentDuration: ms("1m"),
-    rolePerms: {
-      muted: {
-        ADD_REACTIONS: false,
-        CONNECT: false,
-        SEND_MESSAGES: false,
-        SPEAK: false,
-      },
-    },
-  };
-}
-
-interface ModeratorConfig {
-  minPunishmentDuration: number;
-  rolePerms: Omit<Record<ControlRole, PermissionOverwriteOptions>, "categ">;
 }

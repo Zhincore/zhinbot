@@ -19,12 +19,10 @@ export class PrismaService extends PrismaClient {
   }
 
   private async createGuild(id: string) {
-    const link = { guildId: id };
-
     await this.guild.upsert({
       where: { id },
-      create: { moderator: { create: link } },
-      update: { moderator: { upsert: { create: link, update: {} } } },
+      create: { id },
+      update: {},
     });
   }
 }
