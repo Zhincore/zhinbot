@@ -167,8 +167,8 @@ export class PlayerService {
       .setTitle(song.title)
       .setDescription(description)
       .setURL(song.webpage_url || song.url)
-      .setFooter(
-        [
+      .setFooter({
+        text: [
           song.is_live && "🔴 LIVE",
           song.duration && getDurationString(song.duration),
           [
@@ -183,10 +183,10 @@ export class PlayerService {
         ]
           .filter((v) => v)
           .join(" ︱ "),
-      );
+      });
 
     if (song.thumbnail) embed.setThumbnail(song.thumbnail);
-    if (song.uploader) embed.setAuthor(song.uploader, undefined, song.uploader_url);
+    if (song.uploader) embed.setAuthor({ name: song.uploader, url: song.uploader_url });
 
     return embed;
   }

@@ -1,5 +1,6 @@
-import { PlayerModule } from "./PlayerModule";
-import { SelfRolesModule } from "./SelfRolesModule";
-import { UtilsModule } from "./UtilsModule";
+import { AutoModModule } from "./moderator";
+import { PlayerModule } from "./player";
+import { SelfRolesModule } from "./selfroles";
+import { UtilsModule } from "./utils";
 
-export default [PlayerModule, SelfRolesModule, UtilsModule];
+export default [AutoModModule, PlayerModule, SelfRolesModule, UtilsModule];

@@ -17,39 +17,27 @@ model Guild {
 
   // Modules
   selfRoles SelfRolesItem[]
+  warnings  Warning[]
   // effects    EffectItem[]
   // alerts     AlertsItem[]
 }
 
-// #### SERVICES ####
-
-
 // #### MODULES ####
 
-// ## Alerts ##
-// model AlertsItem {
-//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-//   guildId   String
-//   type      String
-//   name      String
-//   channelId String
-//   roleId    String?
-//
-//   @@id([guildId, type, name])
-// }
+// ## Moderator ##
+model Warning {
+  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   String
+  userId    String
+  number    Int
 
-// ## Effects ##
-// model EffectItem {
-//   id        Int     @default(autoincrement())
-//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-//   guildId   String
-//   order     Int     @default(0)
-//   pattern   String
-//   response  String
-//   transform String?
-//
-//   @@id([id, guildId])
-// }
+  reason String
+
+  staffId   String
+  timestamp DateTime @default(now())
+
+  @@id([guildId, userId, number])
+}
 
 // ## Self-roles ##
 model SelfRolesItem {
@@ -82,3 +70,28 @@ model SelfRolesRole {
 
   @@id([guildId, itemName, roleId])
 }
+
+// ## Alerts ##
+// model AlertsItem {
+//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
+//   guildId   String
+//   type      String
+//   name      String
+//   channelId String
+//   roleId    String?
+//
+//   @@id([guildId, type, name])
+// }
+
+// ## Effects ##
+// model EffectItem {
+//   id        Int     @default(autoincrement())
+//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
+//   guildId   String
+//   order     Int     @default(0)
+//   pattern   String
+//   response  String
+//   transform String?
+//
+//   @@id([id, guildId])
+// }

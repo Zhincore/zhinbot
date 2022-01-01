@@ -76,6 +76,7 @@ export class ModuleManager {
         this.logger.error(`Class ${BotModule.name} is missing the BotModule decorator`);
         continue;
       }
+      this.bot.container.get(BotModule);
 
       if (moduleData.discordAdapters) moduleData.discordAdapters.forEach(this.parseAdapterCommands.bind(this));
       this.modules.add(moduleData);

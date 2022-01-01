@@ -3,10 +3,10 @@
     "lib": [
       "es2021"
     ],
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
-      "~/*": ["./*", "../dist/*"],
-      "@core/*": ["./core/*", "../dist/core/*"],
+      "~/*": ["./src/*", "./dist/*"],
+      "@core/*": ["./src/core/*", "./dist/core/*"],
     },
     "target": "es2021",
     "skipLibCheck": true,
