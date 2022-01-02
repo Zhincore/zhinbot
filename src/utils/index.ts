@@ -1,3 +1,7 @@
+import { TextChannel } from "discord.js";
+
+export type MessageData = Parameters<TextChannel["send"]>[0];
+
 export function getDurationString(length: number, float = false) {
   const hours = Math.trunc(length / 3600);
   const minutes = Math.trunc((length - hours * 3600) / 60);

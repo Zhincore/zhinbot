@@ -10,15 +10,15 @@ specifiers:
   '@tensorflow/tfjs-node': ^3.12.0
   '@types/color': ^3.0.2
   '@types/ms': ^0.7.31
-  '@types/node': ^17.0.5
+  '@types/node': ^17.0.6
   '@types/sentiment': ^5.0.1
   '@types/text-table': ^0.2.2
   '@typescript-eslint/eslint-plugin': ^5.8.1
   '@typescript-eslint/parser': ^5.8.1
-  bufferutil: ^4.0.5
+  bufferutil: ^4.0.6
   chalk: ^4.1.2
   color: ^4.1.0
-  discord-api-types: ^0.26.0
+  discord-api-types: ^0.26.1
   discord.js: ^13.5.0
   dotenv: ^10.0.0
   emoji-regex: ^10.0.0
@@ -32,37 +32,37 @@ specifiers:
   prettier: ^2.5.1
   prisma: ^3.7.0
   reflect-metadata: ^0.1.13
-  seedrandom: ~2.4.3
+  seedrandom: ~2.4.4
   sentiment: ^5.0.2
   sodium: ^3.0.2
   text-table: ^0.2.0
   tsconfig-paths: ^3.12.0
   typedi: ^0.10.0
   typescript: ^4.5.4
-  utf-8-validate: ^5.0.7
+  utf-8-validate: ^5.0.8
   winston: ^3.3.3
   winston-journald3: ^0.1.2
   youtube-dl-exec: ^2.0.2
   zlib-sync: ^0.1.7
 
 dependencies:
-  '@discordjs/voice': 0.7.5_5971b5a749a91823f5467a6d31a2f8b3
+  '@discordjs/voice': 0.7.5_bffff4271b89d628e8333ead80d3d8e8
   '@prisma/client': 3.7.0_prisma@3.7.0
   '@tensorflow-models/toxicity': 1.2.2_5abcafba744fef3b06d80cc042fea111
-  '@tensorflow/tfjs': 3.12.0_seedrandom@2.4.3
+  '@tensorflow/tfjs': 3.12.0_seedrandom@2.4.4
   '@tensorflow/tfjs-converter': 3.12.0_@tensorflow+tfjs-core@3.12.0
   '@tensorflow/tfjs-core': 3.12.0
-  '@tensorflow/tfjs-node': 3.12.0_seedrandom@2.4.3
+  '@tensorflow/tfjs-node': 3.12.0_seedrandom@2.4.4
   '@types/color': 3.0.2
   '@types/ms': 0.7.31
-  '@types/node': 17.0.5
+  '@types/node': 17.0.6
   '@types/sentiment': 5.0.1
   '@types/text-table': 0.2.2
-  bufferutil: 4.0.5
+  bufferutil: 4.0.6
   chalk: 4.1.2
   color: 4.1.0
-  discord-api-types: 0.26.0
-  discord.js: 13.5.0_5971b5a749a91823f5467a6d31a2f8b3
+  discord-api-types: 0.26.1
+  discord.js: 13.5.0_bffff4271b89d628e8333ead80d3d8e8
   dotenv: 10.0.0
   emoji-regex: 10.0.0
   erlpack: github.com/discord/erlpack/f7d730debe32c416d1b55b4217f8aef2ade05874
@@ -70,14 +70,14 @@ dependencies:
   ms: 2.1.3
   prisma: 3.7.0
   reflect-metadata: 0.1.13
-  seedrandom: 2.4.3
+  seedrandom: 2.4.4
   sentiment: 5.0.2
   sodium: 3.0.2
   text-table: 0.2.0
   tsconfig-paths: 3.12.0
   typedi: 0.10.0
   typescript: 4.5.4
-  utf-8-validate: 5.0.7
+  utf-8-validate: 5.0.8
   winston: 3.3.3
   winston-journald3: 0.1.2
   youtube-dl-exec: 2.0.2
@@ -127,7 +127,7 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
       '@sindresorhus/is': 4.2.0
-      discord-api-types: 0.26.0
+      discord-api-types: 0.26.1
       ts-mixer: 6.0.0
       tslib: 2.3.1
       zod: 3.11.6
@@ -138,7 +138,7 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@discordjs/voice/0.7.5_5971b5a749a91823f5467a6d31a2f8b3:
+  /@discordjs/voice/0.7.5_bffff4271b89d628e8333ead80d3d8e8:
     resolution: {integrity: sha512-lUk+CmIXNKslT6DkC9IF9rpsqhzlTiedauUCPBzepjd4XWxwBZiyVIzR6QpbAirxkAwCoAbbje+3Ho71PGLEAw==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
@@ -147,7 +147,7 @@ packages:
       prism-media: 1.3.2
       tiny-typed-emitter: 2.1.0
       tslib: 2.3.1
-      ws: 8.4.0_5971b5a749a91823f5467a6d31a2f8b3
+      ws: 8.4.0_bffff4271b89d628e8333ead80d3d8e8
     transitivePeerDependencies:
       - '@discordjs/opus'
       - bufferutil
@@ -328,7 +328,7 @@ packages:
       seedrandom: 2.4.3
     dev: false
 
-  /@tensorflow/tfjs-data/3.12.0_e171bc3c04607732389b3e9ee74b460b:
+  /@tensorflow/tfjs-data/3.12.0_600ce139d54937093b1124e61e3df82a:
     resolution: {integrity: sha512-Q5S0pYgjqqLeFPaoHaEt9KeNFf5BrobcYmLZ9bsUnSowY0Kxz6RvnPWNNaOI3FhgqCF/e+RmGX20J0wx3Ty04Q==}
     peerDependencies:
       '@tensorflow/tfjs-core': 3.12.0
@@ -337,7 +337,7 @@ packages:
       '@tensorflow/tfjs-core': 3.12.0
       '@types/node-fetch': 2.5.12
       node-fetch: 2.6.6
-      seedrandom: 2.4.3
+      seedrandom: 2.4.4
     dev: false
 
   /@tensorflow/tfjs-layers/3.12.0_@tensorflow+tfjs-core@3.12.0:
@@ -348,13 +348,13 @@ packages:
       '@tensorflow/tfjs-core': 3.12.0
     dev: false
 
-  /@tensorflow/tfjs-node/3.12.0_seedrandom@2.4.3:
+  /@tensorflow/tfjs-node/3.12.0_seedrandom@2.4.4:
     resolution: {integrity: sha512-Tl4dil1k9Mjj8A4vLxZJqwOhcV8zo2ZE8XCbKCF+B5i0sBJNqej4WzxJvdA5v3xu36D0UrEaWC5miqaX7ODQFw==}
     engines: {node: '>=8.11.0'}
     requiresBuild: true
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.4
-      '@tensorflow/tfjs': 3.12.0_seedrandom@2.4.3
+      '@tensorflow/tfjs': 3.12.0_seedrandom@2.4.4
       adm-zip: 0.5.9
       google-protobuf: 3.19.1
       https-proxy-agent: 2.2.4
@@ -366,7 +366,7 @@ packages:
       - supports-color
     dev: false
 
-  /@tensorflow/tfjs/3.12.0_seedrandom@2.4.3:
+  /@tensorflow/tfjs/3.12.0_seedrandom@2.4.4:
     resolution: {integrity: sha512-Gpala8Lf2DJ3j2hY43gPQ8TIJzw5sYrxfpQF0SBX26/zuHUMaF/DQz4koeRqf9s1t6MAjVbbkXdYKtGeEz4Jrg==}
     hasBin: true
     dependencies:
@@ -374,11 +374,11 @@ packages:
       '@tensorflow/tfjs-backend-webgl': 3.12.0_@tensorflow+tfjs-core@3.12.0
       '@tensorflow/tfjs-converter': 3.12.0_@tensorflow+tfjs-core@3.12.0
       '@tensorflow/tfjs-core': 3.12.0
-      '@tensorflow/tfjs-data': 3.12.0_e171bc3c04607732389b3e9ee74b460b
+      '@tensorflow/tfjs-data': 3.12.0_600ce139d54937093b1124e61e3df82a
       '@tensorflow/tfjs-layers': 3.12.0_@tensorflow+tfjs-core@3.12.0
       argparse: 1.0.10
       chalk: 4.1.2
-      core-js: 3.20.1
+      core-js: 3.20.2
       regenerator-runtime: 0.13.9
       yargs: 16.2.0
     transitivePeerDependencies:
@@ -420,12 +420,12 @@ packages:
   /@types/node-fetch/2.5.12:
     resolution: {integrity: sha512-MKgC4dlq4kKNa/mYrwpKfzQMB5X3ee5U6fSprkKpToBqBmX4nFZL9cW5jl6sWn+xpRJ7ypWh2yyqqr8UUCstSw==}
     dependencies:
-      '@types/node': 17.0.5
+      '@types/node': 17.0.6
       form-data: 3.0.1
     dev: false
 
-  /@types/node/17.0.5:
-    resolution: {integrity: sha512-w3mrvNXLeDYV1GKTZorGJQivK6XLCoGwpnyJFbJVK/aTBQUxOCaa/GlFAAN3OTDFcb7h5tiFG+YXCO2By+riZw==}
+  /@types/node/17.0.6:
+    resolution: {integrity: sha512-+XBAjfZmmivILUzO0HwBJoYkAyyySSLg5KCGBDFLomJo0sV6szvVLAf4ANZZ0pfWzgEds5KmGLG9D5hfEqOhaA==}
     dev: false
 
   /@types/offscreencanvas/2019.3.0:
@@ -455,7 +455,7 @@ packages:
   /@types/ws/8.2.2:
     resolution: {integrity: sha512-NOn5eIcgWLOo6qW8AcuLZ7G8PycXu0xTxxkS6Q18VWFxgPUSOwV0pBj2a/4viNZVu25i7RIB7GttdkAIUUXOOg==}
     dependencies:
-      '@types/node': 17.0.5
+      '@types/node': 17.0.6
     dev: false
 
   /@typescript-eslint/eslint-plugin/5.8.1_8770ffbed38944eeb584744ab0d5f040:
@@ -704,8 +704,8 @@ packages:
       fill-range: 7.0.1
     dev: true
 
-  /bufferutil/4.0.5:
-    resolution: {integrity: sha512-HTm14iMQKK2FjFLRTM5lAVcyaUzOnqbPtesFIvREgXpJHdQm8bWS+GkQgIkfaBYRHuCnea7w8UVNfwiAQhlr9A==}
+  /bufferutil/4.0.6:
+    resolution: {integrity: sha512-jduaYOYtnio4aIAyc6UbvPCVcgq7nYpVnucyxr6eCYg/Woad9Hf/oxxBRDnGGjPfjUm6j5O/uBWhIu4iLebFaw==}
     engines: {node: '>=6.14.2'}
     requiresBuild: true
     dependencies:
@@ -819,8 +819,8 @@ packages:
     resolution: {integrity: sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=}
     dev: false
 
-  /core-js/3.20.1:
-    resolution: {integrity: sha512-btdpStYFQScnNVQ5slVcr858KP0YWYjV16eGJQw8Gg7CWtu/2qNvIM3qVRIR3n1pK2R9NNOrTevbvAYxajwEjg==}
+  /core-js/3.20.2:
+    resolution: {integrity: sha512-nuqhq11DcOAbFBV4zCbKeGbKQsUDRqTX0oqx7AttUBuqe3h20ixsE039QHelbL6P4h+9kytVqyEtyZ6gsiwEYw==}
     requiresBuild: true
     dev: false
 
@@ -889,12 +889,12 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /discord-api-types/0.26.0:
-    resolution: {integrity: sha512-bnUltSHpQLzTVZTMjm+iNgVhAbtm5oAKHrhtiPaZoxprbm1UtuCZCsG0yXM61NamWfeSz7xnLvgFc50YzVJ5cQ==}
+  /discord-api-types/0.26.1:
+    resolution: {integrity: sha512-T5PdMQ+Y1MEECYMV5wmyi9VEYPagEDEi4S0amgsszpWY0VB9JJ/hEvM6BgLhbdnKky4gfmZEXtEEtojN8ZKJQQ==}
     engines: {node: '>=12'}
     dev: false
 
-  /discord.js/13.5.0_5971b5a749a91823f5467a6d31a2f8b3:
+  /discord.js/13.5.0_bffff4271b89d628e8333ead80d3d8e8:
     resolution: {integrity: sha512-K+ZcB0f+wA1ZzDhz3hlaAi4Ap7jSvVEUZ+U29T4DMoiNNUv22F4vu1byrOq8GyyLLDFiZ3iSudea0MvSHu3fQA==}
     engines: {node: '>=16.6.0', npm: '>=7.0.0'}
     dependencies:
@@ -903,10 +903,10 @@ packages:
       '@sapphire/async-queue': 1.1.9
       '@types/node-fetch': 2.5.12
       '@types/ws': 8.2.2
-      discord-api-types: 0.26.0
+      discord-api-types: 0.26.1
       form-data: 4.0.0
       node-fetch: 2.6.6
-      ws: 8.4.0_5971b5a749a91823f5467a6d31a2f8b3
+      ws: 8.4.0_bffff4271b89d628e8333ead80d3d8e8
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -1880,13 +1880,17 @@ packages:
     resolution: {integrity: sha512-CG0MbSZp73kb6iRH+pcUXyTJQNc5yaDXgziGA/d7mF41Eoi37SiRvhilDRV6UJSZ9D0NM1BERPhCLrJJCsBMiA==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      core-js: 3.20.1
+      core-js: 3.20.2
       immutable: 4.0.0
       unix-dgram: 2.0.4
     dev: false
 
   /seedrandom/2.4.3:
     resolution: {integrity: sha1-JDhQTa0zkXMUv/GKxNeU8W1qrsw=}
+    dev: false
+
+  /seedrandom/2.4.4:
+    resolution: {integrity: sha512-9A+PDmgm+2du77B5i0Ip2cxOqqHjgNxnBgglxLcX78A2D6c2rTo61z4jnVABpF4cKeDMDG+cmXXvdnqse2VqMA==}
     dev: false
 
   /semver/6.3.0:
@@ -2158,8 +2162,8 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /utf-8-validate/5.0.7:
-    resolution: {integrity: sha512-vLt1O5Pp+flcArHGIyKEQq883nBt8nN8tVBcoL0qUXj2XT1n7p70yGIq2VK98I5FdZ1YHc0wk/koOnHjnXWk1Q==}
+  /utf-8-validate/5.0.8:
+    resolution: {integrity: sha512-k4dW/Qja1BYDl2qD4tOMB9PFVha/UJtxTc1cXYOe3WwA/2m0Yn4qB7wLMpJyLJ/7DR0XnTut3HsCSzDT4ZvKgA==}
     engines: {node: '>=6.14.2'}
     requiresBuild: true
     dependencies:
@@ -2195,7 +2199,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 4.2.3
+      string-width: 1.0.2
     dev: false
 
   /winston-journald3/0.1.2:
@@ -2249,7 +2253,7 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
 
-  /ws/8.4.0_5971b5a749a91823f5467a6d31a2f8b3:
+  /ws/8.4.0_bffff4271b89d628e8333ead80d3d8e8:
     resolution: {integrity: sha512-IHVsKe2pjajSUIl4KYMQOdlyliovpEPquKkqbwswulszzI7r0SfQrxnXdWAEqOlDCLrVSJzo+O1hAwdog2sKSQ==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -2261,8 +2265,8 @@ packages:
       utf-8-validate:
         optional: true
     dependencies:
-      bufferutil: 4.0.5
-      utf-8-validate: 5.0.7
+      bufferutil: 4.0.6
+      utf-8-validate: 5.0.8
     dev: false
 
   /y18n/5.0.8:

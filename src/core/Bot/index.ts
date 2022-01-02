@@ -64,8 +64,7 @@ export class Bot extends Discord.Client {
   }
 
   async fetchMember(guildId: Snowflake, userId: Snowflake) {
-    const guild = this.guilds.resolve(guildId);
-    return guild!.members.fetch(userId);
+    return this.guilds.resolve(guildId)?.members.fetch(userId);
   }
 
   async fetchChannel<TChannel extends Discord.Channel = Discord.Channel>(channelId?: Snowflake | null) {

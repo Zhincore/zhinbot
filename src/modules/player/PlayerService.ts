@@ -74,10 +74,10 @@ export class PlayerService {
 
     if (validate) {
       const author = await this.bot.fetchMember(guildId, authorId);
-      const authorVoice = author.voice.channel;
+      const authorVoice = author!.voice.channel;
       const playerVoiceId = player.voiceId;
 
-      if (playerVoiceId && !this.bot.isAdmin(author) && (!authorVoice || playerVoiceId !== authorVoice.id)) {
+      if (playerVoiceId && !this.bot.isAdmin(author!) && (!authorVoice || playerVoiceId !== authorVoice.id)) {
         throw "You can't control the music if you aren't a listener";
       } else if (!playerVoiceId && authorVoice) {
         player.join(authorVoice);
@@ -208,6 +208,6 @@ export class PlayerService {
 
   async getUserVoice(guildId: Snowflake, userId: Snowflake) {
     const member = await this.bot.fetchMember(guildId, userId);
-    return member.voice.channel;
+    return member!.voice.channel;
   }
 }

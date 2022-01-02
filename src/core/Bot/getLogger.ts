@@ -55,10 +55,10 @@ const maxLevelLength = Math.max(...Object.keys(Winston.config.npm.levels).map((l
 
 function printfTemplateFunction(info: Winston.Logform.TransformableInfo) {
   const prefix = info.module ? `[${info.module}]` : "";
-  const msg = info.message.split("\n");
+  const msg = info.message.trim().split("\n");
 
   let level = info.level.toUpperCase().padEnd(maxLevelLength, " ");
-  let message = `${prefix} ${msg.shift()}${msg.map((v) => " ".repeat(level.length) + v).join("\n")}`;
+  let message = `${prefix} ${[msg.shift(), ...msg.map((v) => " ".repeat(level.length) + v)].join("\n")}`;
 
   const colors = levelColors[info.level];
   if (colors) {

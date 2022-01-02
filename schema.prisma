@@ -12,31 +12,46 @@ generator client {
 model Guild {
   id String @id
 
+  members Member[]
+
   // Player
   playerChannel String?
 
   // Modules
-  selfRoles SelfRolesItem[]
   warnings  Warning[]
+  selfRoles SelfRolesItem[]
   // effects    EffectItem[]
   // alerts     AlertsItem[]
+}
+
+model Member {
+  id      String
+  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String
+
+  toxicity Int @default(0)
+
+  warnings Warning[]
+
+  @@id([guildId, id])
 }
 
 // #### MODULES ####
 
 // ## Moderator ##
 model Warning {
-  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId   String
-  userId    String
-  number    Int
+  id      Int     @unique @default(autoincrement())
+  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String
+  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  userId  String
 
   reason String
 
   staffId   String
   timestamp DateTime @default(now())
 
-  @@id([guildId, userId, number])
+  @@id([guildId, id])
 }
 
 // ## Self-roles ##

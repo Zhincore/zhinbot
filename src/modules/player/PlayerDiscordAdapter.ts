@@ -174,13 +174,13 @@ export class PlayerDiscordAdapter {
             : "Nothing",
         })),
       )
-      .setFooter(
-        [
+      .setFooter({
+        text: [
           `${player.queue.length + Number(!!player.currentSong)} song(s) in total`,
           `page ${page + 1} of ${pages}`,
           player.loop ? "🔁 looping on" : "▶️ looping off",
         ].join(" ︱ "),
-      );
+      });
 
     return interaction.reply({
       embeds: [embed],
@@ -190,12 +190,14 @@ export class PlayerDiscordAdapter {
             new MessageButton({
               customId: QUEUE_PAGE_ID + ":" + (page - 1),
               label: "Prev page",
+              emoji: "◀️",
               style: "SECONDARY",
               disabled: page == 0,
             }),
             new MessageButton({
               customId: QUEUE_PAGE_ID + ":" + (page + 1),
               label: "Next page",
+              emoji: "▶️",
               style: "SECONDARY",
               disabled: page + 1 >= pages,
             }),

@@ -22,4 +22,37 @@ export class Config implements Readonly<Config> {
       size: Number(process.env.PLAYER_CACHE_SIZE ?? 2048),
     },
   };
+
+  moderation: ModerationConfig = {
+    warnPenalties: [
+      { count: 2, perTime: ms("1h"), duration: ms("30m") },
+      { count: 3, perTime: ms("12h"), duration: ms("2h") },
+      { count: 6, perTime: ms("24h"), duration: ms("7d") },
+    ],
+
+    automod: {
+      toxicity: {
+        warn: {
+          identity_attack: { mustBeToxic: false },
+          severe_toxicity: { mustBeToxic: false },
+          sexual_explicit: { mustBeToxic: false },
+          threat: { mustBeToxic: false },
+          insult: { mustBeToxic: true },
+        },
+        detectThreshold: 0.85,
+        scoreDeleteThreshold: 0.5,
+      },
+    },
+  };
 }
+
+type ModerationConfig = {
+  warnPenalties: { count: number; perTime: number; duration: number }[];
+  automod: {
+    toxicity: {
+      warn: Record<string, { mustBeToxic: boolean }>;
+      detectThreshold: number;
+      scoreDeleteThreshold: number;
+    };
+  };
+};
