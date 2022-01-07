@@ -4,11 +4,12 @@ import { ToxicityClassifier } from "@tensorflow-models/toxicity";
 import { Service } from "@core/decorators";
 import { Config } from "~/Config";
 import { ModeratorService } from "~/modules/moderator/ModeratorService";
-import { AutomodSubmodule } from "../AutomodSubmodule";
+import { AutomodFilter } from "../AutomodFilter";
 import { replacements, replacementsRegex } from "./replacements";
 
 @Service()
-export class ToxicityAutomodSubmodule extends AutomodSubmodule {
+export class ToxicityAutomodFilter extends AutomodFilter {
+  public readonly name = "toxicity";
   private readonly config = this.globalConfig.moderation.automod.toxicity;
   private readonly toxicity = new ToxicityClassifier(this.config.detectThreshold, [
     "identity_attack",

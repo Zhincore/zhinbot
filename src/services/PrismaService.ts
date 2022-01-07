@@ -3,6 +3,8 @@ import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { Config } from "~/Config";
 
+export { default as Prisma } from "@prisma/client";
+
 @Service()
 export class PrismaService extends PrismaClient {
   constructor(config: Config, bot: Bot) {

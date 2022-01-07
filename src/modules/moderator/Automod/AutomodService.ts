@@ -1,17 +1,25 @@
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
-import { AutomodSubmodule } from "./submodules/AutomodSubmodule";
-import Submodules from "./submodules";
+import { ModeratorService } from "~/modules/moderator/ModeratorService";
+import { AutomodFilter } from "./filters/AutomodFilter";
+import Filters from "./filters";
 
 @Service()
 export class AutomodService {
   // private readonly logger = this.bot.getLogger("Moderator");
-  private readonly submodules: AutomodSubmodule[] = Submodules.map((s) => this.bot.container.get(s));
+  private readonly filters: AutomodFilter[] = Filters.map((filter) => this.bot.container.get(filter));
 
-  constructor(private readonly bot: Bot) {
+  constructor(private readonly bot: Bot, modservice: ModeratorService) {
     bot.on("messageCreate", async (message) => {
-      if (message.author.id === bot.user!.id) return;
-      await Promise.all(this.submodules.map((s) => s.processMessage(message)));
+      if (!message.inGuild() || message.author.id === bot.user!.id) return;
+
+      const config = await modservice.getGuildConfig(message.guildId);
+      if (!config.automod) return;
+      const disabledFilters = config.automodDisabledFilters as string[];
+
+      await Promise.all(
+        this.filters.map((filter) => !disabledFilters.includes(filter.name) && filter.processMessage(message)),
+      );
     });
   }
 }

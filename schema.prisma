@@ -18,6 +18,7 @@ model Guild {
   playerChannel String?
 
   // Modules
+  modConfig ModConfig?
   warnings  Warning[]
   selfRoles SelfRolesItem[]
   // effects    EffectItem[]
@@ -39,6 +40,15 @@ model Member {
 // #### MODULES ####
 
 // ## Moderator ##
+model ModConfig {
+  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String @unique
+
+  automod Boolean @default(false)
+
+  automodDisabledFilters Json @default("[]")
+}
+
 model Warning {
   id      Int     @unique @default(autoincrement())
   guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)

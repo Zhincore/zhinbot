@@ -68,8 +68,6 @@ export class ModuleManager {
   }
 
   register(modules: Constructable<any>[]) {
-    this.commandDataList.length = 0;
-
     for (const BotModule of modules) {
       const moduleData = Decorators.getModuleData(BotModule);
       if (!moduleData) {
@@ -79,6 +77,8 @@ export class ModuleManager {
       this.bot.container.get(BotModule);
 
       if (moduleData.discordAdapters) moduleData.discordAdapters.forEach(this.parseAdapterCommands.bind(this));
+      if (moduleData.services) moduleData.services.forEach((Service) => this.bot.container.get(Service));
+      if (moduleData.subModules) this.register(moduleData.subModules);
       this.modules.add(moduleData);
     }
   }

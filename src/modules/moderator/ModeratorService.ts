@@ -3,13 +3,15 @@ import ms from "ms";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { Config } from "~/Config";
-import { PrismaService } from "~/services/PrismaService";
+import { Cache } from "~/utils/Cache";
+import { PrismaService, Prisma } from "~/services/PrismaService";
 
 const TIMEOUT_ERR = "Unable to timeout this member, their rank is probbably higher than mine.";
 
 @Service()
 export class ModeratorService {
   // private readonly logger = this.bot.getLogger("Moderator");
+  private readonly guildConfigs = new Cache<Prisma.ModConfig>(ms("30m"));
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
 
@@ -30,6 +32,26 @@ export class ModeratorService {
       this.bot.fetchChannel<TextChannel>(channelId).then(send),
       this.bot.users.fetch(userId).then((user) => user?.createDM().then(send)),
     ]);
+  }
+
+  async getGuildConfig(guildId: Snowflake) {
+    let config = this.guildConfigs.get(guildId);
+    if (!config) {
+      config = await this.prisma.modConfig.upsert({ where: { guildId }, create: { guildId }, update: {} });
+      this.guildConfigs.set(guildId, config);
+    }
+    return config;
+  }
+
+  async setGuildConfig(guildId: Snowflake, config: Omit<Prisma.Prisma.ModConfigCreateInput, "guild">) {
+    return this.guildConfigs.set(
+      guildId,
+      await this.prisma.modConfig.upsert({
+        where: { guildId },
+        create: { ...config, guild: { connect: { id: guildId } } },
+        update: config,
+      }),
+    );
   }
 
   // NOTE: This could be in a separate thread?

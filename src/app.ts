@@ -1,10 +1,8 @@
+import "./prestart";
 import "reflect-metadata";
-import { config as dotenv } from "dotenv";
 import { Bot } from "@core/Bot";
 import { Config } from "./Config";
 import modules from "./modules";
-
-dotenv();
 
 async function main() {
   const config = new Config();
