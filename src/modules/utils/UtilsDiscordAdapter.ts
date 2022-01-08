@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import ms from "ms";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 
 @DiscordAdapter()
@@ -22,9 +23,9 @@ export class UtilsDiscordAdapter {
 
     return interaction.editReply(
       [
-        `Process uptime: \`${uptime * 1000} ms\``,
-        `Connection uptime: \`${interaction.client.uptime} ms\``,
-        `Ping: \`${interaction.client.ws.ping} ms\``,
+        `Process uptime: \`${ms(uptime * 1000)}\``,
+        `Connection uptime: \`${ms(interaction.client.uptime!)}\``,
+        `Ping: \`${interaction.client.ws.ping}ms\``,
         `Latency: \`${sent.createdTimestamp - interaction.createdTimestamp}ms\``,
       ].join("\n"),
     );

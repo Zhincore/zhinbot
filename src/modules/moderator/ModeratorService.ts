@@ -8,6 +8,8 @@ import { PrismaService, Prisma } from "~/services/PrismaService";
 
 const TIMEOUT_ERR = "Unable to timeout this member, their rank is probbably higher than mine.";
 
+export type ModConfig = Prisma.ModConfig;
+
 @Service()
 export class ModeratorService {
   // private readonly logger = this.bot.getLogger("Moderator");
@@ -43,13 +45,19 @@ export class ModeratorService {
     return config;
   }
 
-  async setGuildConfig(guildId: Snowflake, config: Omit<Prisma.Prisma.ModConfigCreateInput, "guild">) {
+  async setGuildConfig(guildId: Snowflake, config: Omit<ModConfig, "guild">) {
+    const data = {
+      ...config,
+      guildId: undefined,
+      automodDisabledFilters: config.automodDisabledFilters ?? undefined,
+    };
+
     return this.guildConfigs.set(
       guildId,
       await this.prisma.modConfig.upsert({
         where: { guildId },
-        create: { ...config, guild: { connect: { id: guildId } } },
-        update: config,
+        create: { ...data, guild: { connect: { id: guildId } } },
+        update: data,
       }),
     );
   }
