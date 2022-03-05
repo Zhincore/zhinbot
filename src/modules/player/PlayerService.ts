@@ -1,12 +1,12 @@
 import { TextChannel, Snowflake, MessageEmbed } from "discord.js";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
+import { Player, YTQueryResponse, YtResponse } from "./Player";
+import { getPlayerControls } from "./PlayerDiscordAdapter";
 import { Cache } from "~/utils/Cache";
 import { PrismaService } from "~/services/PrismaService";
 import { Config } from "~/Config";
 import { getDurationString } from "~/utils";
-import { Player, YTQueryResponse, YtResponse } from "./Player";
-import { getPlayerControls } from "./PlayerDiscordAdapter";
 
 @Service()
 export class PlayerService {

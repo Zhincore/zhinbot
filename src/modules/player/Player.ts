@@ -28,7 +28,7 @@ export class Player extends EventEmitter {
   constructor(private readonly config: Config, private readonly cache: Cache<Promise<YTQueryResponse>>) {
     super();
 
-    this.player.on("stateChange", (oldState, state) => {
+    this.player.on<"stateChange">("stateChange", (oldState, state) => {
       if (oldState === state) return;
 
       this.cancelTimeoutIfInactive();

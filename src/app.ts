@@ -1,5 +1,6 @@
 import "./prestart";
 import "reflect-metadata";
+import { addExitCallback } from "catch-exit";
 import { Bot } from "@core/Bot";
 import { Config } from "./Config";
 import modules from "./modules";
@@ -10,7 +11,7 @@ async function main() {
   bot.container.set(Config, config);
   bot.modules.register(modules);
 
-  process.on("exit", () => {
+  addExitCallback(() => {
     bot.destroy();
   });
 

@@ -1,7 +1,7 @@
 import { CommandInteraction, ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton } from "discord.js";
 import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
-import { getDurationString } from "~/utils";
 import { PlayerService } from "./PlayerService";
+import { getDurationString } from "~/utils";
 
 const QUEUE_PAGE_ID = "player.queue";
 const CONTROL_ID = "player";
