@@ -20,6 +20,7 @@ model Guild {
   // Modules
   modConfig ModConfig?
   warnings  Warning[]
+  rating    MessageRating[]
   selfRoles SelfRolesItem[]
   // effects    EffectItem[]
   // alerts     AlertsItem[]
@@ -30,9 +31,8 @@ model Member {
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
 
-  toxicity Int @default(0)
-
   warnings Warning[]
+  rating   MessageRating?
 
   @@id([guildId, id])
 }
@@ -62,6 +62,18 @@ model Warning {
   timestamp DateTime @default(now())
 
   @@id([guildId, id])
+}
+
+// ## Message Rating ##
+model MessageRating {
+  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String  @unique
+  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  userId  String
+
+  rating Int @default(0)
+
+  @@id([guildId, userId])
 }
 
 // ## Self-roles ##

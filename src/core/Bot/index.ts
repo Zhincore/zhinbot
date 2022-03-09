@@ -33,8 +33,23 @@ export class Bot extends Discord.Client {
       this.logger.error(m);
     });
 
-    this.once("ready", () => {
-      this.logger.info("Logged in as %s", this.user!.tag);
+    this.once("ready", async (bot) => {
+      this.logger.info("Logged in as %s", bot.user.tag);
+
+      const app = await bot.application.fetch();
+      if (app.owner) this.settings.owners.push(app.owner.id);
+      try {
+        await Promise.all([
+          // Update avatar
+          app.icon !== bot.user.avatar && bot.user.setAvatar(app.icon).then(() => this.logger.info("Avatar updated")),
+          // Update username
+          app.name &&
+            app.name !== bot.user.username &&
+            bot.user.setUsername(app.name).then(() => this.logger.info(`Username updated to '${app.name}'`)),
+        ]);
+      } catch (err) {
+        this.logger.warn(err);
+      }
     });
 
     this.readyPromise = new Promise((resolve) => this.once("ready", () => resolve()));
@@ -53,7 +68,6 @@ export class Bot extends Discord.Client {
 
   async login(token?: string) {
     await super.login(token);
-
     return "";
   }
 

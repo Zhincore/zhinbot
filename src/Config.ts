@@ -14,6 +14,12 @@ export class Config implements Readonly<Config> {
     },
   };
 
+  activities: ActivitiesConfig = {
+    activityMap: {
+      youtube: "880218394199220334",
+    },
+  };
+
   player = {
     maxQueueLength: Number(process.env.PLAYER_QUEUE_LEN ?? 256),
     timeout: ms(process.env.PLAYER_TIMEOUT ?? "15m"),
@@ -30,29 +36,15 @@ export class Config implements Readonly<Config> {
       { count: 6, perTime: ms("24h"), duration: ms("7d") },
     ],
 
-    automod: {
-      toxicity: {
-        warn: {
-          identity_attack: { mustBeToxic: false },
-          severe_toxicity: { mustBeToxic: false },
-          sexual_explicit: { mustBeToxic: false },
-          threat: { mustBeToxic: false },
-          insult: { mustBeToxic: true },
-        },
-        detectThreshold: 0.85,
-        scoreDeleteThreshold: 0.5,
-      },
-    },
+    automod: {},
   };
 }
 
+type ActivitiesConfig = {
+  activityMap: Record<string, string>;
+};
+
 type ModerationConfig = {
   warnPenalties: { count: number; perTime: number; duration: number }[];
-  automod: {
-    toxicity: {
-      warn: Record<string, { mustBeToxic: boolean }>;
-      detectThreshold: number;
-      scoreDeleteThreshold: number;
-    };
-  };
+  automod: Record<string, never>;
 };

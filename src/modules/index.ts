@@ -1,6 +1,7 @@
+import { ActivitiesModule } from "./activities";
 import { ModeratorModule } from "./moderator";
 import { PlayerModule } from "./player";
 import { SelfRolesModule } from "./selfroles";
 import { UtilsModule } from "./utils";
 
-export default [ModeratorModule, PlayerModule, SelfRolesModule, UtilsModule];
+export default [ActivitiesModule, ModeratorModule, PlayerModule, SelfRolesModule, UtilsModule];

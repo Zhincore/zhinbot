@@ -1,16 +1,15 @@
-import { ApplicationCommandData, ChatInputApplicationCommandData, BaseCommandInteraction } from "discord.js";
+import { ApplicationCommandData, BaseCommandInteraction } from "discord.js";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 import { CustomCommandOption, parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("commands");
 
-type _CommandDataWithType = Omit<ApplicationCommandData, "name">;
-type _CommandDataWithoutType = Omit<ChatInputApplicationCommandData, "name" | "type" | "options">;
-type _CommandData = _CommandDataWithoutType | _CommandDataWithType;
+type _CommandType = ApplicationCommandData["type"];
 
-export type DiscordCommandData = _CommandData & {
+export type DiscordCommandData<Type extends _CommandType> = Omit<ApplicationCommandData, "name"> & {
   name?: string;
-  description: string;
+  type?: Type;
+  description?: Type extends "CHAT_INPUT" ? string : never;
   options?: CustomCommandOption[];
 };
 
@@ -24,7 +23,7 @@ export interface IDiscordCommand extends IInteractionHandler<BaseCommandInteract
 /**
  * Can only be used inside Discord adapter
  */
-export function DiscordCommand(data: DiscordCommandData): MethodDecorator {
+export function DiscordCommand(data: DiscordCommandData<_CommandType>): MethodDecorator {
   return (target, method) => {
     const command: IDiscordCommand = {
       commandData: parseAutocompleters(target, {

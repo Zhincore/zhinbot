@@ -7,16 +7,16 @@ specifiers:
   '@types/ms': ^0.7.31
   '@types/node': ^17.0.21
   '@types/text-table': ^0.2.2
-  '@typescript-eslint/eslint-plugin': ^5.13.0
-  '@typescript-eslint/parser': ^5.13.0
+  '@typescript-eslint/eslint-plugin': ^5.14.0
+  '@typescript-eslint/parser': ^5.14.0
   bufferutil: ^4.0.6
   catch-exit: ^1.2.2
   chalk: ^4.1.2
   color: ^4.2.1
-  discord-api-types: ^0.27.3
+  discord-api-types: ^0.28.0
   discord.js: ^13.6.0
   dotenv: ^16.0.0
-  emoji-regex: ^10.0.0
+  emoji-regex: ^10.0.1
   erlpack: github:discord/erlpack
   eslint: ^7.32.0
   eslint-config-prettier: ^8.5.0
@@ -32,7 +32,7 @@ specifiers:
   tsconfig-paths: ^3.13.0
   typedi: ^0.10.0
   typescript: ^4.6.2
-  utf-8-validate: ^5.0.8
+  utf-8-validate: ^5.0.9
   winston: ^3.6.0
   winston-journald3: ^0.1.2
   yaml: ^1.10.2
@@ -40,7 +40,7 @@ specifiers:
   zlib-sync: ^0.1.7
 
 dependencies:
-  '@discordjs/voice': 0.8.0_bffff4271b89d628e8333ead80d3d8e8
+  '@discordjs/voice': 0.8.0_d6955b83f926115bf12ffeabab6deaae
   '@prisma/client': 3.10.0_prisma@3.10.0
   '@types/color': 3.0.3
   '@types/ms': 0.7.31
@@ -50,10 +50,10 @@ dependencies:
   catch-exit: 1.2.2
   chalk: 4.1.2
   color: 4.2.1
-  discord-api-types: 0.27.3
-  discord.js: 13.6.0_bffff4271b89d628e8333ead80d3d8e8
+  discord-api-types: 0.28.0
+  discord.js: 13.6.0_d6955b83f926115bf12ffeabab6deaae
   dotenv: 16.0.0
-  emoji-regex: 10.0.0
+  emoji-regex: 10.0.1
   erlpack: github.com/discord/erlpack/3b793a333dd3f6a140b9168ea91e9fa9660753ce
   ms: 2.1.3
   prisma: 3.10.0
@@ -63,7 +63,7 @@ dependencies:
   tsconfig-paths: 3.13.0
   typedi: 0.10.0
   typescript: 4.6.2
-  utf-8-validate: 5.0.8
+  utf-8-validate: 5.0.9
   winston: 3.6.0
   winston-journald3: 0.1.2
   yaml: 1.10.2
@@ -71,8 +71,8 @@ dependencies:
   zlib-sync: 0.1.7
 
 devDependencies:
-  '@typescript-eslint/eslint-plugin': 5.13.0_3a0304e4216f58c7e1135459c8d18e32
-  '@typescript-eslint/parser': 5.13.0_eslint@7.32.0+typescript@4.6.2
+  '@typescript-eslint/eslint-plugin': 5.14.0_e3f5f4efe2bd492e36eb6c1c619dfc98
+  '@typescript-eslint/parser': 5.14.0_eslint@7.32.0+typescript@4.6.2
   eslint: 7.32.0
   eslint-config-prettier: 8.5.0_eslint@7.32.0
   eslint-plugin-import: 2.25.4_eslint@7.32.0
@@ -131,7 +131,7 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@discordjs/voice/0.8.0_bffff4271b89d628e8333ead80d3d8e8:
+  /@discordjs/voice/0.8.0_d6955b83f926115bf12ffeabab6deaae:
     resolution: {integrity: sha512-o0JfVLMs3eLjUzPf6oxMydEeum40I7xzfUc66SLN+RrKpSAsTbngf5qnCF53nm+KDNSvrwg1AZqNm4LEAdxJIA==}
     engines: {node: '>=16.9.0'}
     dependencies:
@@ -140,7 +140,7 @@ packages:
       prism-media: 1.3.2
       tiny-typed-emitter: 2.1.0
       tslib: 2.3.1
-      ws: 8.5.0_bffff4271b89d628e8333ead80d3d8e8
+      ws: 8.5.0_d6955b83f926115bf12ffeabab6deaae
     transitivePeerDependencies:
       - '@discordjs/opus'
       - bufferutil
@@ -226,8 +226,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@sapphire/async-queue/1.2.0:
-    resolution: {integrity: sha512-O5ND5Ljpef86X5oy8zXorQ754TMjWALcPSAgPBu4+76HLtDTrNoDyzU2uGE2G4A8Wv51u0MXHzGQ0WZ4GMtpIw==}
+  /@sapphire/async-queue/1.3.0:
+    resolution: {integrity: sha512-z+CDw5X4UgIEpZL8KM+ThVx1i8V60HBg0l/oFewTNbQQeRDJHdVxHyJykv+SF1H+Rc8EkMS81VTWo95jVYgO/g==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
@@ -284,8 +284,8 @@ packages:
       '@types/node': 17.0.21
     dev: false
 
-  /@typescript-eslint/eslint-plugin/5.13.0_3a0304e4216f58c7e1135459c8d18e32:
-    resolution: {integrity: sha512-vLktb2Uec81fxm/cfz2Hd6QaWOs8qdmVAZXLdOBX6JFJDhf6oDZpMzZ4/LZ6SFM/5DgDcxIMIvy3F+O9yZBuiQ==}
+  /@typescript-eslint/eslint-plugin/5.14.0_e3f5f4efe2bd492e36eb6c1c619dfc98:
+    resolution: {integrity: sha512-ir0wYI4FfFUDfLcuwKzIH7sMVA+db7WYen47iRSaCGl+HMAZI9fpBwfDo45ZALD3A45ZGyHWDNLhbg8tZrMX4w==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       '@typescript-eslint/parser': ^5.0.0
@@ -295,10 +295,10 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.13.0_eslint@7.32.0+typescript@4.6.2
-      '@typescript-eslint/scope-manager': 5.13.0
-      '@typescript-eslint/type-utils': 5.13.0_eslint@7.32.0+typescript@4.6.2
-      '@typescript-eslint/utils': 5.13.0_eslint@7.32.0+typescript@4.6.2
+      '@typescript-eslint/parser': 5.14.0_eslint@7.32.0+typescript@4.6.2
+      '@typescript-eslint/scope-manager': 5.14.0
+      '@typescript-eslint/type-utils': 5.14.0_eslint@7.32.0+typescript@4.6.2
+      '@typescript-eslint/utils': 5.14.0_eslint@7.32.0+typescript@4.6.2
       debug: 4.3.3
       eslint: 7.32.0
       functional-red-black-tree: 1.0.1
@@ -311,8 +311,8 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser/5.13.0_eslint@7.32.0+typescript@4.6.2:
-    resolution: {integrity: sha512-GdrU4GvBE29tm2RqWOM0P5QfCtgCyN4hXICj/X9ibKED16136l9ZpoJvCL5pSKtmJzA+NRDzQ312wWMejCVVfg==}
+  /@typescript-eslint/parser/5.14.0_eslint@7.32.0+typescript@4.6.2:
+    resolution: {integrity: sha512-aHJN8/FuIy1Zvqk4U/gcO/fxeMKyoSv/rS46UXMXOJKVsLQ+iYPuXNbpbH7cBLcpSbmyyFbwrniLx5+kutu1pw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -321,9 +321,9 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/scope-manager': 5.13.0
-      '@typescript-eslint/types': 5.13.0
-      '@typescript-eslint/typescript-estree': 5.13.0_typescript@4.6.2
+      '@typescript-eslint/scope-manager': 5.14.0
+      '@typescript-eslint/types': 5.14.0
+      '@typescript-eslint/typescript-estree': 5.14.0_typescript@4.6.2
       debug: 4.3.3
       eslint: 7.32.0
       typescript: 4.6.2
@@ -331,16 +331,16 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/scope-manager/5.13.0:
-    resolution: {integrity: sha512-T4N8UvKYDSfVYdmJq7g2IPJYCRzwtp74KyDZytkR4OL3NRupvswvmJQJ4CX5tDSurW2cvCc1Ia1qM7d0jpa7IA==}
+  /@typescript-eslint/scope-manager/5.14.0:
+    resolution: {integrity: sha512-LazdcMlGnv+xUc5R4qIlqH0OWARyl2kaP8pVCS39qSL3Pd1F7mI10DbdXeARcE62sVQE4fHNvEqMWsypWO+yEw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      '@typescript-eslint/types': 5.13.0
-      '@typescript-eslint/visitor-keys': 5.13.0
+      '@typescript-eslint/types': 5.14.0
+      '@typescript-eslint/visitor-keys': 5.14.0
     dev: true
 
-  /@typescript-eslint/type-utils/5.13.0_eslint@7.32.0+typescript@4.6.2:
-    resolution: {integrity: sha512-/nz7qFizaBM1SuqAKb7GLkcNn2buRdDgZraXlkhz+vUGiN1NZ9LzkA595tHHeduAiS2MsHqMNhE2zNzGdw43Yg==}
+  /@typescript-eslint/type-utils/5.14.0_eslint@7.32.0+typescript@4.6.2:
+    resolution: {integrity: sha512-d4PTJxsqaUpv8iERTDSQBKUCV7Q5yyXjqXUl3XF7Sd9ogNLuKLkxz82qxokqQ4jXdTPZudWpmNtr/JjbbvUixw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: '*'
@@ -349,7 +349,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/utils': 5.13.0_eslint@7.32.0+typescript@4.6.2
+      '@typescript-eslint/utils': 5.14.0_eslint@7.32.0+typescript@4.6.2
       debug: 4.3.3
       eslint: 7.32.0
       tsutils: 3.21.0_typescript@4.6.2
@@ -358,13 +358,13 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/types/5.13.0:
-    resolution: {integrity: sha512-LmE/KO6DUy0nFY/OoQU0XelnmDt+V8lPQhh8MOVa7Y5k2gGRd6U9Kp3wAjhB4OHg57tUO0nOnwYQhRRyEAyOyg==}
+  /@typescript-eslint/types/5.14.0:
+    resolution: {integrity: sha512-BR6Y9eE9360LNnW3eEUqAg6HxS9Q35kSIs4rp4vNHRdfg0s+/PgHgskvu5DFTM7G5VKAVjuyaN476LCPrdA7Mw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@typescript-eslint/typescript-estree/5.13.0_typescript@4.6.2:
-    resolution: {integrity: sha512-Q9cQow0DeLjnp5DuEDjLZ6JIkwGx3oYZe+BfcNuw/POhtpcxMTy18Icl6BJqTSd+3ftsrfuVb7mNHRZf7xiaNA==}
+  /@typescript-eslint/typescript-estree/5.14.0_typescript@4.6.2:
+    resolution: {integrity: sha512-QGnxvROrCVtLQ1724GLTHBTR0lZVu13izOp9njRvMkCBgWX26PKvmMP8k82nmXBRD3DQcFFq2oj3cKDwr0FaUA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       typescript: '*'
@@ -372,8 +372,8 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/types': 5.13.0
-      '@typescript-eslint/visitor-keys': 5.13.0
+      '@typescript-eslint/types': 5.14.0
+      '@typescript-eslint/visitor-keys': 5.14.0
       debug: 4.3.3
       globby: 11.1.0
       is-glob: 4.0.3
@@ -384,16 +384,16 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/utils/5.13.0_eslint@7.32.0+typescript@4.6.2:
-    resolution: {integrity: sha512-+9oHlPWYNl6AwwoEt5TQryEHwiKRVjz7Vk6kaBeD3/kwHE5YqTGHtm/JZY8Bo9ITOeKutFaXnBlMgSATMJALUQ==}
+  /@typescript-eslint/utils/5.14.0_eslint@7.32.0+typescript@4.6.2:
+    resolution: {integrity: sha512-EHwlII5mvUA0UsKYnVzySb/5EE/t03duUTweVy8Zqt3UQXBrpEVY144OTceFKaOe4xQXZJrkptCf7PjEBeGK4w==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
     dependencies:
       '@types/json-schema': 7.0.9
-      '@typescript-eslint/scope-manager': 5.13.0
-      '@typescript-eslint/types': 5.13.0
-      '@typescript-eslint/typescript-estree': 5.13.0_typescript@4.6.2
+      '@typescript-eslint/scope-manager': 5.14.0
+      '@typescript-eslint/types': 5.14.0
+      '@typescript-eslint/typescript-estree': 5.14.0_typescript@4.6.2
       eslint: 7.32.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0_eslint@7.32.0
@@ -402,11 +402,11 @@ packages:
       - typescript
     dev: true
 
-  /@typescript-eslint/visitor-keys/5.13.0:
-    resolution: {integrity: sha512-HLKEAS/qA1V7d9EzcpLFykTePmOQqOFim8oCvhY3pZgQ8Hi38hYpHd9e5GN6nQBFQNecNhws5wkS9Y5XIO0s/g==}
+  /@typescript-eslint/visitor-keys/5.14.0:
+    resolution: {integrity: sha512-yL0XxfzR94UEkjBqyymMLgCBdojzEuy/eim7N9/RIcTNxpJudAcqsU8eRyfzBbcEzGoPWfdM3AGak3cN08WOIw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
-      '@typescript-eslint/types': 5.13.0
+      '@typescript-eslint/types': 5.14.0
       eslint-visitor-keys: 3.3.0
     dev: true
 
@@ -702,23 +702,23 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /discord-api-types/0.27.3:
-    resolution: {integrity: sha512-HOG64DTpZ7CB5EU9eKbjHD50H5qG1pxKG8pmFfHUMKjKvEWeLBHfw0c9xF1cruiYLnBb3+n7m3jBWxZ3H1hcgQ==}
+  /discord-api-types/0.28.0:
+    resolution: {integrity: sha512-Gi36pbzV+2j0q/XPlDJEgX/R+wogLxU2BZFvfTMUHHAQYXqwvqj4iZP5YUGOfKimmJc79rDRrtSPUGz2t4S4GQ==}
     dev: false
 
-  /discord.js/13.6.0_bffff4271b89d628e8333ead80d3d8e8:
+  /discord.js/13.6.0_d6955b83f926115bf12ffeabab6deaae:
     resolution: {integrity: sha512-tXNR8zgsEPxPBvGk3AQjJ9ljIIC6/LOPjzKwpwz8Y1Q2X66Vi3ZqFgRHYwnHKC0jC0F+l4LzxlhmOJsBZDNg9g==}
     engines: {node: '>=16.6.0', npm: '>=7.0.0'}
     dependencies:
       '@discordjs/builders': 0.11.0
       '@discordjs/collection': 0.4.0
-      '@sapphire/async-queue': 1.2.0
+      '@sapphire/async-queue': 1.3.0
       '@types/node-fetch': 2.6.1
       '@types/ws': 8.5.2
       discord-api-types: 0.26.1
       form-data: 4.0.0
       node-fetch: 2.6.7
-      ws: 8.5.0_bffff4271b89d628e8333ead80d3d8e8
+      ws: 8.5.0_d6955b83f926115bf12ffeabab6deaae
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -744,8 +744,8 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /emoji-regex/10.0.0:
-    resolution: {integrity: sha512-KmJa8l6uHi1HrBI34udwlzZY1jOEuID/ft4d8BSSEdRyap7PwBEt910453PJa5MuGvxkLqlt4Uvhu7tttFHViw==}
+  /emoji-regex/10.0.1:
+    resolution: {integrity: sha512-cLuZzriSWVE+rllzeq4zpUEoCPfYEbQ6ZVhIq+ed6ynWST7Bw9XnOr+bKWgCup4paq72DI21gw9M3aaFkm4HAw==}
     dev: false
 
   /emoji-regex/8.0.0:
@@ -2054,8 +2054,8 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /utf-8-validate/5.0.8:
-    resolution: {integrity: sha512-k4dW/Qja1BYDl2qD4tOMB9PFVha/UJtxTc1cXYOe3WwA/2m0Yn4qB7wLMpJyLJ/7DR0XnTut3HsCSzDT4ZvKgA==}
+  /utf-8-validate/5.0.9:
+    resolution: {integrity: sha512-Yek7dAy0v3Kl0orwMlvi7TPtiCNrdfHNd7Gcc/pLq4BLXqfAmd0J7OWMizUQnTTJsyjKn02mU7anqwfmUP4J8Q==}
     engines: {node: '>=6.14.2'}
     requiresBuild: true
     dependencies:
@@ -2142,7 +2142,7 @@ packages:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
     dev: true
 
-  /ws/8.5.0_bffff4271b89d628e8333ead80d3d8e8:
+  /ws/8.5.0_d6955b83f926115bf12ffeabab6deaae:
     resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -2155,7 +2155,7 @@ packages:
         optional: true
     dependencies:
       bufferutil: 4.0.6
-      utf-8-validate: 5.0.8
+      utf-8-validate: 5.0.9
     dev: false
 
   /yallist/4.0.0:
