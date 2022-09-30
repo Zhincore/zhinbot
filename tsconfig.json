@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
-    "lib": [
-      "es2021"
-    ],
+    "lib": ["ESNext"],
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*", "./dist/*"],
-      "@core/*": ["./src/core/*", "./dist/core/*"],
+      "@core/*": ["./src/core/*", "./dist/core/*"]
     },
-    "target": "es2021",
+    "target": "ESNext",
     "skipLibCheck": true,
     "strict": true,
     "alwaysStrict": true,
@@ -17,7 +15,7 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "sourceMap": true,
-    "module": "commonjs",
+    "module": "NodeNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
@@ -28,9 +26,6 @@
   "ts-node": {
     "transpileOnly": true
   },
-  "include": [
-    "src/**/*.ts",
-    "./*.js"
-  ],
+  "include": ["src/**/*.ts", "./*.js"],
   "exclude": ["node_modules", "dist"]
 }

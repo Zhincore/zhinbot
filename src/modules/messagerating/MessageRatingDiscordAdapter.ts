@@ -1,4 +1,10 @@
-import { CommandInteraction, MessageContextMenuInteraction } from "discord.js";
+import {
+  ApplicationCommandOptionType,
+  ApplicationCommandType,
+  ChatInputCommandInteraction,
+  MessageContextMenuCommandInteraction,
+  PermissionFlagsBits,
+} from "discord.js";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 import { MessageRatingService } from "./MessageRatingService";
 
@@ -6,7 +12,7 @@ import { MessageRatingService } from "./MessageRatingService";
 export class MessageRatingDiscordAdapter {
   constructor(private readonly service: MessageRatingService) {}
 
-  async doRating(interaction: MessageContextMenuInteraction<"present">, isLike: boolean) {
+  async doRating(interaction: MessageContextMenuCommandInteraction<"cached">, isLike: boolean) {
     const author = interaction.targetMessage.author;
     if (author.bot) throw new Error("Cannot rate bot message");
     await this.service.rate(interaction.guildId, author.id, isLike ? 1 : -1);
@@ -18,19 +24,19 @@ export class MessageRatingDiscordAdapter {
 
   @DiscordCommand({
     name: "Like message",
-    type: "MESSAGE",
-    defaultPermission: false,
+    type: ApplicationCommandType.Message,
+    defaultMemberPermissions: PermissionFlagsBits.AddReactions,
   })
-  like(interaction: MessageContextMenuInteraction<"present">) {
+  like(interaction: MessageContextMenuCommandInteraction<"cached">) {
     return this.doRating(interaction, true);
   }
 
   @DiscordCommand({
     name: "Dislike message",
-    type: "MESSAGE",
-    defaultPermission: false,
+    type: ApplicationCommandType.Message,
+    defaultMemberPermissions: PermissionFlagsBits.AddReactions,
   })
-  dislike(interaction: MessageContextMenuInteraction<"present">) {
+  dislike(interaction: MessageContextMenuCommandInteraction<"cached">) {
     return this.doRating(interaction, false);
   }
 
@@ -40,11 +46,11 @@ export class MessageRatingDiscordAdapter {
       {
         name: "member",
         description: "The member to show rating of (you if not specified)",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
       },
     ],
   })
-  async rating(interaction: CommandInteraction<"present">) {
+  async rating(interaction: ChatInputCommandInteraction<"cached">) {
     const user = interaction.options.getUser("member", false) ?? interaction.user;
     const rating = await this.service.getRating(interaction.guildId, user.id);
     return interaction.reply(`${user.tag} has rating of \`${rating}\`.`);

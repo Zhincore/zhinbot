@@ -1,4 +1,9 @@
-import { ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, BaseCommandInteraction } from "discord.js";
+import {
+  ApplicationCommandOptionType,
+  ApplicationCommandSubCommandData,
+  ApplicationCommandSubGroupData,
+  ChatInputCommandInteraction,
+} from "discord.js";
 import { DiscordCommandExecutor } from "./DiscordCommand";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 import { CustomCommandOption, CustomAppSubcmdData, parseAutocompleters } from "./DiscordAutocompleter";
@@ -17,9 +22,9 @@ export type DiscordSubcommandData<T extends "subcmd" | "group"> = Omit<_D<T>, "n
   options?: T extends "subcmd" ? CustomCommandOption[] : DiscordSubcommandData<"subcmd">[];
 };
 
-export type DiscordSubcommandExecutor = (interaction: BaseCommandInteraction) => Promise<void>;
+export type DiscordSubcommandExecutor = (interaction: ChatInputCommandInteraction) => Promise<void>;
 
-export interface IDiscordSubcommand extends IInteractionHandler<BaseCommandInteraction> {
+export interface IDiscordSubcommand extends IInteractionHandler<ChatInputCommandInteraction> {
   commandData: ApplicationCommandSub_Data;
   execute: DiscordCommandExecutor;
 }
@@ -33,9 +38,9 @@ export function DiscordSubcommand(data: DiscordSubcommandData<any>): MethodDecor
   return (target, method) => {
     const subcommand: IDiscordSubcommand = {
       commandData: parseAutocompleters(target, {
+        type: ApplicationCommandOptionType.Subcommand,
+        name: method.toString(),
         ...data,
-        type: data.type ?? "SUB_COMMAND",
-        name: data.name ?? method.toString(),
       } as CustomAppSubcmdData),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,
     };

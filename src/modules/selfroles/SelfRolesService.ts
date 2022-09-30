@@ -208,7 +208,7 @@ export class SelfRolesService {
     /// Do Discord.Message
     const guild = await this.bot.guilds.fetch(guildId);
     const { embed, roles } = this.generateEmbed(item, guild);
-    const messageData: Discord.MessageOptions = {
+    const messageData: Discord.MessageCreateOptions = {
       embeds: [embed],
       content: item.message || undefined,
       // components: [
@@ -275,7 +275,7 @@ export class SelfRolesService {
         role: this.bot.resolveRole(role.roleId, guild),
       }));
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new Discord.EmbedBuilder()
       .setTitle(item.title || "Choose your role")
       .setColor(item.color)
       .setDescription(
@@ -294,7 +294,13 @@ export class SelfRolesService {
             : "") +
           "",
       )
-      .setFooter(item.showName ? `Name: ${item.name}` : "");
+      .setFooter(
+        item.showName
+          ? {
+              text: `Name: ${item.name}`,
+            }
+          : null,
+      );
 
     return { embed, roles };
   }

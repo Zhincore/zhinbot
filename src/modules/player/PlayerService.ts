@@ -1,6 +1,7 @@
-import { TextChannel, Snowflake, MessageEmbed } from "discord.js";
+import { TextChannel, Snowflake, EmbedBuilder, ChannelType } from "discord.js";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
+import { Logger } from "winston";
 import { Player, YTQueryResponse, YtResponse } from "./Player";
 import { getPlayerControls } from "./PlayerDiscordAdapter";
 import { Cache } from "~/utils/Cache";
@@ -12,9 +13,10 @@ import { getDurationString } from "~/utils";
 export class PlayerService {
   private readonly songCache = new Cache<Promise<YTQueryResponse>>(16_000, 64);
   private readonly players = new Map<string, { player: Player; updateChannel: TextChannel }>();
-  private readonly playerLogger = this.bot.getLogger("Player");
+  private readonly playerLogger: Logger;
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
+    this.playerLogger = bot.getLogger("Player");
     bot.on("voiceStateUpdate", (oldState, newState) => {
       if (newState.channelId === oldState.channelId) return;
 
@@ -89,7 +91,7 @@ export class PlayerService {
 
   private async getUpdateChannel(channelId: Snowflake) {
     const channel = await this.bot.fetchChannel<TextChannel>(channelId);
-    if (channel?.isText()) return channel;
+    if (channel?.type === ChannelType.GuildText) return channel;
     return null;
   }
 
@@ -118,7 +120,7 @@ export class PlayerService {
       const item = this.players.get(guildId);
       if (!item) return;
 
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setTitle("Player was left idle for too long")
         .setDescription("Queue deleted and voice channel left")
         .setColor("#00afff");
@@ -131,7 +133,7 @@ export class PlayerService {
       const item = this.players.get(guildId);
       if (!item) return;
 
-      const embed = new MessageEmbed().setTitle("Reached end of the music queue").setColor("#00afff");
+      const embed = new EmbedBuilder().setTitle("Reached end of the music queue").setColor("#00afff");
       item.updateChannel.send({ embeds: [embed] }).catch(console.error);
     };
   }
@@ -162,7 +164,7 @@ export class PlayerService {
       upload_date = `${d.slice(-2)}. ${d.slice(-4, -2)}. ${d.slice(0, 4)}`;
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor("#00afff")
       .setTitle(song.title)
       .setDescription(description)

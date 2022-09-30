@@ -20,7 +20,13 @@ export class Bot extends Discord.Client {
 
   constructor(readonly settings: BotSettings) {
     super({
-      intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILD_VOICE_STATES"],
+      intents: [
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMembers,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.GuildMessageReactions,
+        Discord.GatewayIntentBits.GuildVoiceStates,
+      ],
     });
 
     this.on("debug", (m) => {
@@ -74,7 +80,7 @@ export class Bot extends Discord.Client {
   // utils
 
   isAdmin(memberOrRole: Discord.GuildMember | Discord.Role) {
-    return memberOrRole.permissions.has("ADMINISTRATOR");
+    return memberOrRole.permissions.has(Discord.PermissionFlagsBits.Administrator);
   }
 
   async fetchMember(guildId: Snowflake, userId: Snowflake) {
@@ -91,7 +97,7 @@ export class Bot extends Discord.Client {
     if (!messageId) return null;
     const channel = await (typeof channelOrId === "string" ? this.fetchChannel(channelOrId) : channelOrId);
     if (!channel) throw new Error("Discord.Channel not found");
-    if (!channel.isText()) throw new Error("Discord.Channel is not textual");
+    if (channel.type !== Discord.ChannelType.GuildText) throw new Error("Discord.Channel is not textual");
     return channel.messages.fetch(messageId).catch((err) => {
       if (err instanceof DiscordAPIError && err.message === "Unknown Discord.Message") return null;
       throw err;

@@ -1,4 +1,12 @@
-import Discord, { Snowflake, MessageEmbed, TextChannel, DMChannel, MessageOptions, Guild } from "discord.js";
+import Discord, {
+  Snowflake,
+  TextChannel,
+  DMChannel,
+  Guild,
+  ChannelType,
+  MessageCreateOptions,
+  EmbedBuilder,
+} from "discord.js";
 import ms from "ms";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
@@ -17,10 +25,10 @@ export class ModeratorService {
 
   constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
 
-  private async announce(message: MessageOptions, userId: Snowflake, channelId: Snowflake, guild: Guild) {
-    const send = (channel: TextChannel | DMChannel | null) => {
+  private async announce(message: MessageCreateOptions, userId: Snowflake, channelId: Snowflake, guild: Guild) {
+    const send = (channel: TextChannel | DMChannel | null): any => {
       return channel?.send(
-        channel.type === "DM"
+        channel.type === ChannelType.DM
           ? {
               ...message,
               content:
@@ -111,7 +119,7 @@ export class ModeratorService {
     }
 
     if (channelId) {
-      const embed = new MessageEmbed({
+      const embed = new EmbedBuilder({
         title: `🚫 Timed out @${member.user.tag} for ${ms(duration)}`,
         fields: [
           ...(reason ? [{ name: "Reason", value: reason, inline: true }] : []),
@@ -138,7 +146,7 @@ export class ModeratorService {
 
     const member = await memberPromise;
     if (!member) return null;
-    const embed = new MessageEmbed({
+    const embed = new EmbedBuilder({
       title: `⚠️ Warning for @${member.user.tag}`,
       fields: [
         { name: "Reason", value: reason, inline: true },

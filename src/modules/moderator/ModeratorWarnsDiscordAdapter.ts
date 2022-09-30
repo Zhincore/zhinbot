@@ -1,4 +1,10 @@
-import Discord, { Snowflake, CommandInteraction, ButtonInteraction, MessageOptions } from "discord.js";
+import Discord, {
+  Snowflake,
+  ButtonInteraction,
+  ChatInputCommandInteraction,
+  ApplicationCommandOptionType,
+  ButtonStyle,
+} from "discord.js";
 import { Bot } from "@core/Bot";
 import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
 import { ModeratorService } from "./ModeratorService";
@@ -11,23 +17,22 @@ export class ModeratorWarnsDiscordAdapter {
 
   @DiscordCommand({
     description: "Warn a member",
-    defaultPermission: false,
     options: [
       {
         name: "member",
         description: "The member to warn",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "reason",
         description: "The reason for the warning",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
         required: true,
       },
     ],
   })
-  async warn(interaction: CommandInteraction<"present">) {
+  async warn(interaction: ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply({ ephemeral: true });
     const id = await this.service.warn(
       {
@@ -48,22 +53,21 @@ export class ModeratorWarnsDiscordAdapter {
 
   @DiscordCommand({
     description: "Show warnings given to a member",
-    defaultPermission: false,
     options: [
       {
         name: "member",
         description: "The member to show warnings of",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "page",
         description: "Page of the warning list to show (first by default)",
-        type: "NUMBER",
+        type: ApplicationCommandOptionType.Integer,
       },
     ],
   })
-  async warns(interaction: CommandInteraction<"present">) {
+  async warns(interaction: ChatInputCommandInteraction<"cached">) {
     const message = await this.listWarns(
       interaction.guildId,
       interaction.options.getUser("member", true).id,
@@ -76,20 +80,20 @@ export class ModeratorWarnsDiscordAdapter {
   }
 
   @DiscordHandler(WARNS_PAGE_ID)
-  async warnsHandler(interaction: ButtonInteraction<"present">) {
+  async warnsHandler(interaction: ButtonInteraction<"cached">) {
     const [userId, page] = interaction.customId.split(":")[1].split(",");
     const message = await this.listWarns(interaction.guildId, userId, +page);
     return interaction.update(message);
   }
 
-  private async listWarns(guildId: Snowflake, userId: Snowflake, page?: number | null): Promise<MessageOptions> {
+  private async listWarns(guildId: Snowflake, userId: Snowflake, page?: number | null) {
     page = Math.max(0, (page ?? 1) - 1);
     const [user, [count, warns]] = await Promise.all([
       this.bot.users.fetch(userId),
       this.service.listWarns(guildId, userId, page * 25, 25),
     ]);
 
-    const embed = new Discord.MessageEmbed({
+    const embed = new Discord.EmbedBuilder({
       color: 0xfafa00,
       title: `List of warnings given to @${user.tag}`,
       description: `List of warnings given to <@${userId}>` + (warns.length ? "" : "\nNone given yet"),
@@ -100,20 +104,20 @@ export class ModeratorWarnsDiscordAdapter {
       footer: { text: `Page ${page}/${Math.ceil(count / 25)}. ${count} warnings in total` },
     });
 
-    const actionRow = new Discord.MessageActionRow({
+    const actionRow = new Discord.ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
       components: [
-        new Discord.MessageButton({
+        new Discord.ButtonBuilder({
           customId: `${WARNS_PAGE_ID}:${userId},${page - 1}`,
           label: "Prev page",
           emoji: "◀️",
-          style: "SECONDARY",
+          style: ButtonStyle.Secondary,
           disabled: page == 0,
         }),
-        new Discord.MessageButton({
+        new Discord.ButtonBuilder({
           customId: `${WARNS_PAGE_ID}:${userId},${page + 1}`,
           label: "Next page",
           emoji: "▶️",
-          style: "SECONDARY",
+          style: ButtonStyle.Secondary,
           disabled: page + 1 >= count / 25,
         }),
       ],

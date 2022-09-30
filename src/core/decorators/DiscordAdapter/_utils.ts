@@ -1,6 +1,6 @@
-import { Interaction } from "discord.js";
+import { BaseInteraction } from "discord.js";
 
-export type IInteractionHandler<TInteraction extends Interaction> = {
+export type IInteractionHandler<TInteraction extends BaseInteraction> = {
   execute: (interaction: TInteraction) => any | Promise<any>;
 };
 

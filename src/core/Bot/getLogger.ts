@@ -1,6 +1,6 @@
 import Winston from "winston";
 import Journald from "winston-journald3";
-import chalk from "chalk";
+import chalk, { Chalk } from "chalk";
 
 const levelColors: LevelColors = {
   error: {
@@ -58,7 +58,7 @@ function printfTemplateFunction(info: Winston.Logform.TransformableInfo) {
   const msg = info.message.trim().split("\n");
 
   let level = info.level.toUpperCase().padEnd(maxLevelLength, " ");
-  let message = `${prefix} ${[msg.shift(), ...msg.map((v) => " ".repeat(level.length) + v)].join("\n")}`;
+  let message = `${prefix} ${[msg.shift(), ...msg.map((v: string) => " ".repeat(level.length) + v)].join("\n")}`;
 
   const colors = levelColors[info.level];
   if (colors) {
@@ -70,5 +70,5 @@ function printfTemplateFunction(info: Winston.Logform.TransformableInfo) {
 }
 
 type LevelColors = {
-  [level in keyof typeof Winston.config.npm.levels]?: { message?: chalk.Chalk; level?: chalk.Chalk };
+  [level in keyof typeof Winston.config.npm.levels]?: { message?: Chalk; level?: Chalk };
 };

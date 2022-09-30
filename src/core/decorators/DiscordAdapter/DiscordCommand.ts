@@ -1,4 +1,4 @@
-import { ApplicationCommandData, BaseCommandInteraction } from "discord.js";
+import { ApplicationCommandData, ApplicationCommandType, Interaction } from "discord.js";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 import { CustomCommandOption, parseAutocompleters } from "./DiscordAutocompleter";
 
@@ -9,13 +9,13 @@ type _CommandType = ApplicationCommandData["type"];
 export type DiscordCommandData<Type extends _CommandType> = Omit<ApplicationCommandData, "name"> & {
   name?: string;
   type?: Type;
-  description?: Type extends "CHAT_INPUT" ? string : never;
+  description?: Type extends ApplicationCommandType.ChatInput ? string : never;
   options?: CustomCommandOption[];
 };
 
-export type DiscordCommandExecutor = (interaction: BaseCommandInteraction) => Promise<void>;
+export type DiscordCommandExecutor = (interaction: Interaction) => Promise<void>;
 
-export interface IDiscordCommand extends IInteractionHandler<BaseCommandInteraction> {
+export interface IDiscordCommand extends IInteractionHandler<Interaction> {
   commandData: ApplicationCommandData;
   execute: DiscordCommandExecutor;
 }
@@ -27,9 +27,10 @@ export function DiscordCommand(data: DiscordCommandData<_CommandType>): MethodDe
   return (target, method) => {
     const command: IDiscordCommand = {
       commandData: parseAutocompleters(target, {
+        type: ApplicationCommandType.ChatInput,
+        name: method.toString(),
+        defaultMemberPermissions: "0",
         ...data,
-        type: "type" in data ? data.type : "CHAT_INPUT",
-        name: data.name ?? method.toString(),
       }),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,
     };

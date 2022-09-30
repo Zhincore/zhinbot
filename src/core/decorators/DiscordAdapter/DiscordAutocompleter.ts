@@ -1,4 +1,4 @@
-import Discord, { AutocompleteInteraction, ApplicationCommandOptionChoice } from "discord.js";
+import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
 import { ApplicationCommandSub_Data } from "./DiscordSubcommand";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 
@@ -23,7 +23,7 @@ export type CustomAppSubcmdData = Omit<ApplicationCommandSub_Data, "options"> & 
 
 export type Autocompleter = (
   interaction: AutocompleteInteraction,
-) => ApplicationCommandOptionChoice | Promise<ApplicationCommandOptionChoice>;
+) => APIApplicationCommandOptionChoice | Promise<APIApplicationCommandOptionChoice>;
 
 export interface IAutocompleterMapping {
   commandName: string;

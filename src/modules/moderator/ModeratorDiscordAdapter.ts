@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import ms from "ms";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 import { ModeratorService } from "./ModeratorService";
@@ -13,28 +13,28 @@ export class ModeratorDiscordAdapter {
       {
         name: "member",
         description: "The member to timeout",
-        type: "USER",
+        type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "duration",
         description: "How long the timeout should last (e.g. `1h` or `30s`)",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
         required: true,
       },
       {
         name: "reason",
         description: "Explanation why was the timeout given",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
       },
       {
         name: "announce",
         description: "Whether or not the timeout should be announced",
-        type: "BOOLEAN",
+        type: ApplicationCommandOptionType.Boolean,
       },
     ],
   })
-  async timeout(interaction: CommandInteraction<"present">) {
+  async timeout(interaction: ChatInputCommandInteraction<"cached">) {
     const result = await this.service.timeout(
       interaction.guildId,
       interaction.options.getUser("member", true).id,

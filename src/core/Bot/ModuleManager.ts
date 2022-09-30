@@ -1,5 +1,6 @@
 import Discord, { DiscordAPIError } from "discord.js";
 import { Constructable } from "typedi";
+import { Logger } from "winston";
 import * as Decorators from "../decorators";
 import { Bot } from "./";
 
@@ -8,14 +9,14 @@ export class ModuleManager {
   private readonly autocompleters = new Map<string, Decorators.IAutocompleter>();
   private readonly commands = new Map<string, Decorators.IDiscordCommand>();
   private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
-  private readonly logger = this.bot.getLogger("ModuleManager");
+  private readonly logger: Logger;
 
   private commandDataList: Discord.ApplicationCommandData[] = [];
 
   constructor(private readonly bot: Bot) {
-    bot.on("guildCreate", (guild) => this.updateGuildCommands(guild));
+    this.logger = bot.getLogger("ModuleManager");
 
-    bot.on("roleUpdate", (role) => this.updateGuildCommandPermissions(role.guild));
+    bot.on("guildCreate", (guild) => this.updateGuildCommands(guild));
 
     bot.once("ready", (bot): Promise<any> => Promise.all(bot.guilds.cache.map(this.updateGuildCommands.bind(this))));
 
@@ -24,7 +25,7 @@ export class ModuleManager {
 
       if (interaction.isMessageComponent()) {
         handler = this.handlers.get(interaction.customId.split(":")[0]);
-      } else if (interaction.isApplicationCommand()) {
+      } else if (interaction.type === Discord.InteractionType.ApplicationCommand) {
         handler = this.commands.get(interaction.commandName);
       } else if (interaction.isAutocomplete()) {
         const subcmdGroup = interaction.options.getSubcommandGroup(false);
@@ -51,7 +52,7 @@ export class ModuleManager {
 
   private async sendError(interaction: Discord.Interaction, err: any) {
     try {
-      if (interaction.isApplicationCommand() || interaction.isMessageComponent()) {
+      if (interaction.type === Discord.InteractionType.ApplicationCommand || interaction.isMessageComponent()) {
         if (!interaction.replied) {
           if (interaction.deferred) await interaction.editReply({ content: String(err) });
           else await interaction.reply({ content: String(err), ephemeral: true });
@@ -133,47 +134,12 @@ export class ModuleManager {
     try {
       // Apply commands
       await guild.commands.set(this.commandDataList);
-      // Update command permissions
-      await this.updateGuildCommandPermissions(guild);
     } catch (err) {
       if (err instanceof DiscordAPIError && err.message == "Missing Access") {
         await guild.leave();
       }
       this.logger.error(err);
     }
-  }
-
-  private async updateGuildCommandPermissions(guild: Discord.Guild) {
-    // Generate perms for owners
-    const owners = this.bot.settings.owners.map((id) => ({
-      id,
-      type: "USER" as const,
-      permission: true,
-    }));
-    // Generate perms for admins
-    const admins = Array.from(guild.roles.cache.values())
-      .filter((role) => this.bot.isAdmin(role))
-      .map(({ id }) => ({
-        id,
-        type: "ROLE" as const,
-        permission: true,
-      }));
-    // Merge above perms
-    const perms = [...owners, ...admins];
-
-    // Generate perms of all admin commands
-    const fullPermissions: Discord.GuildApplicationCommandPermissionData[] = [];
-    for (const command of guild.commands.cache.values()) {
-      if (command.defaultPermission) continue;
-
-      fullPermissions.push({
-        id: command.id,
-        permissions: perms,
-      });
-    }
-
-    // Apply the permissions
-    await guild.commands.permissions.set({ fullPermissions });
   }
 
   private createMainCommand(adapterData: Decorators.IDiscordAdapter) {
@@ -183,7 +149,7 @@ export class ModuleManager {
           ...adapterData.supercomand,
           options: adapterData.subcommands.map((subcmd) => subcmd.commandData),
         },
-        execute: function (interaction: Discord.CommandInteraction) {
+        execute: function (interaction: Discord.ChatInputCommandInteraction) {
           const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
           const command = adapterData.subcommands!.find((subcmd) => subcmd.commandData.name == subcommand);

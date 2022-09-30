@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import YAML from "yaml";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 import { ModeratorService, ModConfig } from "./ModeratorService";
@@ -13,23 +13,23 @@ export class ModeratorConfigDiscordAdapter {
       {
         name: "set",
         description: "Change configuration",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "automod",
             description: "Enable/Disable automod",
-            type: "BOOLEAN",
+            type: ApplicationCommandOptionType.Boolean,
           },
         ],
       },
       {
         name: "get",
         description: "Show configuration",
-        type: "SUB_COMMAND",
+        type: ApplicationCommandOptionType.Subcommand,
       },
     ],
   })
-  async modconf(interaction: CommandInteraction<"present">) {
+  async modconf(interaction: ChatInputCommandInteraction<"cached">) {
     const config = await this.service.getGuildConfig(interaction.guildId);
     const subcommand = interaction.options.getSubcommand();
 

@@ -1,4 +1,14 @@
-import { CommandInteraction, ButtonInteraction, MessageEmbed, MessageActionRow, MessageButton } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  ButtonInteraction,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ApplicationCommandOptionType,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+  PermissionFlagsBits,
+} from "discord.js";
 import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
 import { PlayerService } from "./PlayerService";
 import { getDurationString } from "~/utils";
@@ -10,7 +20,7 @@ const CONTROL_ID = "player";
 export class PlayerDiscordAdapter {
   constructor(private readonly service: PlayerService) {}
 
-  private getPlayer(interaction: CommandInteraction<"present"> | ButtonInteraction<"present">, validate = true) {
+  private getPlayer(interaction: ChatInputCommandInteraction<"cached"> | ButtonInteraction<"cached">, validate = true) {
     return this.service.getPlayer(interaction.guildId, interaction.channelId, interaction.user.id, validate);
   }
 
@@ -19,12 +29,13 @@ export class PlayerDiscordAdapter {
     options: [
       {
         name: "query",
-        type: "STRING",
+        type: ApplicationCommandOptionType.String,
         description: "URL or name of the song to play",
       },
     ],
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
-  async play(interaction: CommandInteraction<"present">) {
+  async play(interaction: ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply();
 
     const query = interaction.options.getString("query", false);
@@ -45,17 +56,20 @@ export class PlayerDiscordAdapter {
 
   @DiscordCommand({
     description: "Change the channel where the players sends currently playing songs",
-    defaultPermission: false,
-    options: [{ name: "channel", type: "CHANNEL", description: "The channel for updates" }],
+    options: [{ name: "channel", type: ApplicationCommandOptionType.Channel, description: "The channel for updates" }],
+    defaultMemberPermissions: PermissionFlagsBits.DeafenMembers,
   })
-  async playerchannel(interaction: CommandInteraction<"present">) {
+  async playerchannel(interaction: ChatInputCommandInteraction<"cached">) {
     const channel = interaction.options.getChannel("channel", false);
     await this.service.changeUpdateChannel(interaction.guildId, channel?.id ?? interaction.channelId);
     return interaction.reply({ content: "Player channel updated", ephemeral: true });
   }
 
-  @DiscordCommand({ description: "Show the currently playing song" })
-  async playing(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({
+    description: "Show the currently playing song",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  })
+  async playing(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
 
     if (!player.currentSong) throw "Nothing is currently playing";
@@ -66,29 +80,32 @@ export class PlayerDiscordAdapter {
     });
   }
 
-  @DiscordCommand({ description: "Pause the music player" })
-  async pause(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({ description: "Pause the music player", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  async pause(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.pause();
     return interaction.reply("Player paused");
   }
 
-  @DiscordCommand({ description: "Resume paused music player" })
-  async resume(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({ description: "Resume paused music player", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  async resume(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.resume();
     return interaction.reply("Player resumed");
   }
 
-  @DiscordCommand({ description: "Stop playing, leave the voice channel and forget the queue" })
-  async stop(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({
+    description: "Stop playing, leave the voice channel and forget the queue",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  })
+  async stop(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.destroy();
     return interaction.reply("Player stopped");
   }
 
-  @DiscordCommand({ description: "Skip currently playing song" })
-  async skip(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({ description: "Skip currently playing song", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  async skip(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     return interaction.reply(player.skip() ? "Current song skipped" : "Failed to skip song");
   }
@@ -98,21 +115,22 @@ export class PlayerDiscordAdapter {
     options: [
       {
         name: "position",
-        type: "INTEGER",
+        type: ApplicationCommandOptionType.Integer,
         required: true,
         description: "The position of the song in the queue",
       },
     ],
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
-  async remove(interaction: CommandInteraction<"present">) {
+  async remove(interaction: ChatInputCommandInteraction<"cached">) {
     const position = Math.min(1, interaction.options.getInteger("position", true));
     const player = await this.getPlayer(interaction);
     const [song] = player.queue.splice(position - 1, 1);
     return interaction.reply(song ? "Song removed" : `No song at position ${position}`);
   }
 
-  @DiscordCommand({ description: "Join a voice channel" })
-  async join(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({ description: "Join a voice channel", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  async join(interaction: ChatInputCommandInteraction<"cached">) {
     const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
     if (!voice) throw "You are not in a voice channel";
 
@@ -122,8 +140,11 @@ export class PlayerDiscordAdapter {
     return interaction.reply("Joining voice channel");
   }
 
-  @DiscordCommand({ description: "Leave the current voice chat (remembers the queue for a while)" })
-  async leave(interaction: CommandInteraction<"present">) {
+  @DiscordCommand({
+    description: "Leave the current voice chat (remembers the queue for a while)",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  })
+  async leave(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.leave();
     return interaction.reply("Voice channel left");
@@ -131,9 +152,12 @@ export class PlayerDiscordAdapter {
 
   @DiscordCommand({
     description: "Toggle looping of the current player queue",
-    options: [{ name: "loop", type: "BOOLEAN", description: "Whether the queue should loop" }],
+    options: [
+      { name: "loop", type: ApplicationCommandOptionType.Boolean, description: "Whether the queue should loop" },
+    ],
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
-  async loop(interaction: CommandInteraction<"present">) {
+  async loop(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     const state = interaction.options.getBoolean("loop", false);
     player.loop = state ?? !player.loop;
@@ -145,24 +169,25 @@ export class PlayerDiscordAdapter {
     options: [
       {
         name: "page",
-        type: "INTEGER",
+        type: ApplicationCommandOptionType.Integer,
         description: "Page of the queue to show (first by default)",
       },
     ],
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
-  async queue(interaction: CommandInteraction<"present">) {
+  async queue(interaction: ChatInputCommandInteraction<"cached">) {
     const page = Math.max(0, (interaction.options.getInteger("page", false) ?? 1) - 1);
 
     return this.sendQueue(interaction, page);
   }
 
-  private async sendQueue(interaction: CommandInteraction<"present"> | ButtonInteraction<"present">, page = 0) {
+  private async sendQueue(interaction: ChatInputCommandInteraction<"cached"> | ButtonInteraction<"cached">, page = 0) {
     const player = await this.getPlayer(interaction);
 
     const queue = [player.currentSong, ...player.queue];
     const pages = Math.ceil(queue.length / 25);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setTitle("Player queue")
       .setColor("#00afff")
       .setDescription(page * 25 > queue.length ? "This page is empty" : "")
@@ -185,20 +210,20 @@ export class PlayerDiscordAdapter {
     return interaction.reply({
       embeds: [embed],
       components: [
-        new MessageActionRow({
+        new ActionRowBuilder<MessageActionRowComponentBuilder>({
           components: [
-            new MessageButton({
+            new ButtonBuilder({
               customId: QUEUE_PAGE_ID + ":" + (page - 1),
               label: "Prev page",
               emoji: "◀️",
-              style: "SECONDARY",
+              style: ButtonStyle.Secondary,
               disabled: page == 0,
             }),
-            new MessageButton({
+            new ButtonBuilder({
               customId: QUEUE_PAGE_ID + ":" + (page + 1),
               label: "Next page",
               emoji: "▶️",
-              style: "SECONDARY",
+              style: ButtonStyle.Secondary,
               disabled: page + 1 >= pages,
             }),
           ],
@@ -209,13 +234,13 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordHandler(QUEUE_PAGE_ID)
-  async queueButtons(interaction: ButtonInteraction<"present">) {
+  async queueButtons(interaction: ButtonInteraction<"cached">) {
     const page = +(interaction.customId.split(":")[1] || 0);
     return this.sendQueue(interaction, page);
   }
 
   @DiscordHandler(CONTROL_ID)
-  async controlButtons(interaction: ButtonInteraction<"present">) {
+  async controlButtons(interaction: ButtonInteraction<"cached">) {
     const cmd = interaction.customId.split(":")[1];
     const player = await this.getPlayer(interaction);
 
@@ -244,40 +269,40 @@ export class PlayerDiscordAdapter {
 }
 
 export const getPlayerControls = (extra?: "queue" | "loop") =>
-  new MessageActionRow({
+  new ActionRowBuilder<MessageActionRowComponentBuilder>({
     components: [
-      new MessageButton({
+      new ButtonBuilder({
         customId: CONTROL_ID + ":" + "stop",
         label: "Stop",
         emoji: "⏹️",
-        style: "SECONDARY",
+        style: ButtonStyle.Secondary,
       }),
-      new MessageButton({
+      new ButtonBuilder({
         customId: CONTROL_ID + ":" + "play",
         label: "Play/pause",
         emoji: "⏯️",
-        style: "PRIMARY",
+        style: ButtonStyle.Primary,
       }),
-      new MessageButton({
+      new ButtonBuilder({
         customId: CONTROL_ID + ":" + "skip",
         label: "Skip",
         emoji: "⏭️",
-        style: "SECONDARY",
+        style: ButtonStyle.Secondary,
       }),
       ...(extra
         ? [
-            new MessageButton(
+            new ButtonBuilder(
               extra === "queue"
                 ? {
                     customId: QUEUE_PAGE_ID,
                     label: "Show queue",
-                    style: "SECONDARY",
+                    style: ButtonStyle.Secondary,
                   }
                 : {
                     customId: CONTROL_ID + ":" + "loop",
                     label: "Toggle looping",
                     emoji: "🔁",
-                    style: "SECONDARY",
+                    style: ButtonStyle.Secondary,
                   },
             ),
           ]
