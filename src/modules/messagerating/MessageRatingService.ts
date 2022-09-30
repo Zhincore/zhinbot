@@ -11,7 +11,7 @@ export class MessageRatingService {
       .upsert({
         where: { guildId_userId: { guildId, userId } },
         update: { rating: { increment: rating } },
-        create: { guildId, userId, rating: rating },
+        create: { guildId, userId, rating },
         select: { rating: true },
       })
       .then(({ rating }) => rating);

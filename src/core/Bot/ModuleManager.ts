@@ -146,6 +146,7 @@ export class ModuleManager {
     if (adapterData && adapterData.supercomand && adapterData.subcommands) {
       return {
         commandData: {
+          defaultMemberPermissions: "0",
           ...adapterData.supercomand,
           options: adapterData.subcommands.map((subcmd) => subcmd.commandData),
         },

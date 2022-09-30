@@ -67,7 +67,7 @@ model Warning {
 // ## Message Rating ##
 model MessageRating {
   guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String  @unique
+  guildId String
   member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
   userId  String
 
