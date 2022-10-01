@@ -11,6 +11,13 @@
       "decorators": true
     },
     "externalHelpers": true,
-    "loose": true
+    "loose": true,
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    }
+  },
+  "module": {
+    "type": "commonjs"
   }
 }
