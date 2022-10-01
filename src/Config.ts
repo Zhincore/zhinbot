@@ -1,4 +1,5 @@
 import ms from "ms";
+import Color from "color";
 import { Service } from "@core/decorators";
 
 @Service()
@@ -7,6 +8,8 @@ export class Config implements Readonly<Config> {
 
   databaseUrl = process.env.DATABASE_URL;
   owners = (process.env.OWNERS ?? "").split(/[, ]+/).filter(Boolean);
+
+  color = Color("#63a6cb").rgbNumber();
 
   auth = {
     discord: {

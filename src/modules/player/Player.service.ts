@@ -1,13 +1,13 @@
 import { TextChannel, Snowflake, EmbedBuilder, ChannelType } from "discord.js";
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
 import { Logger } from "winston";
-import { Player, YTQueryResponse, YtResponse } from "./Player";
-import { getPlayerControls } from "./Player.discord";
+import { Bot } from "@core/Bot";
+import { Service } from "@core/decorators";
 import { Cache } from "~/utils/Cache";
-import { PrismaService } from "~/services/PrismaService";
+import { PrismaService } from "~/services/Prisma.service";
 import { Config } from "~/Config";
 import { getDurationString } from "~/utils";
+import { Player, YTQueryResponse, YtResponse } from "./Player";
+import { getPlayerControls } from "./Player.discord";
 
 @Service()
 export class PlayerService {

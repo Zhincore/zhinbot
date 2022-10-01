@@ -10,8 +10,8 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
-import { PlayerService } from "./Player.service";
 import { getDurationString } from "~/utils";
+import { PlayerService } from "./Player.service";
 
 const QUEUE_PAGE_ID = "player.queue";
 const CONTROL_ID = "player";

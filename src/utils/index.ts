@@ -12,3 +12,7 @@ export function getDurationString(length: number, float = false) {
     .map((v) => String(v).padStart(2, "0"))
     .join(":");
 }
+
+export function pickRandom<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}

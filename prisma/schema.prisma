@@ -14,6 +14,11 @@ model Guild {
 
   members Member[]
 
+  // Birthdays
+  bdayAlertTime    String?
+  bdayAlertChannel String?
+  bdayAlertPing    String?
+
   // Player
   playerChannel String?
 
@@ -31,13 +36,34 @@ model Member {
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
 
+  birthday Birthday?      @relation(fields: [id], references: [userId])
   warnings Warning[]
-  // rating   MessageRating?
+  rating   MessageRating?
 
   @@id([guildId, id])
 }
 
 // #### MODULES ####
+
+// ## Birthdays ##
+model Birthday {
+  userId String   @id
+  date   DateTime
+
+  members Member[]
+}
+
+// ## Message Rating ##
+model MessageRating {
+  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String
+  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  userId  String
+
+  rating Int @default(0)
+
+  @@id([guildId, userId])
+}
 
 // ## Moderator ##
 model ModConfig {
@@ -64,18 +90,6 @@ model Warning {
   @@id([guildId, id])
 }
 
-// ## Message Rating ##
-model MessageRating {
-  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String
-  // member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
-  userId  String
-
-  rating Int @default(0)
-
-  @@id([guildId, userId])
-}
-
 // ## Self-roles ##
 model SelfRolesItem {
   name      String
@@ -93,6 +107,7 @@ model SelfRolesItem {
   showRoles   Boolean @default(true)
 
   roles SelfRolesRole[]
+
   @@id([guildId, name])
 }
 

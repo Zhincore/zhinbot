@@ -12,7 +12,7 @@ import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { Config } from "~/Config";
 import { Cache } from "~/utils/Cache";
-import { PrismaService, Prisma } from "~/services/PrismaService";
+import { PrismaService, Prisma } from "~/services/Prisma.service";
 
 const TIMEOUT_ERR = "Unable to timeout this member, their rank is probbably higher than mine.";
 

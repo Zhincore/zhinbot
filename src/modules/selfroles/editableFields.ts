@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { CustomCommandOptionData } from "@core/decorators";
 import { ApplicationCommandOptionType } from "discord.js";
+import { CustomCommandOptionData } from "@core/decorators";
 
 type Field = Prisma.SelfRolesItemScalarFieldEnum;
 

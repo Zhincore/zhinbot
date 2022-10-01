@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@discordjs/voice": "^0.11.0",
+    "@fluent/bundle": "^0.17.1",
     "@prisma/client": "^4.4.0",
     "@types/color": "^3.0.3",
     "@types/ms": "^0.7.31",
@@ -26,6 +27,7 @@
     "bufferutil": "^4.0.6",
     "catch-exit": "^1.2.2",
     "chalk": "^4",
+    "chrono-node": "^2.4.1",
     "color": "^4.2.3",
     "discord-api-types": "^0.37.11",
     "discord.js": "^14.5.0",
@@ -51,6 +53,7 @@
     "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-sonarjs": "^0.15.0",
