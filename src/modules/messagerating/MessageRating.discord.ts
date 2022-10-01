@@ -6,7 +6,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
-import { MessageRatingService } from "./MessageRatingService";
+import { MessageRatingService } from "./MessageRating.service";
 
 @DiscordAdapter()
 export class MessageRatingDiscordAdapter {

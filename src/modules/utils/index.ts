@@ -1,5 +1,5 @@
 import { BotModule } from "@core/decorators";
-import { UtilsDiscordAdapter } from "./UtilsDiscordAdapter";
+import { UtilsDiscordAdapter } from "./Utils.discord";
 
 @BotModule({ discordAdapters: [UtilsDiscordAdapter] })
 export class UtilsModule {}

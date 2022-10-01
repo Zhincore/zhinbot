@@ -32,7 +32,7 @@ model Member {
   guildId String
 
   warnings Warning[]
-  rating   MessageRating?
+  // rating   MessageRating?
 
   @@id([guildId, id])
 }
@@ -68,7 +68,7 @@ model Warning {
 model MessageRating {
   guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
-  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  // member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
   userId  String
 
   rating Int @default(0)

@@ -1,7 +1,7 @@
 import { BotModule } from "@core/decorators";
-import { ModeratorDiscordAdapter } from "./ModeratorDiscordAdapter";
-import { ModeratorConfigDiscordAdapter } from "./ModeratorConfigDiscordAdapter";
-import { ModeratorWarnsDiscordAdapter } from "./ModeratorWarnsDiscordAdapter";
+import { ModeratorDiscordAdapter } from "./Moderator.discord";
+import { ModeratorConfigDiscordAdapter } from "./ModeratorConfig.discord";
+import { ModeratorWarnsDiscordAdapter } from "./ModeratorWarns.discord";
 import { AutomodSubModule } from "./Automod";
 
 @BotModule({

@@ -9,7 +9,7 @@ import {
   DiscordHandler,
   CustomCommandOption,
 } from "@core/decorators";
-import { SelfRolesService } from "./SelfRolesService";
+import { SelfRolesService } from "./SelfRoles.service";
 import { editableFields, editableFieldNameToField } from "./editableFields";
 
 export const ROLE_ASSIGN_ID = "selfroles.assign";

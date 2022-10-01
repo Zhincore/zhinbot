@@ -1,5 +1,5 @@
 import { BotModule } from "@core/decorators";
-import { AutomodService } from "./AutomodService";
+import { AutomodService } from "./Automod.service";
 
 @BotModule({ services: [AutomodService] })
 export class AutomodSubModule {}

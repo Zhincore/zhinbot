@@ -7,7 +7,7 @@ import Discord, {
 } from "discord.js";
 import { Bot } from "@core/Bot";
 import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
-import { ModeratorService } from "./ModeratorService";
+import { ModeratorService } from "./Moderator.service";
 
 const WARNS_PAGE_ID = "warns";
 

@@ -3,7 +3,7 @@ import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { Logger } from "winston";
 import { Player, YTQueryResponse, YtResponse } from "./Player";
-import { getPlayerControls } from "./PlayerDiscordAdapter";
+import { getPlayerControls } from "./Player.discord";
 import { Cache } from "~/utils/Cache";
 import { PrismaService } from "~/services/PrismaService";
 import { Config } from "~/Config";

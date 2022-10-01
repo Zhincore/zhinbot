@@ -2,7 +2,7 @@ import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { AutomodFilter } from "./filters/AutomodFilter";
 import Filters from "./filters";
-import { ModeratorService } from "~/modules/moderator/ModeratorService";
+import { ModeratorService } from "~/modules/moderator/Moderator.service";
 
 @Service()
 export class AutomodService {

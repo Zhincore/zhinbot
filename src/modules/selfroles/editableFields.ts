@@ -65,10 +65,7 @@ export const editableFields: Partial<Record<Field, CustomCommandOptionData>> = {
   },
 };
 
-export const editableFieldNameToField = Object.entries(editableFields).reduce<Record<string, Field>>(
-  (acc, [field, item]) => {
-    acc[item.name] = field as Field;
-    return acc;
-  },
-  {},
-);
+export const editableFieldNameToField = Object.entries(editableFields).reduce((acc, [field, item]) => {
+  acc[item.name] = field as Field;
+  return acc;
+}, {} as Record<string, Field>);
