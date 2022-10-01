@@ -82,6 +82,7 @@ export class BirthdaysService {
       subjects.push(subject);
       embeds.push(
         new EmbedBuilder({
+          color: this.config.color,
           title: "🎂 " + pickRandom(messages.titles).replace("{subject}", subject.toString()),
           description: pickRandom(messages.messages),
         }),

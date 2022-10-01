@@ -3,17 +3,17 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, PermissionFl
 import { DiscordAdapter, DiscordSubcommand } from "@core/decorators";
 import { BirthdaysService } from "./Birthdays.service";
 
-@DiscordAdapter({
+@DiscordAdapter(() => ({
   supercomand: {
     name: "birthday",
     description: "Save your birthday or see birthdays of others",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   },
-})
+}))
 export class BirthdaysDiscordAdapter {
   constructor(private readonly service: BirthdaysService) {}
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Save your birthday so we can notify everyone when it comes!",
     options: [
       {
@@ -23,7 +23,7 @@ export class BirthdaysDiscordAdapter {
         required: true,
       },
     ],
-  })
+  }))
   async set(interaction: ChatInputCommandInteraction) {
     const rawDate = interaction.options.getString("date", true);
     const date = chrono.parseDate(rawDate.replaceAll(".", "/").replace(/\/[$ ]/, ""));
@@ -43,7 +43,7 @@ export class BirthdaysDiscordAdapter {
     });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Show birthday of yours or other member",
     options: [
       {
@@ -52,7 +52,7 @@ export class BirthdaysDiscordAdapter {
         type: ApplicationCommandOptionType.User,
       },
     ],
-  })
+  }))
   async get(interaction: ChatInputCommandInteraction) {
     let isSelf = false;
     let user = interaction.options.getUser("user", false);
@@ -78,9 +78,9 @@ export class BirthdaysDiscordAdapter {
     });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Delete your birthday from the database",
-  })
+  }))
   async forget(interaction: ChatInputCommandInteraction) {
     const result = await this.service.forget(interaction.user.id);
 

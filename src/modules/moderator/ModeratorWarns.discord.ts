@@ -15,7 +15,7 @@ const WARNS_PAGE_ID = "warns";
 export class ModeratorWarnsDiscordAdapter {
   constructor(private readonly bot: Bot, private readonly service: ModeratorService) {}
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Warn a member",
     options: [
       {
@@ -31,7 +31,7 @@ export class ModeratorWarnsDiscordAdapter {
         required: true,
       },
     ],
-  })
+  }))
   async warn(interaction: ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply({ ephemeral: true });
     const id = await this.service.warn(
@@ -51,7 +51,7 @@ export class ModeratorWarnsDiscordAdapter {
     );
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Show warnings given to a member",
     options: [
       {
@@ -66,7 +66,7 @@ export class ModeratorWarnsDiscordAdapter {
         type: ApplicationCommandOptionType.Integer,
       },
     ],
-  })
+  }))
   async warns(interaction: ChatInputCommandInteraction<"cached">) {
     const message = await this.listWarns(
       interaction.guildId,

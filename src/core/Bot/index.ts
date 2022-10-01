@@ -1,6 +1,7 @@
 import Discord, { Snowflake, DiscordAPIError } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
+import { TranslationService } from "../Translation.service";
 import { getLogger } from "./getLogger";
 import { ModuleManager } from "./ModuleManager";
 
@@ -70,6 +71,11 @@ export class Bot extends Discord.Client {
   destroy() {
     this.logger.info("Logging out...");
     super.destroy();
+  }
+
+  async loadTranslations() {
+    const trans = this.container.get(TranslationService);
+    await trans.load();
   }
 
   async login(token?: string) {

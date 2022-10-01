@@ -10,16 +10,16 @@ import { Bot } from "@core/Bot";
 import { Config } from "~/Config";
 import { BirthdaysService } from "./Birthdays.service";
 
-@DiscordAdapter({
+@DiscordAdapter(() => ({
   supercomand: {
     name: "birthdayconf",
     description: "Configure the birthday alerts",
   },
-})
+}))
 export class BirthdaysConfigDiscordAdapter {
   constructor(private readonly service: BirthdaysService, private readonly bot: Bot, private readonly config: Config) {}
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Update birthday module alerts",
     type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
@@ -61,7 +61,7 @@ export class BirthdaysConfigDiscordAdapter {
         ],
       },
     ],
-  })
+  }))
   async set(interaction: ChatInputCommandInteraction<"cached">) {
     const property = interaction.options.getSubcommand(true);
     const value = interaction.options.get(property, true);
@@ -93,9 +93,9 @@ export class BirthdaysConfigDiscordAdapter {
       ephemeral: true,
     });
   }
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Show current birthday module settings",
-  })
+  }))
   async show(interaction: ChatInputCommandInteraction<"cached">) {
     const settings = await this.service.getAlertSettings(interaction.guildId);
 

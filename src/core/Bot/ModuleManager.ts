@@ -1,7 +1,8 @@
-import Discord, { DiscordAPIError } from "discord.js";
+import Discord, { ApplicationCommandType, ChatInputApplicationCommandData, DiscordAPIError } from "discord.js";
 import { Constructable } from "typedi";
 import { Logger } from "winston";
 import * as Decorators from "../decorators";
+import { TranslationService } from "../Translation.service";
 import { Bot } from "./";
 
 export class ModuleManager {
@@ -85,8 +86,9 @@ export class ModuleManager {
   }
 
   private parseAdapterCommands(DiscordAdapter: Constructable<any>) {
+    const trans = this.bot.container.get(TranslationService);
     const discordAdapter = this.bot.container.get(DiscordAdapter);
-    const adapterData = Decorators.getDiscordAdapterData(discordAdapter);
+    const adapterData = Decorators.getDiscordAdapterData(discordAdapter, trans);
     if (!adapterData) {
       this.logger.error(`Class ${DiscordAdapter.name} is missing the DiscordAdapter decorator`);
       this.bot.container.remove(DiscordAdapter);
@@ -119,8 +121,10 @@ export class ModuleManager {
 
     // Generate command list
     const mainCommand = adapterData ? this.createMainCommand(adapterData) : undefined;
-    const commands = [...(adapterData.commands ?? []), mainCommand].filter(Boolean) as Decorators.IDiscordCommand[];
-    for (const { commandData, execute } of commands) {
+
+    for (const command of [...(adapterData.commands ?? []), mainCommand]) {
+      if (!command) continue;
+      const { commandData, execute } = command;
       if (this.commands.has(commandData.name)) throw new Error(`Command '${commandData.name}' already exists`);
       this.commands.set(commandData.name, {
         commandData,
@@ -147,10 +151,11 @@ export class ModuleManager {
       return {
         commandData: {
           defaultMemberPermissions: "0",
-          ...adapterData.supercomand,
-          options: adapterData.subcommands.map((subcmd) => subcmd.commandData),
-        },
-        execute: function (interaction: Discord.ChatInputCommandInteraction) {
+          type: ApplicationCommandType.ChatInput,
+          ...adapterData.supercomand!,
+          options: adapterData.subcommands?.map((subcmd) => subcmd.commandData),
+        } as ChatInputApplicationCommandData,
+        execute(interaction: Discord.ChatInputCommandInteraction) {
           const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
           const command = adapterData.subcommands!.find((subcmd) => subcmd.commandData.name == subcommand);

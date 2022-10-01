@@ -24,7 +24,7 @@ export class PlayerDiscordAdapter {
     return this.service.getPlayer(interaction.guildId, interaction.channelId, interaction.user.id, validate);
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Play music in your voice chat",
     options: [
       {
@@ -34,7 +34,7 @@ export class PlayerDiscordAdapter {
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async play(interaction: ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply();
 
@@ -54,21 +54,21 @@ export class PlayerDiscordAdapter {
     return interaction.editReply("Playing");
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Change the channel where the players sends currently playing songs",
     options: [{ name: "channel", type: ApplicationCommandOptionType.Channel, description: "The channel for updates" }],
     defaultMemberPermissions: PermissionFlagsBits.DeafenMembers,
-  })
+  }))
   async playerchannel(interaction: ChatInputCommandInteraction<"cached">) {
     const channel = interaction.options.getChannel("channel", false);
     await this.service.changeUpdateChannel(interaction.guildId, channel?.id ?? interaction.channelId);
     return interaction.reply({ content: "Player channel updated", ephemeral: true });
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Show the currently playing song",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async playing(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
 
@@ -80,37 +80,46 @@ export class PlayerDiscordAdapter {
     });
   }
 
-  @DiscordCommand({ description: "Pause the music player", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  @DiscordCommand(() => ({
+    description: "Pause the music player",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  }))
   async pause(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.pause();
     return interaction.reply("Player paused");
   }
 
-  @DiscordCommand({ description: "Resume paused music player", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  @DiscordCommand(() => ({
+    description: "Resume paused music player",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  }))
   async resume(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.resume();
     return interaction.reply("Player resumed");
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Stop playing, leave the voice channel and forget the queue",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async stop(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.destroy();
     return interaction.reply("Player stopped");
   }
 
-  @DiscordCommand({ description: "Skip currently playing song", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  @DiscordCommand(() => ({
+    description: "Skip currently playing song",
+    defaultMemberPermissions: PermissionFlagsBits.Speak,
+  }))
   async skip(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     return interaction.reply(player.skip() ? "Current song skipped" : "Failed to skip song");
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Remove a song from queue at specified position",
     options: [
       {
@@ -121,7 +130,7 @@ export class PlayerDiscordAdapter {
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async remove(interaction: ChatInputCommandInteraction<"cached">) {
     const position = Math.min(1, interaction.options.getInteger("position", true));
     const player = await this.getPlayer(interaction);
@@ -129,7 +138,7 @@ export class PlayerDiscordAdapter {
     return interaction.reply(song ? "Song removed" : `No song at position ${position}`);
   }
 
-  @DiscordCommand({ description: "Join a voice channel", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  @DiscordCommand(() => ({ description: "Join a voice channel", defaultMemberPermissions: PermissionFlagsBits.Speak }))
   async join(interaction: ChatInputCommandInteraction<"cached">) {
     const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
     if (!voice) throw "You are not in a voice channel";
@@ -140,23 +149,23 @@ export class PlayerDiscordAdapter {
     return interaction.reply("Joining voice channel");
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Leave the current voice chat (remembers the queue for a while)",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async leave(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     player.leave();
     return interaction.reply("Voice channel left");
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Toggle looping of the current player queue",
     options: [
       { name: "loop", type: ApplicationCommandOptionType.Boolean, description: "Whether the queue should loop" },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async loop(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
     const state = interaction.options.getBoolean("loop", false);
@@ -164,7 +173,7 @@ export class PlayerDiscordAdapter {
     return interaction.reply(`The player queue now **${player.loop ? "will" : "won't"}** loop`);
   }
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Show the current player queue",
     options: [
       {
@@ -174,7 +183,7 @@ export class PlayerDiscordAdapter {
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
-  })
+  }))
   async queue(interaction: ChatInputCommandInteraction<"cached">) {
     const page = Math.max(0, (interaction.options.getInteger("page", false) ?? 1) - 1);
 

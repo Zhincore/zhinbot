@@ -1,5 +1,6 @@
 import { ApplicationCommandData } from "discord.js";
 import { Service } from "typedi";
+import { TranslationService } from "~/core/Translation.service";
 import {
   getAutocompleters,
   getAutocompleterMappings,
@@ -24,7 +25,7 @@ export type IDiscordAdapter = DiscordAdapterData & {
   autocompleteMappings?: IAutocompleterMapping[];
 };
 
-export function DiscordAdapter(data: DiscordAdapterData = {}): ClassDecorator {
+export function DiscordAdapter(data: (trans: TranslationService) => DiscordAdapterData = () => ({})): ClassDecorator {
   const service = Service();
   return (target) => {
     Reflect.defineMetadata(symbol, data, target);
@@ -32,14 +33,17 @@ export function DiscordAdapter(data: DiscordAdapterData = {}): ClassDecorator {
   };
 }
 
-export function getDiscordAdapterData(target: any): IDiscordAdapter | undefined {
-  const adapterData: DiscordAdapterData | undefined = Reflect.getMetadata(symbol, target.constructor);
+export function getDiscordAdapterData(target: any, trans: TranslationService): IDiscordAdapter | undefined {
+  const adapterData: ((trans: TranslationService) => DiscordAdapterData) | undefined = Reflect.getMetadata(
+    symbol,
+    target.constructor,
+  );
   if (!adapterData) return;
 
   return {
-    ...adapterData,
-    commands: getDiscordCommands(target),
-    subcommands: getDiscordSubcommands(target),
+    ...adapterData(trans),
+    commands: getDiscordCommands(target)?.map((v) => v(trans)),
+    subcommands: getDiscordSubcommands(target)?.map((v) => v(trans)),
     handlers: getDiscordHandlers(target),
     autocompleters: getAutocompleters(target),
     autocompleteMappings: getAutocompleterMappings(target),

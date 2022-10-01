@@ -10,7 +10,7 @@ const { activityMap } = new Config().activities;
 export class ActivitiesDiscordAdapter {
   constructor(private readonly bot: Bot) {}
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Start an activity",
     options: [
       {
@@ -26,7 +26,7 @@ export class ActivitiesDiscordAdapter {
         type: ApplicationCommandOptionType.Channel,
       },
     ],
-  })
+  }))
   async activity(interaction: ChatInputCommandInteraction<"cached">) {
     const author = await this.bot.fetchMember(interaction.guildId, interaction.user.id);
     const channel = interaction.options.getChannel("channel", false) ?? author?.voice.channel;

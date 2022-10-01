@@ -7,7 +7,7 @@ import { ModeratorService } from "./Moderator.service";
 export class ModeratorDiscordAdapter {
   constructor(private readonly service: ModeratorService) {}
 
-  @DiscordCommand({
+  @DiscordCommand(() => ({
     description: "Timeout a member for a custom amount of time",
     options: [
       {
@@ -33,7 +33,7 @@ export class ModeratorDiscordAdapter {
         type: ApplicationCommandOptionType.Boolean,
       },
     ],
-  })
+  }))
   async timeout(interaction: ChatInputCommandInteraction<"cached">) {
     const result = await this.service.timeout(
       interaction.guildId,

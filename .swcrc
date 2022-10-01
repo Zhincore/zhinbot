@@ -10,6 +10,11 @@
       "syntax": "typescript",
       "decorators": true
     },
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["./dist/*"],
+      "@core/*": ["./dist/core/*"]
+    },
     "externalHelpers": true,
     "loose": true,
     "transform": {

@@ -8,6 +8,8 @@ import modules from "./modules";
 async function main() {
   const config = new Config();
   const bot: Bot = new Bot(config);
+
+  await bot.loadTranslations();
   bot.container.set(Config, config);
   bot.modules.register(modules);
 

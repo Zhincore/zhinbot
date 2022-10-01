@@ -7,14 +7,14 @@
   "private": true,
   "license": "GPLV3 OR LATER",
   "scripts": {
-    "db": "prisma db push",
-    "dist": "npm run db && npm run build",
-    "watch": "pnpm build -w -s inline",
+    "prebuild": "prisma db push",
+    "watch": "swc src -d dist -w -s inline",
     "build": "swc src -d dist",
     "format": "prettier --write \"src/**/*.ts\"",
+    "check": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "start": "node -r tsconfig-paths/register .",
-    "dev": "node -r tsconfig-paths/register --enable-source-maps ."
+    "start": "node .",
+    "dev": "node --enable-source-maps ."
   },
   "dependencies": {
     "@discordjs/voice": "^0.11.0",
@@ -39,7 +39,6 @@
     "prisma": "^4.4.0",
     "reflect-metadata": "^0.1.13",
     "text-table": "^0.2.0",
-    "tsconfig-paths": "^4.1.0",
     "typedi": "^0.10.0",
     "typescript": "^4.8.4",
     "utf-8-validate": "^5.0.9",

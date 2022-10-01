@@ -3,8 +3,8 @@
     "lib": ["ESNext"],
     "baseUrl": "./",
     "paths": {
-      "~/*": ["./src/*", "./dist/*"],
-      "@core/*": ["./src/core/*", "./dist/core/*"]
+      "~/*": ["./src/*"],
+      "@core/*": ["./src/core/*"]
     },
     "target": "ESNext",
     "skipLibCheck": true,

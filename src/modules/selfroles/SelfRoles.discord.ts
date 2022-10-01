@@ -22,12 +22,12 @@ const ID_ARG: CustomCommandOption = {
   autocomplete: "item",
 };
 
-@DiscordAdapter({
+@DiscordAdapter(() => ({
   supercomand: {
     name: "selfroles",
     description: "Allow your members to give themselves roles by reacting to a message.",
   },
-})
+}))
 export class SelfRolesDiscordAdapter {
   constructor(private readonly service: SelfRolesService, private readonly bot: Bot) {}
 
@@ -44,16 +44,16 @@ export class SelfRolesDiscordAdapter {
     );
   }
 
-  @DiscordSubcommand({ description: "Show all self-roles of the guild" })
+  @DiscordSubcommand(() => ({ description: "Show all self-roles of the guild" }))
   async list(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const result = await this.service.list(interaction.guildId);
     return interaction.reply({ content: table(result), ephemeral: true });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Show info about a self-roles item",
     options: [{ ...ID_ARG }],
-  })
+  }))
   async show(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const name = interaction.options.getString("item", true);
     const result = await this.service.get(interaction.guildId, name);
@@ -98,20 +98,20 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Create a new self-roles",
     options: [{ ...ID_ARG, name: "name" }],
-  })
+  }))
   async create(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const name = interaction.options.getString("name", true);
     const id = await this.service.create(interaction.guildId, name);
     return interaction.reply({ content: `Created new selfroles item with name \`${id}\`!`, ephemeral: true });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Destroy a self-roles item and delete it's message",
     options: [{ ...ID_ARG }],
-  })
+  }))
   async destroy(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const name = interaction.options.getString("item", true);
     const result = await this.service.destroy(interaction.guildId, name);
@@ -138,10 +138,10 @@ export class SelfRolesDiscordAdapter {
     }
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     description: "Re-send/edit the self-roles item's message",
     options: [{ ...ID_ARG }],
-  })
+  }))
   async render(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply({ ephemeral: true });
     const name = interaction.options.getString("item", true);
@@ -150,7 +150,7 @@ export class SelfRolesDiscordAdapter {
     return interaction.editReply(result ? "Successfully (re)rendered item" : "Failed (re)rendering item");
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     name: "role",
     description: "Edit roles of a self-roles item",
     type: ApplicationCommandOptionType.SubcommandGroup,
@@ -181,7 +181,7 @@ export class SelfRolesDiscordAdapter {
         ],
       },
     ],
-  })
+  }))
   async role(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const cmd = interaction.options.getSubcommand(true);
     const itemName = interaction.options.getString("item", true);
@@ -214,7 +214,7 @@ export class SelfRolesDiscordAdapter {
     return interaction.reply({ content: "Unknown subcommand", ephemeral: true });
   }
 
-  @DiscordSubcommand({
+  @DiscordSubcommand(() => ({
     name: "edit",
     description: "Edit a self-roles item",
     type: ApplicationCommandOptionType.SubcommandGroup,
@@ -224,7 +224,7 @@ export class SelfRolesDiscordAdapter {
       type: ApplicationCommandOptionType.Subcommand,
       options: [{ ...ID_ARG }, { ...field, name: "value" }],
     })),
-  })
+  }))
   async edit(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply({ ephemeral: true });
     const fieldName = interaction.options.getSubcommand(true);
