@@ -6,18 +6,28 @@ import { Config } from "./Config";
 import modules from "./modules";
 
 async function main() {
+  console.log("Loading configuration...");
   const config = new Config();
-  const bot: Bot = new Bot(config);
+  await config.load();
 
-  await bot.loadTranslations();
+  console.log("Initializing...");
+  const bot: Bot = new Bot(config.system);
   bot.container.set(Config, config);
+  const logger = bot.getLogger("Bootstrap");
+
+  logger.debug("Loading translations...");
+  await bot.loadTranslations();
+
+  logger.debug("Loading modules...");
   bot.modules.register(modules);
 
+  logger.debug("Logging into Discord...");
   addExitCallback(() => {
     bot.destroy();
   });
+  await bot.login(config.auth.discordToken).catch((err) => console.error("Boot failed", err));
 
-  await bot.login(config.auth.discord.token).catch((err) => console.error("Boot failed", err));
+  logger.debug("Done.");
 }
 
 main();

@@ -9,7 +9,7 @@ export { default as Prisma } from "@prisma/client";
 export class PrismaService extends PrismaClient {
   constructor(config: Config, bot: Bot) {
     super({
-      datasources: { db: { url: config.databaseUrl } },
+      datasources: { db: { url: config.auth.databaseUrl } },
       errorFormat: process.env.NODE_ENV === "production" ? "minimal" : undefined,
     });
 

@@ -72,7 +72,7 @@ export class ModeratorService {
 
   // NOTE: This could be in a separate thread?
   private async checkWarnPenalty(guildId: Snowflake, userId: Snowflake, channelId?: Snowflake) {
-    const { warnPenalties } = this.config.moderation;
+    const { warnPenalties } = this.config.modules.moderation;
     const time = Date.now();
     const warns = await this.prisma.warning.findMany({ where: { guildId, userId }, select: { timestamp: true } });
 

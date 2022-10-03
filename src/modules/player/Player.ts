@@ -103,7 +103,7 @@ export class Player extends EventEmitter {
     this.timeout = setTimeout(() => {
       this.emit("timeout");
       this.destroy();
-    }, this.config.player.timeout).unref();
+    }, this.config.modules.player.timeout).unref();
   }
 
   private clearTimeout() {
@@ -195,7 +195,7 @@ export class Player extends EventEmitter {
 
   async add(query: string) {
     if (this.destroyed) return;
-    if (this.queue.length >= this.config.player.maxQueueLength) throw new Error("The queue is full");
+    if (this.queue.length >= this.config.modules.player.maxQueueLength) throw new Error("The queue is full");
 
     if (!query.startsWith("http")) {
       query = "ytsearch:" + query;

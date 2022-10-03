@@ -5,8 +5,8 @@ import { Bot } from "@core/Bot";
 import { PrismaService } from "~/services/Prisma.service";
 import { Schedule } from "~/utils/Schedule";
 import { Config } from "~/Config";
-import { pickRandom } from "~/utils";
-import * as messages from "./messages";
+import { TranslationService } from "~/core/Translation.service";
+import { dateToUTC } from "~/utils";
 
 const DAY = 24 * 60 * 60 * 1000;
 const GUILD_SELECT = {
@@ -19,7 +19,12 @@ const GUILD_SELECT = {
 export class BirthdaysService {
   private readonly schedules = new Map<Snowflake, Schedule>();
 
-  constructor(private readonly prisma: PrismaService, private readonly bot: Bot, private readonly config: Config) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly trans: TranslationService,
+    private readonly bot: Bot,
+    private readonly config: Config,
+  ) {
     bot.on("guildDelete", (guild) => this.removeSchedule(guild.id));
 
     bot.once("ready", () => this.updateSchedules());
@@ -47,7 +52,7 @@ export class BirthdaysService {
     // If the start already happened today, schedule for tomorrow
     if (+start < +now) start = new Date(+start + DAY);
 
-    schedule = new Schedule(() => this.announceBirthdays(guildId), start, DAY);
+    schedule = new Schedule(() => this.announceBirthdays(guildId).catch(console.error), start, DAY);
   }
 
   private removeSchedule(guildId: Snowflake) {
@@ -73,28 +78,42 @@ export class BirthdaysService {
     });
     if (!bdays.length) return;
 
-    const embeds: EmbedBuilder[] = [];
     const subjects: GuildMember[] = [];
     for (const bday of bdays) {
       const subject = await guild.members.fetch(bday.userId);
       if (!subject) continue;
 
       subjects.push(subject);
-      embeds.push(
-        new EmbedBuilder({
-          color: this.config.color,
-          title: "🎂 " + pickRandom(messages.titles).replace("{subject}", subject.toString()),
-          description: pickRandom(messages.messages),
-        }),
-      );
     }
 
     if (!subjects.length) return;
 
     const listFormatter = new Intl.ListFormat();
     return channel.send({
-      content: (ping ? ping.toString() + " | " : "") + listFormatter.format(subjects.map((s) => s.toString())),
-      embeds: embeds,
+      content: ping?.toString() || undefined,
+      embeds: [
+        new EmbedBuilder({
+          color: this.config.color,
+          title:
+            "🎂 " +
+            this.trans.translate(
+              "birthdays-alert-title",
+              {
+                subject_count: subjects.length,
+                subjects: listFormatter.format(subjects.map((s) => s.nickname || s.user.username)),
+              },
+              guild.preferredLocale,
+            ),
+          description: this.trans.translate(
+            "birthdays-alert-message",
+            {
+              subject_count: subjects.length,
+              subjects: listFormatter.format(subjects.map((s) => s.toString())),
+            },
+            guild.preferredLocale,
+          ),
+        }),
+      ],
     });
   }
 
@@ -145,7 +164,7 @@ export class BirthdaysService {
     const _date = new Date(0);
     _date.setMonth(date.getMonth());
     _date.setDate(date.getDate());
-    return _date;
+    return dateToUTC(_date);
   }
 
   stringifyDate(date: Date) {

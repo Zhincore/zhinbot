@@ -29,7 +29,7 @@ const levelColors: LevelColors = {
   },
 };
 
-export function getLogger(serviceName?: string) {
+export function getLogger(journalServiceName?: string) {
   const isProd = process.env.NODE_ENV === "production";
 
   const logger = Winston.createLogger({
@@ -46,7 +46,7 @@ export function getLogger(serviceName?: string) {
     ],
   });
 
-  if (isProd && serviceName) logger.add(new Journald({ identifier: serviceName }));
+  if (isProd && journalServiceName) logger.add(new Journald({ identifier: journalServiceName }));
 
   return logger;
 }

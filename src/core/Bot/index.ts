@@ -1,21 +1,21 @@
 import Discord, { Snowflake, DiscordAPIError } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
+import { Logger } from "winston";
 import { TranslationService } from "../Translation.service";
 import { getLogger } from "./getLogger";
 import { ModuleManager } from "./ModuleManager";
 
 type BotSettings = {
-  owners: string[];
-  serviceName?: string;
+  journalIdentifier?: string;
 };
 
 @Service()
 export class Bot extends Discord.Client {
-  private readonly logger = getLogger();
+  private readonly logger: Logger;
 
   readonly container = Container.of();
-  readonly modules = new ModuleManager(this);
+  readonly modules: ModuleManager;
 
   readonly readyPromise: Promise<void>;
 
@@ -29,6 +29,9 @@ export class Bot extends Discord.Client {
         Discord.GatewayIntentBits.GuildVoiceStates,
       ],
     });
+
+    this.logger = getLogger(this.settings.journalIdentifier);
+    this.modules = new ModuleManager(this);
 
     this.on("debug", (m) => {
       this.logger.debug(m);
@@ -44,7 +47,6 @@ export class Bot extends Discord.Client {
       this.logger.info("Logged in as %s", bot.user.tag);
 
       const app = await bot.application.fetch();
-      if (app.owner) this.settings.owners.push(app.owner.id);
       try {
         await Promise.all([
           // Update avatar

@@ -1,6 +1,4 @@
-import { TextChannel } from "discord.js";
-
-export type MessageData = Parameters<TextChannel["send"]>[0];
+export * from "./ErrnoException";
 
 export function getDurationString(length: number, float = false) {
   const hours = Math.trunc(length / 3600);
@@ -13,6 +11,6 @@ export function getDurationString(length: number, float = false) {
     .join(":");
 }
 
-export function pickRandom<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
+export function dateToUTC(date: Date) {
+  return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 }

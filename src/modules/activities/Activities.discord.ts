@@ -2,9 +2,6 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType, ChannelType, InviteTargetType } from "discord-api-types/v10";
 import { Bot } from "@core/Bot";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
-import { Config } from "~/Config";
-
-const { activityMap } = new Config().activities;
 
 @DiscordAdapter()
 export class ActivitiesDiscordAdapter {
@@ -18,7 +15,7 @@ export class ActivitiesDiscordAdapter {
         description: "The activity to start",
         type: ApplicationCommandOptionType.String,
         required: true,
-        choices: Object.entries(activityMap).map(([name, value]) => ({ name, value })),
+        // choices: Object.entries(activityMap).map(([name, value]) => ({ name, value })),
       },
       {
         name: "channel",

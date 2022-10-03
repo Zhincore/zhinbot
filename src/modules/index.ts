@@ -1,4 +1,4 @@
-import { ActivitiesModule } from "./activities";
+// import { ActivitiesModule } from "./activities";
 import { BirthdaysModule } from "./birthdays";
 import { MessageRatingModule } from "./messagerating";
 import { ModeratorModule } from "./moderator";
@@ -7,7 +7,7 @@ import { SelfRolesModule } from "./selfroles";
 import { UtilsModule } from "./utils";
 
 export default [
-  ActivitiesModule,
+  // ActivitiesModule,
   BirthdaysModule,
   MessageRatingModule,
   ModeratorModule,

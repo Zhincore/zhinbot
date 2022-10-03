@@ -1,0 +1,36 @@
+# Hex number of the color that should be used in embeds etc. 
+color = 0x63A6CB
+
+##
+## Modules section 
+##
+[modules]
+
+# Activities module
+[modules.activities]
+
+youtube = "880218394199220334"
+
+# Player module
+[modules.player]
+
+maxQueueLength = 256
+timeout = "15m"
+
+songCache = { ttl = "48h", size = 2048 }
+
+# Moderation module
+[modules.moderation]
+
+warnPenalties = [
+  { count = 2, perTime = "1h", duration = "30m" },
+  { count = 3, perTime = "12h", duration = "2h" },
+  { count = 6, perTime = "24h", duration = "7d" },
+]
+
+## !!!
+## Advanced section 
+## !!!
+[system]
+
+#journalIdentifier = 
