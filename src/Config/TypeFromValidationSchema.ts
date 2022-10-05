@@ -32,7 +32,7 @@ type _TypeFromObj<Obj extends ValidationSchema> = _TryOptional<
     ? TypeFromValidationSchema<Obj["props"]>
     : // Record
     Obj["type"] extends "record"
-    ? { [Key in _TypeFromPrimitive<Obj["key"]>]: _TypeFromObj<Obj["value"]> }
+    ? { [Key in _TypeFromPrimitive<Obj["key"]>]: _TypeFromAny<Obj["value"]> }
     : // Array
     Obj["type"] extends "array"
     ? _TypeFromAny<Obj["items"]>[]
