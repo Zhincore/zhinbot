@@ -6,7 +6,7 @@ import { PrismaService } from "~/services/Prisma.service";
 import { Schedule } from "~/utils/Schedule";
 import { Config } from "~/Config";
 import { TranslationService } from "~/core/Translation.service";
-import { dateToUTC } from "~/utils";
+import { chooseRandom, dateToUTC } from "~/utils";
 
 const DAY = 24 * 60 * 60 * 1000;
 const GUILD_SELECT = {
@@ -89,11 +89,13 @@ export class BirthdaysService {
     if (!subjects.length) return;
 
     const listFormatter = new Intl.ListFormat();
+    const images = this.config.modules.birthdays.images;
     return channel.send({
       content: ping?.toString() || undefined,
       embeds: [
         new EmbedBuilder({
           color: this.config.color,
+          image: images.length ? { url: chooseRandom(this.config.modules.birthdays.images) } : undefined,
           title:
             "🎂 " +
             this.trans.translate(

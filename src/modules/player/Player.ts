@@ -209,7 +209,7 @@ export class Player extends EventEmitter {
             dumpSingleJson: true,
             extractAudio: true,
             audioFormat: "opus",
-            noCheckCertificate: true,
+            noCheckCertificates: true,
             noWarnings: true,
             markWatched: false,
             geoBypass: true,

@@ -14,3 +14,7 @@ export function getDurationString(length: number, float = false) {
 export function dateToUTC(date: Date) {
   return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 }
+
+export function chooseRandom<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}

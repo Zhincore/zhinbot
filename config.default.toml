@@ -11,6 +11,18 @@ color = 0x63A6CB
 
 youtube = "880218394199220334"
 
+# Birthdays module
+[modules.birthdays]
+
+images = [
+  # Sourced from https://twitter.com/IKEAsame/status/1215976200813699072
+  "https://pbs.twimg.com/media/EOAD3dAUcAACa5C?format=jpg",
+  "https://pbs.twimg.com/media/EOAD38DVUAADiIm?format=jpg",
+  "https://pbs.twimg.com/media/EOAD4bMVUAEhmLm?format=jpg",
+  "https://pbs.twimg.com/media/EOAD5SNUEAA9yww?format=jpg",
+  "https://pbs.twimg.com/media/EOAD51hUcAIyhpd?format=jpg"
+]
+
 # Player module
 [modules.player]
 

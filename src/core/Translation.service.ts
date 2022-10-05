@@ -1,13 +1,13 @@
 import fs from "node:fs/promises";
 import Path from "node:path";
 import { FluentBundle, FluentFunction, FluentNumber, FluentResource, FluentVariable } from "@fluent/bundle";
-import { Locale, LocaleString } from "discord.js";
+import { LocaleString } from "discord.js";
 import { Service } from "./decorators";
 import { getLogger } from "./Bot/getLogger";
 
 @Service()
 export class TranslationService {
-  private readonly logger = getLogger("Translations");
+  private readonly logger = getLogger().child("Translations");
   private readonly localeBoundles = new Map<string, FluentBundle>();
   private readonly functions: Record<string, FluentFunction> = {
     RANDOM_INDEX: ([max]) => new FluentNumber(Math.floor(Math.random() * Number(max))),
@@ -72,7 +72,7 @@ export class TranslationService {
 
   t = this.translate;
 
-  getTranslate(locale = "en") {
+  getTranslate(locale?: LocaleString | LocaleString[]) {
     return (pattern: string, args?: Record<string, FluentVariable>) => this.translate(pattern, args, locale);
   }
 }

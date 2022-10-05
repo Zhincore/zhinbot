@@ -3,8 +3,8 @@ import TOML from "@ltd/j-toml";
 import Validator from "fastest-validator";
 import ms from "ms";
 import { Service } from "@core/decorators";
-import { isErrno } from "./utils";
-import { defineValidationSchema, TypeFromValidationSchema } from "./utils/TypeFromValidationSchema";
+import { isErrno } from "../utils";
+import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromValidationSchema";
 
 const SCHEMA = defineValidationSchema({
   color: "number",
@@ -15,6 +15,13 @@ const SCHEMA = defineValidationSchema({
       type: "record",
       key: "string",
       value: "string",
+    },
+    birthdays: {
+      $$type: "object",
+      images: {
+        type: "array",
+        items: "string",
+      },
     },
     player: {
       $$type: "object",
@@ -31,12 +38,10 @@ const SCHEMA = defineValidationSchema({
       warnPenalties: {
         type: "array",
         items: {
-          type: "object",
-          props: {
-            count: "number",
-            perTime: "ms",
-            duration: "ms",
-          },
+          $$type: "object",
+          count: "number",
+          perTime: "ms",
+          duration: "ms",
         },
       },
     },
@@ -58,8 +63,11 @@ export class Config implements IConfig {
     discordToken: env("DISCORD_TOKEN"),
   };
 
-  modules = {
+  modules: IConfig["modules"] = {
     activities: {},
+    birthdays: {
+      images: [],
+    },
     player: {
       maxQueueLength: 0,
       timeout: 0,
@@ -73,15 +81,20 @@ export class Config implements IConfig {
     },
   };
 
-  system = {
+  system: IConfig["system"] = {
     journalIdentifier: undefined,
   };
 
-  private readonly check = new Validator({
+  readonly #check = new Validator({
+    useNewCustomCheckerFunction: true,
     aliases: {
       ms: { type: "string", custom: (v: any) => ms(v) },
     },
   }).compile(SCHEMA);
+
+  constructor() {
+    console.log(new Error("instantiated"));
+  }
 
   async load() {
     const defaults = await this.loadFile("./config.default.toml");
@@ -97,7 +110,7 @@ export class Config implements IConfig {
     try {
       const obj = TOML.parse(await fs.readFile(path), undefined, false);
 
-      const errors = await this.check(obj);
+      const errors = await this.#check(obj);
       if (Array.isArray(errors) && errors.length) {
         console.error(`Config file '${path}' contains errors:\n` + errors.map((e) => `\t- ${e.message}`).join("\n"));
         console.error(`Config file '${path}' is not valid and won't be loaded.`);
