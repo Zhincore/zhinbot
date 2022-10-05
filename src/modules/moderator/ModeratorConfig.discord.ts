@@ -7,7 +7,7 @@ import { ModeratorService, ModConfig } from "./Moderator.service";
 export class ModeratorConfigDiscordAdapter {
   constructor(private readonly service: ModeratorService) {}
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     description: "Change or show configuration of the moderator module",
     options: [
       {
@@ -28,7 +28,7 @@ export class ModeratorConfigDiscordAdapter {
         type: ApplicationCommandOptionType.Subcommand,
       },
     ],
-  }))
+  })
   async modconf(interaction: ChatInputCommandInteraction<"cached">) {
     const config = await this.service.getGuildConfig(interaction.guildId);
     const subcommand = interaction.options.getSubcommand();

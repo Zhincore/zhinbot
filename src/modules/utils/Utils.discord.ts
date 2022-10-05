@@ -4,27 +4,27 @@ import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 
 @DiscordAdapter()
 export class UtilsDiscordAdapter {
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     description: 'Replies with "Pong!"',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
-  }))
+  })
   ping(interaction: ChatInputCommandInteraction) {
     return interaction.reply("Pong!");
   }
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     description: "Measures the roundtrip latency between Discord and the bot",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
-  }))
+  })
   async latency(interaction: ChatInputCommandInteraction) {
     const sent = (await interaction.reply({ content: "Pinging...", fetchReply: true })) as Message;
     return interaction.editReply(`Roundtrip latency: \`${sent.createdTimestamp - interaction.createdTimestamp}ms\``);
   }
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     description: "Sends some numbers about the bot",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
-  }))
+  })
   async status(interaction: ChatInputCommandInteraction) {
     const sent = (await interaction.reply({ content: "Measuring...", fetchReply: true })) as Message;
 

@@ -66,6 +66,12 @@ export class Bot extends Discord.Client {
     this.container.set(Bot, this);
   }
 
+  get trans() {
+    return this.container.get(TranslationService);
+  }
+
+  get = this.container.get;
+
   getLogger(module: string) {
     return this.logger.child({ module });
   }
@@ -76,8 +82,7 @@ export class Bot extends Discord.Client {
   }
 
   async loadTranslations() {
-    const trans = this.container.get(TranslationService);
-    await trans.load();
+    await this.trans.load();
   }
 
   async login(token?: string) {

@@ -51,7 +51,7 @@ export class TranslationService {
 
   translate(
     pattern: string,
-    args?: Record<string, FluentVariable>,
+    args?: Record<string, FluentVariable> | null,
     locale: LocaleString | LocaleString[] = "en-US",
   ): string {
     const locales = Array.isArray(locale) ? [...locale] : [locale];

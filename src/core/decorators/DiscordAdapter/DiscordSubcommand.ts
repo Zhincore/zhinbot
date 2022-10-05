@@ -4,9 +4,9 @@ import {
   ApplicationCommandSubGroupData,
   ChatInputCommandInteraction,
 } from "discord.js";
-import { TranslationService } from "~/core/Translation.service";
+import { Bot } from "~/core/Bot";
 import { DiscordCommandExecutor } from "./DiscordCommand";
-import { pushToMetaArray, IInteractionHandler } from "./_utils";
+import { pushToMetaArray, IInteractionHandler, AnnotWithBot } from "./_utils";
 import { CustomCommandOption, CustomAppSubcmdData, parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("subcommands");
@@ -33,17 +33,15 @@ export interface IDiscordSubcommand extends IInteractionHandler<ChatInputCommand
 /**
  * Can only be used inside Discord adapter
  */
-export function DiscordSubcommand(
-  data: (trans: TranslationService) => DiscordSubcommandData<"subcmd">,
-): MethodDecorator;
-export function DiscordSubcommand(data: (trans: TranslationService) => DiscordSubcommandData<"group">): MethodDecorator;
-export function DiscordSubcommand(data: (trans: TranslationService) => DiscordSubcommandData<any>): MethodDecorator {
+export function DiscordSubcommand(data: AnnotWithBot<DiscordSubcommandData<"subcmd">>): MethodDecorator;
+export function DiscordSubcommand(data: AnnotWithBot<DiscordSubcommandData<"group">>): MethodDecorator;
+export function DiscordSubcommand(data: AnnotWithBot<DiscordSubcommandData<any>>): MethodDecorator {
   return (target, method) => {
-    const subcommand = (trans: TranslationService): IDiscordSubcommand => ({
+    const subcommand = (bot: Bot): IDiscordSubcommand => ({
       commandData: parseAutocompleters(target, {
         type: ApplicationCommandOptionType.Subcommand,
         name: method.toString(),
-        ...data(trans),
+        ...(typeof data === "function" ? data(bot) : data),
       } as CustomAppSubcmdData),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,
     });
@@ -52,6 +50,6 @@ export function DiscordSubcommand(data: (trans: TranslationService) => DiscordSu
   };
 }
 
-export function getDiscordSubcommands(target: any): ((trans: TranslationService) => IDiscordSubcommand)[] | undefined {
+export function getDiscordSubcommands(target: any): ((bot: Bot) => IDiscordSubcommand)[] | undefined {
   return Reflect.getMetadata(symbol, target);
 }

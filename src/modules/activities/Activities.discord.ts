@@ -2,12 +2,13 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType, ChannelType, InviteTargetType } from "discord-api-types/v10";
 import { Bot } from "@core/Bot";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
+import { Config } from "~/Config";
 
 @DiscordAdapter()
 export class ActivitiesDiscordAdapter {
   constructor(private readonly bot: Bot) {}
 
-  @DiscordCommand(() => ({
+  @DiscordCommand((bot) => ({
     description: "Start an activity",
     options: [
       {
@@ -15,7 +16,7 @@ export class ActivitiesDiscordAdapter {
         description: "The activity to start",
         type: ApplicationCommandOptionType.String,
         required: true,
-        // choices: Object.entries(activityMap).map(([name, value]) => ({ name, value })),
+        choices: Object.entries(bot.get(Config).modules.activities).map(([name, value]) => ({ name, value })),
       },
       {
         name: "channel",

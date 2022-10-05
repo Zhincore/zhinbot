@@ -1,6 +1,6 @@
 import { ApplicationCommandData } from "discord.js";
 import { Service } from "typedi";
-import { TranslationService } from "~/core/Translation.service";
+import { Bot } from "~/core/Bot";
 import {
   getAutocompleters,
   getAutocompleterMappings,
@@ -10,6 +10,7 @@ import {
 import { getDiscordCommands, IDiscordCommand } from "./DiscordCommand";
 import { getDiscordSubcommands, IDiscordSubcommand } from "./DiscordSubcommand";
 import { getDiscordHandlers, IDiscordHandler } from "./DiscordHandler";
+import { AnnotWithBot } from "./_utils";
 
 const symbol = Symbol("discordAdapter");
 
@@ -25,7 +26,7 @@ export type IDiscordAdapter = DiscordAdapterData & {
   autocompleteMappings?: IAutocompleterMapping[];
 };
 
-export function DiscordAdapter(data: (trans: TranslationService) => DiscordAdapterData = () => ({})): ClassDecorator {
+export function DiscordAdapter(data: AnnotWithBot<DiscordAdapterData> = {}): ClassDecorator {
   const service = Service();
   return (target) => {
     Reflect.defineMetadata(symbol, data, target);
@@ -33,17 +34,17 @@ export function DiscordAdapter(data: (trans: TranslationService) => DiscordAdapt
   };
 }
 
-export function getDiscordAdapterData(target: any, trans: TranslationService): IDiscordAdapter | undefined {
-  const adapterData: ((trans: TranslationService) => DiscordAdapterData) | undefined = Reflect.getMetadata(
+export function getDiscordAdapterData(target: any, bot: Bot): IDiscordAdapter | undefined {
+  const adapterData: ((bot: Bot) => DiscordAdapterData) | DiscordAdapterData | undefined = Reflect.getMetadata(
     symbol,
     target.constructor,
   );
   if (!adapterData) return;
 
   return {
-    ...adapterData(trans),
-    commands: getDiscordCommands(target)?.map((v) => v(trans)),
-    subcommands: getDiscordSubcommands(target)?.map((v) => v(trans)),
+    ...(typeof adapterData === "function" ? adapterData(bot) : adapterData),
+    commands: getDiscordCommands(target)?.map((v) => v(bot)),
+    subcommands: getDiscordSubcommands(target)?.map((v) => v(bot)),
     handlers: getDiscordHandlers(target),
     autocompleters: getAutocompleters(target),
     autocompleteMappings: getAutocompleterMappings(target),

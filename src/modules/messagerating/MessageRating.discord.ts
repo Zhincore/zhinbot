@@ -22,25 +22,25 @@ export class MessageRatingDiscordAdapter {
     });
   }
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     name: "Like message",
     type: ApplicationCommandType.Message,
     defaultMemberPermissions: PermissionFlagsBits.AddReactions,
-  }))
+  })
   like(interaction: MessageContextMenuCommandInteraction<"cached">) {
     return this.doRating(interaction, true);
   }
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     name: "Dislike message",
     type: ApplicationCommandType.Message,
     defaultMemberPermissions: PermissionFlagsBits.AddReactions,
-  }))
+  })
   dislike(interaction: MessageContextMenuCommandInteraction<"cached">) {
     return this.doRating(interaction, false);
   }
 
-  @DiscordCommand(() => ({
+  @DiscordCommand({
     description: "Show rating of a member",
     options: [
       {
@@ -49,7 +49,7 @@ export class MessageRatingDiscordAdapter {
         type: ApplicationCommandOptionType.User,
       },
     ],
-  }))
+  })
   async rating(interaction: ChatInputCommandInteraction<"cached">) {
     const user = interaction.options.getUser("member", false) ?? interaction.user;
     const rating = await this.service.getRating(interaction.guildId, user.id);

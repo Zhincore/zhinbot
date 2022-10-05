@@ -2,7 +2,6 @@ import Discord, { ApplicationCommandType, ChatInputApplicationCommandData, Disco
 import { Constructable } from "typedi";
 import { Logger } from "winston";
 import * as Decorators from "../decorators";
-import { TranslationService } from "../Translation.service";
 import { Bot } from "./";
 
 export class ModuleManager {
@@ -86,9 +85,8 @@ export class ModuleManager {
   }
 
   private parseAdapterCommands(DiscordAdapter: Constructable<any>) {
-    const trans = this.bot.container.get(TranslationService);
     const discordAdapter = this.bot.container.get(DiscordAdapter);
-    const adapterData = Decorators.getDiscordAdapterData(discordAdapter, trans);
+    const adapterData = Decorators.getDiscordAdapterData(discordAdapter, this.bot);
     if (!adapterData) {
       this.logger.error(`Class ${DiscordAdapter.name} is missing the DiscordAdapter decorator`);
       this.bot.container.remove(DiscordAdapter);

@@ -12,6 +12,7 @@ export type CustomCommandOptionData = Omit<Discord.ApplicationCommandOptionData,
   autocomplete?: string | false;
   required?: boolean;
   choices?: Discord.ApplicationCommandChoicesData["choices"];
+  channel_types?: Discord.ApplicationCommandChannelOptionData["channel_types"];
 };
 type _CustomSubcommandOption = Omit<Discord.ApplicationCommandSubCommandData, "options"> & {
   options?: CustomCommandOptionData[];

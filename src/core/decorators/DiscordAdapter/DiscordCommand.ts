@@ -1,6 +1,6 @@
 import { ApplicationCommandData, ApplicationCommandType, Interaction } from "discord.js";
-import { TranslationService } from "~/core/Translation.service";
-import { pushToMetaArray, IInteractionHandler } from "./_utils";
+import { Bot } from "~/core/Bot";
+import { pushToMetaArray, IInteractionHandler, AnnotWithBot } from "./_utils";
 import { CustomCommandOption, parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("commands");
@@ -24,14 +24,14 @@ export interface IDiscordCommand extends IInteractionHandler<Interaction> {
 /**
  * Can only be used inside Discord adapter
  */
-export function DiscordCommand(data: (trans: TranslationService) => DiscordCommandData<_CommandType>): MethodDecorator {
+export function DiscordCommand(data: AnnotWithBot<DiscordCommandData<_CommandType>>): MethodDecorator {
   return (target, method) => {
-    const command = (trans: TranslationService): IDiscordCommand => ({
+    const command = (bot: Bot): IDiscordCommand => ({
       commandData: parseAutocompleters(target, {
         type: ApplicationCommandType.ChatInput,
         name: method.toString(),
         defaultMemberPermissions: "0",
-        ...data(trans),
+        ...(typeof data === "function" ? data(bot) : data),
       }),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,
     });
@@ -40,6 +40,6 @@ export function DiscordCommand(data: (trans: TranslationService) => DiscordComma
   };
 }
 
-export function getDiscordCommands(target: any): ((trans: TranslationService) => IDiscordCommand)[] | undefined {
+export function getDiscordCommands(target: any): ((bot: Bot) => IDiscordCommand)[] | undefined {
   return Reflect.getMetadata(symbol, target);
 }
