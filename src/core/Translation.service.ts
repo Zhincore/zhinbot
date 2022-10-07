@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import Path from "node:path";
 import { FluentBundle, FluentFunction, FluentNumber, FluentResource, FluentVariable } from "@fluent/bundle";
-import { LocaleString } from "discord.js";
 import { Service } from "./decorators";
 import { getLogger } from "./Bot/getLogger";
 
@@ -12,6 +11,8 @@ export class TranslationService {
   private readonly functions: Record<string, FluentFunction> = {
     RANDOM_INDEX: ([max]) => new FluentNumber(Math.floor(Math.random() * Number(max))),
   };
+
+  constructor(public defaultLocale: string = "en") {}
 
   async load() {
     for (const error of await this.loadFolder("./translations")) {
@@ -52,9 +53,12 @@ export class TranslationService {
   translate(
     pattern: string,
     args?: Record<string, FluentVariable> | null,
-    locale: LocaleString | LocaleString[] = "en-US",
+    locale?: string | string[],
+    forceLocale = false,
   ): string {
-    const locales = Array.isArray(locale) ? [...locale] : [locale];
+    const locales = Array.isArray(locale) ? [...locale] : locale ? [locale] : [];
+    if (!forceLocale || !locales.length) locales.push(this.defaultLocale);
+
     const bundle = this.localeBoundles.get(locales.shift()!.split("-")[0]);
     if (bundle) {
       const message = bundle.getMessage(pattern);
@@ -72,7 +76,7 @@ export class TranslationService {
 
   t = this.translate;
 
-  getTranslate(locale?: LocaleString | LocaleString[]) {
+  getTranslate(locale?: string | string[]) {
     return (pattern: string, args?: Record<string, FluentVariable>) => this.translate(pattern, args, locale);
   }
 }

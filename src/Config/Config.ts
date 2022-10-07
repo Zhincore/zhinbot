@@ -8,7 +8,10 @@ import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromVali
 
 const SCHEMA = defineValidationSchema({
   color: "number",
-
+  defaultLocale: {
+    type: "string",
+    optional: true,
+  },
   modules: {
     $$type: "object",
     activities: {
@@ -57,6 +60,7 @@ type IConfig = TypeFromValidationSchema<typeof SCHEMA>;
 @Service()
 export class Config implements IConfig {
   color = 0x63a6cb;
+  defaultLocale = "en";
 
   auth = {
     databaseUrl: env("DATABASE_URL", null) ?? undefined,

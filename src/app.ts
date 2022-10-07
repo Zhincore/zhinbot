@@ -11,7 +11,7 @@ async function main() {
   await config.load();
 
   console.log("Initializing...");
-  const bot: Bot = new Bot(config.system);
+  const bot: Bot = new Bot({ ...config.system, defaultLocale: config.defaultLocale });
   const logger = bot.getLogger("Bootstrap");
   bot.container.set(Config, config);
 

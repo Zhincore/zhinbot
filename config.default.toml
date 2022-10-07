@@ -1,5 +1,7 @@
 # Hex number of the color that should be used in embeds etc. 
 color = 0x63A6CB
+# Default language of the bot
+defaultLocale = "en"
 
 ##
 ## Modules section 
