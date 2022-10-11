@@ -1,7 +1,7 @@
 # Hex number of the color that should be used in embeds etc. 
 color = 0x63A6CB
-# Default language of the bot
-defaultLocale = "en"
+# Default language of the bot (https://discord.com/developers/docs/reference#locales)
+defaultLocale = "en-US"
 
 ##
 ## Modules section 

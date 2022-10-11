@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import TOML from "@ltd/j-toml";
 import Validator from "fastest-validator";
 import ms from "ms";
+import { Locale, LocaleString } from "discord.js";
 import { Service } from "@core/decorators";
 import { isErrno } from "../utils";
 import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromValidationSchema";
@@ -9,7 +10,8 @@ import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromVali
 const SCHEMA = defineValidationSchema({
   color: "number",
   defaultLocale: {
-    type: "string",
+    type: "enum",
+    values: Object.values<LocaleString>(Locale),
     optional: true,
   },
   modules: {
@@ -60,7 +62,7 @@ type IConfig = TypeFromValidationSchema<typeof SCHEMA>;
 @Service()
 export class Config implements IConfig {
   color = 0x63a6cb;
-  defaultLocale = "en";
+  defaultLocale: IConfig["defaultLocale"] = "en-US";
 
   auth = {
     databaseUrl: env("DATABASE_URL", null) ?? undefined,

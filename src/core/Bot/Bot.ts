@@ -1,4 +1,4 @@
-import Discord, { Snowflake, DiscordAPIError } from "discord.js";
+import Discord, { Snowflake, DiscordAPIError, LocaleString } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
 import { Logger } from "winston";
@@ -7,7 +7,7 @@ import { getLogger } from "./getLogger";
 import { ModuleManager } from "./ModuleManager";
 
 type BotSettings = {
-  defaultLocale?: string;
+  defaultLocale?: LocaleString;
   journalIdentifier?: string;
 };
 

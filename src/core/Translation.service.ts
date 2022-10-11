@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import Path from "node:path";
 import { FluentBundle, FluentFunction, FluentNumber, FluentResource, FluentVariable } from "@fluent/bundle";
+import { Locale } from "discord.js";
+import type { LocaleString } from "discord.js";
 import { Service } from "./decorators";
 import { getLogger } from "./Bot/getLogger";
 
@@ -12,7 +14,7 @@ export class TranslationService {
     RANDOM_INDEX: ([max]) => new FluentNumber(Math.floor(Math.random() * Number(max))),
   };
 
-  constructor(public defaultLocale: string = "en") {}
+  constructor(public defaultLocale: LocaleString = "en-US") {}
 
   async load() {
     for (const error of await this.loadFolder("./translations")) {
@@ -30,6 +32,10 @@ export class TranslationService {
       if (!dirent.isFile() || !dirent.name.endsWith(".ftl")) continue;
 
       const locale = dirent.name.slice(0, -".ftl".length);
+      if (!Object.values(Locale).includes(locale as any)) {
+        this.logger.warn(`Filename '${dirent.name}' doesn't correspond to a valid locale.`);
+        continue;
+      }
 
       promises.push(
         fs.readFile(Path.join(path, dirent.name), "utf-8").then((f) => {
@@ -47,17 +53,25 @@ export class TranslationService {
   }
 
   getLocales() {
-    return Array.from(this.localeBoundles.keys());
+    return Array.from(this.localeBoundles.keys()) as LocaleString[];
   }
 
-  translate(
+  getTranslations(pattern: string, args?: Record<string, FluentVariable> | null) {
+    return this.getLocales().reduce((obj, locale) => {
+      const msg = this.translate(pattern, args, locale, true);
+      if (msg) obj[locale] = msg;
+      return obj;
+    }, {} as Record<LocaleString, string>);
+  }
+
+  translate<Strict extends boolean = false>(
     pattern: string,
     args?: Record<string, FluentVariable> | null,
-    locale?: string | string[],
-    forceLocale = false,
-  ): string {
+    locale?: LocaleString | LocaleString[],
+    strict?: Strict,
+  ): Strict extends true ? string | undefined : string {
     const locales = Array.isArray(locale) ? [...locale] : locale ? [locale] : [];
-    if (!forceLocale || !locales.length) locales.push(this.defaultLocale);
+    if (!strict || !locales.length) locales.push(this.defaultLocale);
 
     const bundle = this.localeBoundles.get(locales.shift()!.split("-")[0]);
     if (bundle) {
@@ -70,13 +84,17 @@ export class TranslationService {
     // Try to fallback
     if (locales.length) return this.translate(pattern, args, locales);
 
-    this.logger.warn(new Error(`Requested pattern '${pattern}' was not found.`));
-    return pattern;
+    if (!strict) {
+      this.logger.warn(new Error(`Requested pattern '${pattern}' was not found.`));
+      return pattern;
+    }
+    return undefined as any;
   }
 
   t = this.translate;
 
-  getTranslate(locale?: string | string[]) {
-    return (pattern: string, args?: Record<string, FluentVariable>) => this.translate(pattern, args, locale);
+  getTranslate(locale?: LocaleString | LocaleString[]) {
+    return <Strict extends boolean = false>(pattern: string, args?: Record<string, FluentVariable>, strict?: Strict) =>
+      this.translate<Strict>(pattern, args, locale, strict);
   }
 }

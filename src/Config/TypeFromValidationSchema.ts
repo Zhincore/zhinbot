@@ -36,6 +36,9 @@ type _TypeFromObj<Obj extends ValidationSchema> = _TryOptional<
     : // Array
     Obj["type"] extends "array"
     ? _TypeFromAny<Obj["items"]>[]
+    : // Enum
+    Obj["type"] extends "enum"
+    ? Obj["values"][number]
     : // Primitive
       _TypeFromPrimitive<Obj["type"]>
 >;

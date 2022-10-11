@@ -1,4 +1,10 @@
-import Discord, { ApplicationCommandType, ChatInputApplicationCommandData, DiscordAPIError } from "discord.js";
+import Discord, {
+  ApplicationCommandData,
+  ApplicationCommandOption,
+  ApplicationCommandType,
+  ChatInputApplicationCommandData,
+  DiscordAPIError,
+} from "discord.js";
 import { Constructable } from "typedi";
 import { Logger } from "winston";
 import * as Decorators from "../decorators";
@@ -125,11 +131,27 @@ export class ModuleManager {
       const { commandData, execute } = command;
       if (this.commands.has(commandData.name)) throw new Error(`Command '${commandData.name}' already exists`);
       this.commands.set(commandData.name, {
-        commandData,
+        commandData: this.translateCommandData(commandData),
         execute: execute.bind(discordAdapter),
       });
       this.commandDataList.push(commandData);
     }
+  }
+
+  private translateCommandData<T extends ApplicationCommandData>(data: T): T {
+    const trans = this.bot.trans;
+
+    const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P): P => {
+      return {
+        ...subdata,
+        nameLocalizations: trans.getTranslations(subdata.name),
+        description: "description" in subdata ? trans.translate(subdata.description) : undefined,
+        descriptionLocalizations: "description" in subdata ? trans.getTranslations(subdata.description) : undefined,
+        options: "options" in subdata ? subdata.options?.map(traverse) : undefined,
+      };
+    };
+
+    return traverse(data);
   }
 
   private async updateGuildCommands(guild: Discord.Guild) {
@@ -150,7 +172,7 @@ export class ModuleManager {
         commandData: {
           defaultMemberPermissions: "0",
           type: ApplicationCommandType.ChatInput,
-          ...adapterData.supercomand!,
+          ...adapterData.supercomand,
           options: adapterData.subcommands?.map((subcmd) => subcmd.commandData),
         } as ChatInputApplicationCommandData,
         execute(interaction: Discord.ChatInputCommandInteraction) {
