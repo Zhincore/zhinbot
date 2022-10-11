@@ -7,26 +7,28 @@ import {
 import { Bot } from "~/core/Bot";
 import { DiscordCommandExecutor } from "./DiscordCommand";
 import { pushToMetaArray, IInteractionHandler, AnnotWithBot } from "./_utils";
-import { CustomCommandOption, CustomAppSubcmdData, parseAutocompleters } from "./DiscordAutocompleter";
+import { CustomCommandOptionData, CustomAppSubcmdData, parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("subcommands");
 
-export type ApplicationCommandSub_Data = ApplicationCommandSubCommandData | ApplicationCommandSubGroupData;
+export type ApplicationCommandSubData = ApplicationCommandSubCommandData | ApplicationCommandSubGroupData;
 
 type _D<T extends "subcmd" | "group"> = T extends "subcmd"
   ? ApplicationCommandSubCommandData
   : ApplicationCommandSubGroupData;
-export type DiscordSubcommandData<T extends "subcmd" | "group"> = Omit<_D<T>, "name" | "type" | "options"> & {
+export type DiscordSubcommandData<T extends "subcmd" | "group"> = Omit<
+  _D<T>,
+  "name" | "type" | "options" | "description"
+> & {
   name?: string;
   type?: _D<T>["type"];
-  description: string;
-  options?: T extends "subcmd" ? CustomCommandOption[] : DiscordSubcommandData<"subcmd">[];
+  options?: T extends "subcmd" ? CustomCommandOptionData[] : Omit<DiscordSubcommandData<"subcmd">, "description">[];
 };
 
 export type DiscordSubcommandExecutor = (interaction: ChatInputCommandInteraction) => Promise<void>;
 
 export interface IDiscordSubcommand extends IInteractionHandler<ChatInputCommandInteraction> {
-  commandData: ApplicationCommandSub_Data;
+  commandData: ApplicationCommandSubData;
   execute: DiscordCommandExecutor;
 }
 

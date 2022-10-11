@@ -13,36 +13,30 @@ import { BirthdaysService } from "./Birthdays.service";
 @DiscordAdapter({
   supercomand: {
     name: "birthdayconf",
-    description: "Configure the birthday alerts",
   },
 })
 export class BirthdaysConfigDiscordAdapter {
   constructor(private readonly service: BirthdaysService, private readonly bot: Bot, private readonly config: Config) {}
 
   @DiscordSubcommand({
-    description: "Update birthday module alerts",
     type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: "time",
-        description: "The time at which to announce birthdays. E.g. `9:00am` or `16:00`",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "time",
-            description: "The time at which to announce birthdays. E.g. `9:00am` or `16:00`. Nothing to disable",
             type: ApplicationCommandOptionType.String,
           },
         ],
       },
       {
         name: "channel",
-        description: "The channel in which we should announce birthdays. Nothing to disable announcements",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "channel",
-            description: "The channel in which we should announce birthdays. Nothing to disable announcements",
             type: ApplicationCommandOptionType.Channel,
             channel_types: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
           },
@@ -50,12 +44,10 @@ export class BirthdaysConfigDiscordAdapter {
       },
       {
         name: "ping",
-        description: "A role to ping in each birthday annoucements. Nothing to ping noone",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "ping",
-            description: "A role to ping in each birthday annoucements. Nothing to ping noone",
             type: ApplicationCommandOptionType.Role,
           },
         ],
@@ -93,9 +85,7 @@ export class BirthdaysConfigDiscordAdapter {
       ephemeral: true,
     });
   }
-  @DiscordSubcommand({
-    description: "Show current birthday module settings",
-  })
+  @DiscordSubcommand({})
   async show(interaction: ChatInputCommandInteraction<"cached">) {
     const settings = await this.service.getAlertSettings(interaction.guildId);
 

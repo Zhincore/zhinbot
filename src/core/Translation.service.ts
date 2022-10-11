@@ -3,18 +3,21 @@ import Path from "node:path";
 import { FluentBundle, FluentFunction, FluentNumber, FluentResource, FluentVariable } from "@fluent/bundle";
 import { Locale } from "discord.js";
 import type { LocaleString } from "discord.js";
+import { Logger } from "winston";
 import { Service } from "./decorators";
-import { getLogger } from "./Bot/getLogger";
+import { Bot } from "./Bot";
 
 @Service()
 export class TranslationService {
-  private readonly logger = getLogger().child("Translations");
+  private readonly logger: Logger;
   private readonly localeBoundles = new Map<string, FluentBundle>();
   private readonly functions: Record<string, FluentFunction> = {
     RANDOM_INDEX: ([max]) => new FluentNumber(Math.floor(Math.random() * Number(max))),
   };
 
-  constructor(public defaultLocale: LocaleString = "en-US") {}
+  constructor(public defaultLocale: LocaleString = "en-US", bot: Bot) {
+    this.logger = bot.getLogger("TranslationService");
+  }
 
   async load() {
     for (const error of await this.loadFolder("./translations")) {

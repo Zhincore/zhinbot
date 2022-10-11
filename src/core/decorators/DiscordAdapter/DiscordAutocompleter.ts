@@ -1,11 +1,17 @@
 import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
-import { ApplicationCommandSub_Data } from "./DiscordSubcommand";
+import { ApplicationCommandSubData } from "./DiscordSubcommand";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 
 const mappingSymbol = Symbol("mappingAutocompleters");
 const symbol = Symbol("autocompleters");
 
-export type CustomCommandOptionData = Omit<Discord.ApplicationCommandOptionData, "autocomplete"> & {
+export type CustomCommandOptionData = Omit<
+  Exclude<
+    Discord.ApplicationCommandOptionData,
+    Discord.ApplicationCommandSubCommandData | Discord.ApplicationCommandSubGroupData
+  >,
+  "autocomplete" | "description"
+> & {
   /**
    * Id of the autocompleter
    */
@@ -14,13 +20,11 @@ export type CustomCommandOptionData = Omit<Discord.ApplicationCommandOptionData,
   choices?: Discord.ApplicationCommandChoicesData["choices"];
   channel_types?: Discord.ApplicationCommandChannelOptionData["channel_types"];
 };
-type _CustomSubcommandOption = Omit<Discord.ApplicationCommandSubCommandData, "options"> & {
+
+export type CustomAppCmdData = Omit<Discord.ApplicationCommandData, "options"> & {
   options?: CustomCommandOptionData[];
 };
-export type CustomCommandOption = CustomCommandOptionData | _CustomSubcommandOption;
-
-export type CustomAppCmdData = Omit<Discord.ApplicationCommandData, "options"> & { options?: CustomCommandOption[] };
-export type CustomAppSubcmdData = Omit<ApplicationCommandSub_Data, "options"> & { options?: CustomCommandOption[] };
+export type CustomAppSubcmdData = Omit<ApplicationCommandSubData, "options"> & { options?: CustomCommandOptionData[] };
 
 export type Autocompleter = (
   interaction: AutocompleteInteraction,
@@ -50,7 +54,7 @@ export function parseAutocompleters(
   target: object,
   commandData: CustomAppSubcmdData,
   supercmd?: string,
-): ApplicationCommandSub_Data;
+): ApplicationCommandSubData;
 export function parseAutocompleters(
   target: object,
   commandData: CustomAppCmdData | CustomAppSubcmdData,
@@ -58,7 +62,7 @@ export function parseAutocompleters(
 ): any {
   if (!("options" in commandData)) return commandData;
 
-  for (const option of commandData.options as CustomCommandOption[]) {
+  for (const option of commandData.options as CustomCommandOptionData[]) {
     if ("options" in option) {
       parseAutocompleters(target, option, commandData.name);
     } else if (option.autocomplete) {

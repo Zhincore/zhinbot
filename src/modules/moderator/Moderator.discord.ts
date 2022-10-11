@@ -8,30 +8,11 @@ export class ModeratorDiscordAdapter {
   constructor(private readonly service: ModeratorService) {}
 
   @DiscordCommand({
-    description: "Timeout a member for a custom amount of time",
     options: [
-      {
-        name: "member",
-        description: "The member to timeout",
-        type: ApplicationCommandOptionType.User,
-        required: true,
-      },
-      {
-        name: "duration",
-        description: "How long the timeout should last (e.g. `1h` or `30s`)",
-        type: ApplicationCommandOptionType.String,
-        required: true,
-      },
-      {
-        name: "reason",
-        description: "Explanation why was the timeout given",
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: "announce",
-        description: "Whether or not the timeout should be announced",
-        type: ApplicationCommandOptionType.Boolean,
-      },
+      { name: "member", type: ApplicationCommandOptionType.User, required: true },
+      { name: "duration", type: ApplicationCommandOptionType.String, required: true },
+      { name: "reason", type: ApplicationCommandOptionType.String },
+      { name: "announce", type: ApplicationCommandOptionType.Boolean },
     ],
   })
   async timeout(interaction: ChatInputCommandInteraction<"cached">) {

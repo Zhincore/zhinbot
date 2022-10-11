@@ -141,13 +141,19 @@ export class ModuleManager {
   private translateCommandData<T extends ApplicationCommandData>(data: T): T {
     const trans = this.bot.trans;
 
-    const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P): P => {
+    const getKey = (...elements: any[]) => elements.filter((v) => v).join("-");
+    const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P, supname?: string): P => {
+      const getLocalKey = (...elements: any[]) => getKey("cmd", supname, subdata.name, ...elements);
       return {
         ...subdata,
-        nameLocalizations: trans.getTranslations(subdata.name),
-        description: "description" in subdata ? trans.translate(subdata.description) : undefined,
-        descriptionLocalizations: "description" in subdata ? trans.getTranslations(subdata.description) : undefined,
-        options: "options" in subdata ? subdata.options?.map(traverse) : undefined,
+        name: trans.translate(getLocalKey("name"), {}, [], true) ?? data.name,
+        nameLocalizations: trans.getTranslations(getLocalKey("name")),
+        description: "description" in subdata ? trans.translate(getLocalKey("dsc")) : undefined,
+        descriptionLocalizations: "description" in subdata ? trans.getTranslations(getLocalKey("dsc")) : undefined,
+        options:
+          "options" in subdata
+            ? subdata.options?.map((opt) => traverse(opt, getKey(supname, subdata.name)))
+            : undefined,
       };
     };
 

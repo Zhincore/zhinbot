@@ -6,7 +6,6 @@ import { BirthdaysService } from "./Birthdays.service";
 @DiscordAdapter({
   supercomand: {
     name: "birthday",
-    description: "Save your birthday or see birthdays of others",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   },
 })
@@ -14,11 +13,9 @@ export class BirthdaysDiscordAdapter {
   constructor(private readonly service: BirthdaysService) {}
 
   @DiscordSubcommand({
-    description: "Save your birthday so we can notify everyone when it comes!",
     options: [
       {
         name: "date",
-        description: "The date of your birthday. For example `16 Oct` or `16/10` or `16.10.` etc.",
         type: ApplicationCommandOptionType.String,
         required: true,
       },
@@ -44,11 +41,9 @@ export class BirthdaysDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    description: "Show birthday of yours or other member",
     options: [
       {
         name: "user",
-        description: "The user to get birthday of. Yours by default.",
         type: ApplicationCommandOptionType.User,
       },
     ],
@@ -78,9 +73,7 @@ export class BirthdaysDiscordAdapter {
     });
   }
 
-  @DiscordSubcommand({
-    description: "Delete your birthday from the database",
-  })
+  @DiscordSubcommand({})
   async forget(interaction: ChatInputCommandInteraction) {
     const result = await this.service.forget(interaction.user.id);
 

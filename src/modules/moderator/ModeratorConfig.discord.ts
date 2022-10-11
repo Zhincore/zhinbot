@@ -8,7 +8,6 @@ export class ModeratorConfigDiscordAdapter {
   constructor(private readonly service: ModeratorService) {}
 
   @DiscordCommand({
-    description: "Change or show configuration of the moderator module",
     options: [
       {
         name: "set",

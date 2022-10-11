@@ -35,9 +35,7 @@ export function getLogger(journalServiceName?: string) {
   const logger = Winston.createLogger({
     level: isProd ? "info" : "debug",
     levels: Winston.config.npm.levels,
-    defaultMeta: {
-      module: undefined,
-    },
+    defaultMeta: {},
     format: Winston.format.combine(Winston.format.splat(), Winston.format.printf(printfTemplateFunction)),
     transports: [
       new Winston.transports.Console({

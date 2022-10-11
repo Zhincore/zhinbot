@@ -21,11 +21,17 @@ async function main() {
   logger.debug("Loading modules...");
   bot.modules.register(modules);
 
-  logger.debug("Logging into Discord...");
   addExitCallback(() => {
     bot.destroy();
   });
-  await bot.login(config.auth.discordToken).catch((err) => console.error("Boot failed", err));
+
+  if (!process.env.DRY_RUN) {
+    logger.debug("Logging into Discord...");
+
+    await bot.login(config.auth.discordToken).catch((err) => console.error("Boot failed", err));
+  } else {
+    logger.debug("Running in dry mode, not logging in");
+  }
 
   logger.debug("Done.");
 }

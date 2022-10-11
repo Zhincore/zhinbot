@@ -7,14 +7,14 @@ import {
   DiscordAutocompleter,
   DiscordSubcommand,
   DiscordHandler,
-  CustomCommandOption,
+  CustomCommandOptionData,
 } from "@core/decorators";
 import { SelfRolesService } from "./SelfRoles.service";
 import { editableFields, editableFieldNameToField } from "./editableFields";
 
 export const ROLE_ASSIGN_ID = "selfroles.assign";
 export const DESTROY_BTN_ID = "selfroles.delete";
-const ID_ARG: CustomCommandOption = {
+const ID_ARG: CustomCommandOptionData = {
   name: "item",
   type: ApplicationCommandOptionType.String,
   description: "Name of the self-roles item",

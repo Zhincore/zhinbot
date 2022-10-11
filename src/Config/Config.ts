@@ -98,10 +98,6 @@ export class Config implements IConfig {
     },
   }).compile(SCHEMA);
 
-  constructor() {
-    console.log(new Error("instantiated"));
-  }
-
   async load() {
     const defaults = await this.loadFile("./config.default.toml");
     if (defaults) Object.assign(this, defaults);

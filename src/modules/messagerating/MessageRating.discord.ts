@@ -23,7 +23,6 @@ export class MessageRatingDiscordAdapter {
   }
 
   @DiscordCommand({
-    name: "Like message",
     type: ApplicationCommandType.Message,
     defaultMemberPermissions: PermissionFlagsBits.AddReactions,
   })
@@ -32,7 +31,6 @@ export class MessageRatingDiscordAdapter {
   }
 
   @DiscordCommand({
-    name: "Dislike message",
     type: ApplicationCommandType.Message,
     defaultMemberPermissions: PermissionFlagsBits.AddReactions,
   })
@@ -41,11 +39,9 @@ export class MessageRatingDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Show rating of a member",
     options: [
       {
         name: "member",
-        description: "The member to show rating of (you if not specified)",
         type: ApplicationCommandOptionType.User,
       },
     ],

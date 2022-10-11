@@ -1,4 +1,4 @@
-import { ApplicationCommandData } from "discord.js";
+import { ChatInputApplicationCommandData } from "discord.js";
 import { Service } from "typedi";
 import { Bot } from "~/core/Bot";
 import {
@@ -15,7 +15,7 @@ import { AnnotWithBot } from "./_utils";
 const symbol = Symbol("discordAdapter");
 
 export type DiscordAdapterData = {
-  supercomand?: ApplicationCommandData;
+  supercomand?: Omit<ChatInputApplicationCommandData, "description">;
 };
 
 export type IDiscordAdapter = DiscordAdapterData & {

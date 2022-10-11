@@ -36,7 +36,7 @@ export class Bot extends Discord.Client {
     this.modules = new ModuleManager(this);
 
     this.container.set(Bot, this);
-    this.trans = new TranslationService(settings.defaultLocale);
+    this.trans = new TranslationService(settings.defaultLocale, this);
     this.container.set(TranslationService, this.trans);
 
     this.on("debug", (m) => {
