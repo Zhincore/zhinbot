@@ -1,4 +1,9 @@
-import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
+import Discord, {
+  AutocompleteInteraction,
+  APIApplicationCommandOptionChoice,
+  ApplicationCommandSubGroupData,
+  ApplicationCommandSubCommandData,
+} from "discord.js";
 import { ApplicationCommandSubData } from "./DiscordSubcommand";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 
@@ -21,10 +26,19 @@ export type CustomCommandOptionData = Omit<
   channel_types?: Discord.ApplicationCommandChannelOptionData["channel_types"];
 };
 
-export type CustomAppCmdData = Omit<Discord.ApplicationCommandData, "options"> & {
-  options?: CustomCommandOptionData[];
-};
-export type CustomAppSubcmdData = Omit<ApplicationCommandSubData, "options"> & { options?: CustomCommandOptionData[] };
+type _RemoveTranslated<T> = Omit<T, "description">;
+type _ReplaceOptions<T, Opts> = Omit<T, "options"> & { options?: Opts };
+
+export type CustomCommandData = _ReplaceOptions<
+  Discord.ApplicationCommandData,
+  CustomCommandOptionData[] | CustomSubData[]
+>;
+type CustomSubCommandData = _ReplaceOptions<
+  _RemoveTranslated<ApplicationCommandSubCommandData>,
+  CustomCommandOptionData[]
+>;
+type CustomSubGroupData = _ReplaceOptions<_RemoveTranslated<ApplicationCommandSubGroupData>, CustomSubCommandData[]>;
+export type CustomSubData = CustomSubCommandData | CustomSubGroupData;
 
 export type Autocompleter = (
   interaction: AutocompleteInteraction,
@@ -47,17 +61,17 @@ export interface IAutocompleter extends IInteractionHandler<AutocompleteInteract
 
 export function parseAutocompleters(
   target: object,
-  commandData: CustomAppCmdData,
+  commandData: CustomCommandData,
   supercmd?: string,
 ): Discord.ApplicationCommandData;
 export function parseAutocompleters(
   target: object,
-  commandData: CustomAppSubcmdData,
+  commandData: CustomSubData,
   supercmd?: string,
 ): ApplicationCommandSubData;
 export function parseAutocompleters(
   target: object,
-  commandData: CustomAppCmdData | CustomAppSubcmdData,
+  commandData: CustomCommandData | CustomSubData,
   supercmd?: string,
 ): any {
   if (!("options" in commandData)) return commandData;
