@@ -1,15 +1,12 @@
 import { ApplicationCommandData, ApplicationCommandType, Interaction } from "discord.js";
 import { Bot } from "~/core/Bot";
-import { pushToMetaArray, IInteractionHandler, AnnotWithBot } from "./_utils";
-import { CustomCommandData, parseAutocompleters } from "./DiscordAutocompleter";
+import { pushToMetaArray, IInteractionHandler, AnnotWithBot, CustomCommandData } from "./_utils";
+import { parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("commands");
 
-type _CommandType = ApplicationCommandData["type"];
-
-export type DiscordCommandData<Type extends _CommandType> = Omit<CustomCommandData, "name" | "description"> & {
+export type DiscordCommandData = Omit<CustomCommandData, "name"> & {
   name?: string;
-  type?: Type;
 };
 
 export type DiscordCommandExecutor = (interaction: Interaction) => Promise<void>;
@@ -22,7 +19,7 @@ export interface IDiscordCommand extends IInteractionHandler<Interaction> {
 /**
  * Can only be used inside Discord adapter
  */
-export function DiscordCommand(data: AnnotWithBot<DiscordCommandData<_CommandType>>): MethodDecorator {
+export function DiscordCommand(data: AnnotWithBot<DiscordCommandData>): MethodDecorator {
   return (target, method) => {
     const command = (bot: Bot): IDiscordCommand => ({
       commandData: parseAutocompleters(target, {

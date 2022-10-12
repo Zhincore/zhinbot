@@ -1,44 +1,14 @@
-import Discord, {
-  AutocompleteInteraction,
-  APIApplicationCommandOptionChoice,
-  ApplicationCommandSubGroupData,
-  ApplicationCommandSubCommandData,
-} from "discord.js";
-import { ApplicationCommandSubData } from "./DiscordSubcommand";
-import { pushToMetaArray, IInteractionHandler } from "./_utils";
+import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
+import {
+  pushToMetaArray,
+  IInteractionHandler,
+  CustomCommandData,
+  CustomSubData,
+  CustomCommandOptionData,
+} from "./_utils";
 
 const mappingSymbol = Symbol("mappingAutocompleters");
 const symbol = Symbol("autocompleters");
-
-export type CustomCommandOptionData = Omit<
-  Exclude<
-    Discord.ApplicationCommandOptionData,
-    Discord.ApplicationCommandSubCommandData | Discord.ApplicationCommandSubGroupData
-  >,
-  "autocomplete" | "description"
-> & {
-  /**
-   * Id of the autocompleter
-   */
-  autocomplete?: string | false;
-  required?: boolean;
-  choices?: Discord.ApplicationCommandChoicesData["choices"];
-  channel_types?: Discord.ApplicationCommandChannelOptionData["channel_types"];
-};
-
-type _RemoveTranslated<T> = Omit<T, "description">;
-type _ReplaceOptions<T, Opts> = Omit<T, "options"> & { options?: Opts };
-
-export type CustomCommandData = _ReplaceOptions<
-  Discord.ApplicationCommandData,
-  CustomCommandOptionData[] | CustomSubData[]
->;
-type CustomSubCommandData = _ReplaceOptions<
-  _RemoveTranslated<ApplicationCommandSubCommandData>,
-  CustomCommandOptionData[]
->;
-type CustomSubGroupData = _ReplaceOptions<_RemoveTranslated<ApplicationCommandSubGroupData>, CustomSubCommandData[]>;
-export type CustomSubData = CustomSubCommandData | CustomSubGroupData;
 
 export type Autocompleter = (
   interaction: AutocompleteInteraction,
@@ -64,11 +34,7 @@ export function parseAutocompleters(
   commandData: CustomCommandData,
   supercmd?: string,
 ): Discord.ApplicationCommandData;
-export function parseAutocompleters(
-  target: object,
-  commandData: CustomSubData,
-  supercmd?: string,
-): ApplicationCommandSubData;
+export function parseAutocompleters(target: object, commandData: CustomSubData, supercmd?: string): CustomSubData;
 export function parseAutocompleters(
   target: object,
   commandData: CustomCommandData | CustomSubData,

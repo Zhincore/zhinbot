@@ -10,12 +10,12 @@ import {
 import { getDiscordCommands, IDiscordCommand } from "./DiscordCommand";
 import { getDiscordSubcommands, IDiscordSubcommand } from "./DiscordSubcommand";
 import { getDiscordHandlers, IDiscordHandler } from "./DiscordHandler";
-import { AnnotWithBot } from "./_utils";
+import { AnnotWithBot, RemoveTranslated } from "./_utils";
 
 const symbol = Symbol("discordAdapter");
 
 export type DiscordAdapterData = {
-  supercomand?: Omit<ChatInputApplicationCommandData, "description">;
+  supercomand?: RemoveTranslated<ChatInputApplicationCommandData>;
 };
 
 export type IDiscordAdapter = DiscordAdapterData & {

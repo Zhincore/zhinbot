@@ -1,34 +1,30 @@
-import {
-  ApplicationCommandOptionType,
-  ApplicationCommandSubCommandData,
-  ApplicationCommandSubGroupData,
-  ChatInputCommandInteraction,
-} from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import { Bot } from "~/core/Bot";
 import { DiscordCommandExecutor } from "./DiscordCommand";
-import { pushToMetaArray, IInteractionHandler, AnnotWithBot } from "./_utils";
-import { CustomCommandOptionData, CustomAppSubcmdData, parseAutocompleters } from "./DiscordAutocompleter";
+import {
+  pushToMetaArray,
+  IInteractionHandler,
+  AnnotWithBot,
+  CustomSubCommandData,
+  CustomSubGroupData,
+  CustomCommandOptionData,
+  CustomSubData,
+} from "./_utils";
+import { parseAutocompleters } from "./DiscordAutocompleter";
 
 const symbol = Symbol("subcommands");
 
-export type ApplicationCommandSubData = ApplicationCommandSubCommandData | ApplicationCommandSubGroupData;
-
-type _D<T extends "subcmd" | "group"> = T extends "subcmd"
-  ? ApplicationCommandSubCommandData
-  : ApplicationCommandSubGroupData;
-export type DiscordSubcommandData<T extends "subcmd" | "group"> = Omit<
-  _D<T>,
-  "name" | "type" | "options" | "description"
-> & {
+type _D<T extends "subcmd" | "group"> = T extends "subcmd" ? CustomSubCommandData : CustomSubGroupData;
+export type DiscordSubcommandData<T extends "subcmd" | "group"> = Omit<_D<T>, "name" | "type" | "options"> & {
   name?: string;
   type?: _D<T>["type"];
-  options?: T extends "subcmd" ? CustomCommandOptionData[] : Omit<DiscordSubcommandData<"subcmd">, "description">[];
+  options?: T extends "subcmd" ? CustomCommandOptionData[] : DiscordSubcommandData<"subcmd">[];
 };
 
 export type DiscordSubcommandExecutor = (interaction: ChatInputCommandInteraction) => Promise<void>;
 
 export interface IDiscordSubcommand extends IInteractionHandler<ChatInputCommandInteraction> {
-  commandData: ApplicationCommandSubData;
+  commandData: CustomSubData;
   execute: DiscordCommandExecutor;
 }
 
@@ -44,7 +40,7 @@ export function DiscordSubcommand(data: AnnotWithBot<DiscordSubcommandData<any>>
         type: ApplicationCommandOptionType.Subcommand,
         name: method.toString(),
         ...(typeof data === "function" ? data(bot) : data),
-      } as CustomAppSubcmdData),
+      } as CustomSubData),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,
     });
 
