@@ -2,13 +2,8 @@ import Discord, { ApplicationCommandOptionType, ButtonStyle, MessageActionRowCom
 import Color from "color";
 import { Bot } from "@core/Bot";
 import { table } from "@core/utils";
-import {
-  DiscordAdapter,
-  DiscordAutocompleter,
-  DiscordSubcommand,
-  DiscordHandler,
-  CustomCommandOptionData,
-} from "@core/decorators";
+import { DiscordAdapter, DiscordAutocompleter, DiscordSubcommand, DiscordHandler } from "@core/decorators";
+import { CustomCommandOptionData } from "~/core/decorators/DiscordAdapter/_utils";
 import { SelfRolesService } from "./SelfRoles.service";
 import { editableFields, editableFieldNameToField } from "./editableFields";
 
@@ -17,7 +12,7 @@ export const DESTROY_BTN_ID = "selfroles.delete";
 const ID_ARG: CustomCommandOptionData = {
   name: "item",
   type: ApplicationCommandOptionType.String,
-  description: "Name of the self-roles item",
+  description: "t:cmd-selfroles--item-dsc",
   required: true,
   autocomplete: "item",
 };
@@ -25,7 +20,6 @@ const ID_ARG: CustomCommandOptionData = {
 @DiscordAdapter({
   supercomand: {
     name: "selfroles",
-    description: "Allow your members to give themselves roles by reacting to a message.",
   },
 })
 export class SelfRolesDiscordAdapter {
@@ -44,14 +38,13 @@ export class SelfRolesDiscordAdapter {
     );
   }
 
-  @DiscordSubcommand({ description: "Show all self-roles of the guild" })
+  @DiscordSubcommand({})
   async list(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const result = await this.service.list(interaction.guildId);
     return interaction.reply({ content: table(result), ephemeral: true });
   }
 
   @DiscordSubcommand({
-    description: "Show info about a self-roles item",
     options: [{ ...ID_ARG }],
   })
   async show(interaction: Discord.ChatInputCommandInteraction<"cached">) {
@@ -99,7 +92,6 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    description: "Create a new self-roles",
     options: [{ ...ID_ARG, name: "name" }],
   })
   async create(interaction: Discord.ChatInputCommandInteraction<"cached">) {
@@ -109,10 +101,9 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    description: "Destroy a self-roles item and delete it's message",
     options: [{ ...ID_ARG }],
   })
-  async destroy(interaction: Discord.ChatInputCommandInteraction<"cached">) {
+  async delete(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     const name = interaction.options.getString("item", true);
     const result = await this.service.destroy(interaction.guildId, name);
 
@@ -139,7 +130,6 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    description: "Re-send/edit the self-roles item's message",
     options: [{ ...ID_ARG }],
   })
   async render(interaction: Discord.ChatInputCommandInteraction<"cached">) {
@@ -151,34 +141,26 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordSubcommand({
-    name: "role",
-    description: "Edit roles of a self-roles item",
     type: ApplicationCommandOptionType.SubcommandGroup,
     options: [
       {
         name: "set",
-        description: "Add or change a role of a self-roles item",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           { ...ID_ARG },
           {
             name: "role",
             type: ApplicationCommandOptionType.Role,
-            description: "The role to add/change",
             required: true,
           },
-          { name: "emoji", type: ApplicationCommandOptionType.String, description: "Emoji to assign to this role" },
-          { name: "description", type: ApplicationCommandOptionType.String, description: "Description for this role" },
+          { name: "emoji", type: ApplicationCommandOptionType.String },
+          { name: "description", type: ApplicationCommandOptionType.String },
         ],
       },
       {
         name: "remove",
-        description: "Remove a role of a self-roles item",
         type: ApplicationCommandOptionType.Subcommand,
-        options: [
-          { ...ID_ARG },
-          { name: "role", type: ApplicationCommandOptionType.Role, description: "The role to remove", required: true },
-        ],
+        options: [{ ...ID_ARG }, { name: "role", type: ApplicationCommandOptionType.Role, required: true }],
       },
     ],
   })
@@ -214,17 +196,15 @@ export class SelfRolesDiscordAdapter {
     return interaction.reply({ content: "Unknown subcommand", ephemeral: true });
   }
 
-  @DiscordSubcommand({
-    name: "edit",
-    description: "Edit a self-roles item",
+  @DiscordSubcommand((b) => ({
     type: ApplicationCommandOptionType.SubcommandGroup,
     options: Object.values(editableFields).map((field) => ({
       name: field.name,
-      description: `Edit the '${field.name}' field`,
+      description: b.trans.t(`cmd-selfroles-edit--dsc`, { fieldName: field.name }),
       type: ApplicationCommandOptionType.Subcommand,
       options: [{ ...ID_ARG }, { ...field, name: "value" }],
     })),
-  })
+  }))
   async edit(interaction: Discord.ChatInputCommandInteraction<"cached">) {
     await interaction.deferReply({ ephemeral: true });
     const fieldName = interaction.options.getSubcommand(true);

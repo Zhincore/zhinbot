@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { Bot } from "~/core/Bot";
+import { Bot } from "@core/Bot";
 import { DiscordCommandExecutor } from "./DiscordCommand";
 import {
   pushToMetaArray,

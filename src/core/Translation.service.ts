@@ -76,7 +76,7 @@ export class TranslationService {
     const locales = Array.isArray(locale) ? [...locale] : locale ? [locale] : [];
     if (!strict || !locales.length) locales.push(this.defaultLocale);
 
-    const bundle = this.localeBoundles.get(locales.shift()!.split("-")[0]);
+    const bundle = this.localeBoundles.get(locales.shift()!);
     if (bundle) {
       const message = bundle.getMessage(pattern);
       if (message?.value) {

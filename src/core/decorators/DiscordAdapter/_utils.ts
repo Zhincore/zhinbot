@@ -1,6 +1,6 @@
 import Discord, { BaseInteraction } from "discord.js";
-import { Bot } from "~/core/Bot";
-import { Optional, Replace } from "~/utils";
+import { Bot } from "@core/Bot";
+import { Optional, Replace } from "@core/utils";
 
 export type IInteractionHandler<TInteraction extends BaseInteraction> = {
   execute: (interaction: TInteraction) => any | Promise<any>;
@@ -9,6 +9,7 @@ export type IInteractionHandler<TInteraction extends BaseInteraction> = {
 export type AnnotWithBot<T> = ((bot: Bot) => T) | T;
 export type RemoveTranslated<T> = Optional<T, "description">;
 export type ReplaceOptions<T, Opts> = Replace<T, { options?: Opts }>;
+export type ToCustomData<T, Opts> = ReplaceOptions<RemoveTranslated<T>, Opts>;
 
 export type CustomCommandOptionData = RemoveTranslated<
   Omit<
@@ -28,19 +29,13 @@ export type CustomCommandOptionData = RemoveTranslated<
   channel_types?: Discord.ApplicationCommandChannelOptionData["channel_types"];
 };
 
-export type CustomCommandData = ReplaceOptions<
+export type CustomCommandData = ToCustomData<
   Discord.ApplicationCommandData,
   CustomCommandOptionData[] | CustomSubData[]
 >;
 export type CustomSubData = CustomSubCommandData | CustomSubGroupData;
-export type CustomSubCommandData = ReplaceOptions<
-  RemoveTranslated<Discord.ApplicationCommandSubCommandData>,
-  CustomCommandOptionData[]
->;
-export type CustomSubGroupData = ReplaceOptions<
-  RemoveTranslated<Discord.ApplicationCommandSubGroupData>,
-  CustomSubCommandData[]
->;
+export type CustomSubCommandData = ToCustomData<Discord.ApplicationCommandSubCommandData, CustomCommandOptionData[]>;
+export type CustomSubGroupData = ToCustomData<Discord.ApplicationCommandSubGroupData, CustomSubCommandData[]>;
 
 export function pushToMetaArray(symbol: symbol, item: any, target: any) {
   let array = Reflect.getMetadata(symbol, target);

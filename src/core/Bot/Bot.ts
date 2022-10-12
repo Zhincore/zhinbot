@@ -57,7 +57,7 @@ export class Bot extends Discord.Client {
     );
   }
 
-  get = this.container.get;
+  get = this.container.get.bind(this.container);
 
   getLogger(module: string) {
     return this.logger.child({ module });

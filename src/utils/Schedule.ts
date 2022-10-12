@@ -12,10 +12,10 @@ export class Schedule {
       this.timeout = undefined;
       if (this.destroyed) return;
 
-      if (repeat) this.interval = setInterval(executor, repeat);
+      if (repeat) this.interval = setInterval(executor, repeat).unref();
 
       await executor();
-    }, +start - Date.now());
+    }, +start - Date.now()).unref();
   }
 
   destroy() {

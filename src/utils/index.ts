@@ -18,3 +18,7 @@ export function dateToUTC(date: Date) {
 export function chooseRandom<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
+
+export function isUppercase(str: string) {
+  return str && str[0] === str[0].toUpperCase();
+}

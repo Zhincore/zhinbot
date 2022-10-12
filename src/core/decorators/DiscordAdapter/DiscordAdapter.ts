@@ -1,6 +1,6 @@
 import { ChatInputApplicationCommandData } from "discord.js";
 import { Service } from "typedi";
-import { Bot } from "~/core/Bot";
+import { Bot } from "@core/Bot";
 import {
   getAutocompleters,
   getAutocompleterMappings,

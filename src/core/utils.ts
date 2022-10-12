@@ -1,5 +1,8 @@
 import textTable from "text-table";
 
+export type Replace<T, P> = Omit<T, keyof P> & P;
+export type Optional<T, Key extends string> = Replace<T, { [x in Key]?: T[x] }>;
+
 export function table(result: Record<string, any>[]) {
   return result && result.length
     ? "```\n" +

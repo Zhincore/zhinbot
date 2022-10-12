@@ -4,6 +4,7 @@ import Discord, {
   ApplicationCommandType,
   ChatInputApplicationCommandData,
   DiscordAPIError,
+  LocaleString,
 } from "discord.js";
 import { Constructable } from "typedi";
 import { Logger } from "winston";
@@ -140,16 +141,34 @@ export class ModuleManager {
 
   private translateCommandData<T extends ApplicationCommandData>(data: T): T {
     const trans = this.bot.trans;
+    const isChat = data.type === ApplicationCommandType.ChatInput;
 
     const getKey = (...elements: any[]) => elements.filter((v) => v).join("-");
+    const translateProp = (
+      key: string,
+      record: boolean,
+      value?: string | Partial<Record<LocaleString, string | null>>,
+    ) => {
+      if (value) {
+        if (typeof value === "string" && value.startsWith("t:")) key = value.substring(2);
+        else return value;
+      }
+      return record ? trans.getTranslations(key) : trans.translate(key, {}, [], true);
+    };
     const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P, supname?: string): P => {
-      const getLocalKey = (...elements: any[]) => getKey("cmd", supname, subdata.name, ...elements);
+      const keyPrefix = ["cmd", supname, subdata.name];
+      const nameKey = getKey(...keyPrefix);
+      const dscKey = getKey(...keyPrefix, "dsc");
+      const chatSubdata = isChat ? (subdata as ChatInputApplicationCommandData) : undefined;
+
       return {
         ...subdata,
-        name: trans.translate(getLocalKey("name"), {}, [], true) ?? data.name,
-        nameLocalizations: trans.getTranslations(getLocalKey("name")),
-        description: "description" in subdata ? trans.translate(getLocalKey("dsc")) : undefined,
-        descriptionLocalizations: "description" in subdata ? trans.getTranslations(getLocalKey("dsc")) : undefined,
+        name: translateProp(nameKey, false, subdata.name),
+        nameLocalizations: translateProp(nameKey, true, subdata.nameLocalizations),
+        description: isChat ? translateProp(dscKey, false, chatSubdata?.description) : undefined,
+        descriptionLocalizations: isChat
+          ? translateProp(dscKey, true, chatSubdata?.descriptionLocalizations)
+          : undefined,
         options:
           "options" in subdata
             ? subdata.options?.map((opt) => traverse(opt, getKey(supname, subdata.name)))

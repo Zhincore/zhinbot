@@ -25,12 +25,10 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Play music in your voice chat",
     options: [
       {
         name: "query",
         type: ApplicationCommandOptionType.String,
-        description: "URL or name of the song to play",
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
@@ -55,8 +53,7 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Change the channel where the players sends currently playing songs",
-    options: [{ name: "channel", type: ApplicationCommandOptionType.Channel, description: "The channel for updates" }],
+    options: [{ name: "channel", type: ApplicationCommandOptionType.Channel }],
     defaultMemberPermissions: PermissionFlagsBits.DeafenMembers,
   })
   async playerchannel(interaction: ChatInputCommandInteraction<"cached">) {
@@ -66,7 +63,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Show the currently playing song",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async playing(interaction: ChatInputCommandInteraction<"cached">) {
@@ -81,7 +77,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Pause the music player",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async pause(interaction: ChatInputCommandInteraction<"cached">) {
@@ -91,7 +86,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Resume paused music player",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async resume(interaction: ChatInputCommandInteraction<"cached">) {
@@ -101,7 +95,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Stop playing, leave the voice channel and forget the queue",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async stop(interaction: ChatInputCommandInteraction<"cached">) {
@@ -111,7 +104,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Skip currently playing song",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async skip(interaction: ChatInputCommandInteraction<"cached">) {
@@ -120,13 +112,11 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Remove a song from queue at specified position",
     options: [
       {
         name: "position",
         type: ApplicationCommandOptionType.Integer,
         required: true,
-        description: "The position of the song in the queue",
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
@@ -138,7 +128,7 @@ export class PlayerDiscordAdapter {
     return interaction.reply(song ? "Song removed" : `No song at position ${position}`);
   }
 
-  @DiscordCommand({ description: "Join a voice channel", defaultMemberPermissions: PermissionFlagsBits.Speak })
+  @DiscordCommand({ defaultMemberPermissions: PermissionFlagsBits.Speak })
   async join(interaction: ChatInputCommandInteraction<"cached">) {
     const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
     if (!voice) throw "You are not in a voice channel";
@@ -150,7 +140,6 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Leave the current voice chat (remembers the queue for a while)",
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async leave(interaction: ChatInputCommandInteraction<"cached">) {
@@ -160,10 +149,7 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Toggle looping of the current player queue",
-    options: [
-      { name: "loop", type: ApplicationCommandOptionType.Boolean, description: "Whether the queue should loop" },
-    ],
+    options: [{ name: "loop", type: ApplicationCommandOptionType.Boolean }],
     defaultMemberPermissions: PermissionFlagsBits.Speak,
   })
   async loop(interaction: ChatInputCommandInteraction<"cached">) {
@@ -174,12 +160,10 @@ export class PlayerDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Show the current player queue",
     options: [
       {
         name: "page",
         type: ApplicationCommandOptionType.Integer,
-        description: "Page of the queue to show (first by default)",
       },
     ],
     defaultMemberPermissions: PermissionFlagsBits.Speak,

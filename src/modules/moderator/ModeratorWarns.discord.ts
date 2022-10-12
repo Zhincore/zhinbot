@@ -16,17 +16,14 @@ export class ModeratorWarnsDiscordAdapter {
   constructor(private readonly bot: Bot, private readonly service: ModeratorService) {}
 
   @DiscordCommand({
-    description: "Warn a member",
     options: [
       {
         name: "member",
-        description: "The member to warn",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "reason",
-        description: "The reason for the warning",
         type: ApplicationCommandOptionType.String,
         required: true,
       },
@@ -52,17 +49,14 @@ export class ModeratorWarnsDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Show warnings given to a member",
     options: [
       {
         name: "member",
-        description: "The member to show warnings of",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "page",
-        description: "Page of the warning list to show (first by default)",
         type: ApplicationCommandOptionType.Integer,
       },
     ],

@@ -11,19 +11,16 @@ export class ModeratorConfigDiscordAdapter {
     options: [
       {
         name: "set",
-        description: "Change configuration",
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
             name: "automod",
-            description: "Enable/Disable automod",
             type: ApplicationCommandOptionType.Boolean,
           },
         ],
       },
       {
         name: "get",
-        description: "Show configuration",
         type: ApplicationCommandOptionType.Subcommand,
       },
     ],

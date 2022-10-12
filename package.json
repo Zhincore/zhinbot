@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "author": "",
-  "main": "dist/app",
+  "main": "dist/main",
   "private": true,
   "license": "GPLV3 OR LATER",
   "scripts": {
