@@ -18,13 +18,13 @@ const levelColors: LevelColors = {
     level: chalk.greenBright,
     message: chalk.whiteBright,
   },
-  silly: {
-    message: chalk.blueBright,
-  },
   verbose: {
     message: chalk.white, // it's grayish actually
   },
   debug: {
+    message: chalk.gray,
+  },
+  silly: {
     message: chalk.gray,
   },
 };
@@ -33,7 +33,7 @@ export function getLogger(journalServiceName?: string) {
   const isProd = process.env.NODE_ENV === "production";
 
   const logger = Winston.createLogger({
-    level: isProd ? "info" : "debug",
+    level: process.env.LOG_LEVEL ?? (isProd ? "info" : "debug"),
     levels: Winston.config.npm.levels,
     defaultMeta: {},
     format: Winston.format.combine(Winston.format.splat(), Winston.format.printf(printfTemplateFunction)),

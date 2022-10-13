@@ -184,3 +184,13 @@ cmd-selfroles-edit-channel-dsc = The channel of the self-roled embed
 cmd-selfroles-edit-description-dsc = Description to show in the embed
 cmd-selfroles-edit-messageid-dsc = !Advanced! Change id of the tracked message
 
+###
+### Utils
+###
+
+# /ping
+cmd-ping-dsc = Replies with "Pong!"
+# /latency
+cmd-latency-dsc = Measures the roundtrip latency between Discord and the bot
+# /status
+cmd-status-dsc = Sends some numbers about the bot

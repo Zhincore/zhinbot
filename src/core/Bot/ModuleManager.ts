@@ -131,11 +131,12 @@ export class ModuleManager {
       if (!command) continue;
       const { commandData, execute } = command;
       if (this.commands.has(commandData.name)) throw new Error(`Command '${commandData.name}' already exists`);
+      const commandDataTrans = this.translateCommandData(commandData);
       this.commands.set(commandData.name, {
-        commandData: this.translateCommandData(commandData),
+        commandData: commandDataTrans,
         execute: execute.bind(discordAdapter),
       });
-      this.commandDataList.push(commandData);
+      this.commandDataList.push(commandDataTrans);
     }
   }
 
@@ -151,9 +152,12 @@ export class ModuleManager {
     ) => {
       if (value) {
         if (typeof value === "string" && value.startsWith("t:")) key = value.substring(2);
-        else return value;
+        else {
+          this.logger.silly(`Translation key '${key}' got replaced by explicit value and not translated.`);
+          return value;
+        }
       }
-      return record ? trans.getTranslations(key) : trans.translate(key, {}, [], true);
+      return record ? trans.getTranslations(key, {}, true) : trans.translate(key, {}, [], true);
     };
     const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P, supname?: string): P => {
       const keyPrefix = ["cmd", supname, subdata.name];

@@ -7,9 +7,9 @@ export type IInteractionHandler<TInteraction extends BaseInteraction> = {
 };
 
 export type AnnotWithBot<T> = ((bot: Bot) => T) | T;
-export type RemoveTranslated<T> = Optional<T, "description">;
+export type RemoveTranslated<T extends Record<string, any>> = Optional<T, "description">;
 export type ReplaceOptions<T, Opts> = Replace<T, { options?: Opts }>;
-export type ToCustomData<T, Opts> = ReplaceOptions<RemoveTranslated<T>, Opts>;
+export type ToCustomData<T extends Record<string, any>, Opts> = ReplaceOptions<RemoveTranslated<T>, Opts>;
 
 export type CustomCommandOptionData = RemoveTranslated<
   Omit<

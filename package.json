@@ -8,14 +8,14 @@
   "license": "GPLV3 OR LATER",
   "scripts": {
     "prebuild": "prisma db push",
-    "watch": "swc src -d dist -w -s inline",
     "build": "swc src -d dist",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "check": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.ts\" --fix",
+    "watch": "swc src -d dist -w -s inline",
     "start": "node .",
     "dev": "node --enable-source-maps .",
-    "dev:dry": "DRY_RUN=true node --enable-source-maps ."
+    "dev:dry": "DRY_RUN=true nodemon --exec ts-node -r tsconfig-paths/register src/main.ts",
+    "check": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@discordjs/voice": "^0.13.0",
@@ -63,6 +63,9 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-sonarjs": "^0.16.0",
-    "prettier": "^2.7.1"
+    "nodemon": "^2.0.20",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0"
   }
 }

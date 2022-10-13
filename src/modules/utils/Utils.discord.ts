@@ -5,7 +5,6 @@ import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 @DiscordAdapter()
 export class UtilsDiscordAdapter {
   @DiscordCommand({
-    description: 'Replies with "Pong!"',
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   })
   ping(interaction: ChatInputCommandInteraction) {
@@ -13,7 +12,6 @@ export class UtilsDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Measures the roundtrip latency between Discord and the bot",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   })
   async latency(interaction: ChatInputCommandInteraction) {
@@ -22,7 +20,6 @@ export class UtilsDiscordAdapter {
   }
 
   @DiscordCommand({
-    description: "Sends some numbers about the bot",
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   })
   async status(interaction: ChatInputCommandInteraction) {

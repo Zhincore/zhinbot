@@ -59,8 +59,9 @@ export class TranslationService {
     return Array.from(this.localeBoundles.keys()) as LocaleString[];
   }
 
-  getTranslations(pattern: string, args?: Record<string, FluentVariable> | null) {
+  getTranslations(pattern: string, args?: Record<string, FluentVariable> | null, skipDefault = false) {
     return this.getLocales().reduce((obj, locale) => {
+      if (skipDefault && locale == this.defaultLocale) return obj;
       const msg = this.translate(pattern, args, locale, true);
       if (msg) obj[locale] = msg;
       return obj;
