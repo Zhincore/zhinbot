@@ -26,6 +26,6 @@
   "ts-node": {
     "transpileOnly": true
   },
-  "include": ["src/**/*.ts", "./*.js"],
+  "include": ["src/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

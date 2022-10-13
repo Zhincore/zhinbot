@@ -28,3 +28,6 @@ Run `pnpm start` to start
 - `check` - Checks source code typings with TSC
 - `lint` - Lints source code with Eslint
 - `format` - Formats source code with Prettier
+
+## Misc
+- `generateDocs` - Auto-generates command list in docs/modules/ folder

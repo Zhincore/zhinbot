@@ -9,12 +9,17 @@ import Discord, {
 import { Constructable } from "typedi";
 import { Logger } from "winston";
 import * as Decorators from "../decorators";
+import { IDiscordCommand } from "../decorators";
 import { Bot } from "./";
+
+export interface DiscordCommandRecord extends IDiscordCommand {
+  moduleName: string;
+}
 
 export class ModuleManager {
   private readonly modules = new Set<Decorators.BotModuleData<any>>();
   private readonly autocompleters = new Map<string, Decorators.IAutocompleter>();
-  private readonly commands = new Map<string, Decorators.IDiscordCommand>();
+  private readonly commands = new Map<string, DiscordCommandRecord>();
   private readonly handlers = new Map<string, Decorators.IDiscordHandler>();
   private readonly logger: Logger;
 
@@ -57,6 +62,10 @@ export class ModuleManager {
     });
   }
 
+  getCommands() {
+    return this.commands.values();
+  }
+
   private async sendError(interaction: Discord.Interaction, err: any) {
     try {
       if (interaction.type === Discord.InteractionType.ApplicationCommand || interaction.isMessageComponent()) {
@@ -84,14 +93,16 @@ export class ModuleManager {
       }
       this.bot.container.get(BotModule);
 
-      if (moduleData.discordAdapters) moduleData.discordAdapters.forEach(this.parseAdapterCommands.bind(this));
       if (moduleData.services) moduleData.services.forEach((Service) => this.bot.container.get(Service));
       if (moduleData.subModules) this.register(moduleData.subModules);
+      if (moduleData.discordAdapters) {
+        moduleData.discordAdapters.forEach((adapter) => this.parseAdapterCommands(adapter, BotModule.name));
+      }
       this.modules.add(moduleData);
     }
   }
 
-  private parseAdapterCommands(DiscordAdapter: Constructable<any>) {
+  private parseAdapterCommands(DiscordAdapter: Constructable<any>, moduleName: string) {
     const discordAdapter = this.bot.container.get(DiscordAdapter);
     const adapterData = Decorators.getDiscordAdapterData(discordAdapter, this.bot);
     if (!adapterData) {
@@ -100,6 +111,7 @@ export class ModuleManager {
       return;
     }
 
+    // Generate autocompleter map
     for (const autocompleteMapping of adapterData.autocompleteMappings ?? []) {
       const autocompleter = adapterData.autocompleters?.find((item) => item.id === autocompleteMapping.id);
       const id = Decorators.getAutocompleterId(
@@ -120,24 +132,28 @@ export class ModuleManager {
       });
     }
 
+    // Generate handler map
     for (const handler of adapterData.handlers ?? []) {
       this.handlers.set(handler.id, { ...handler, execute: handler.execute.bind(discordAdapter) });
     }
 
     // Generate command list
     const mainCommand = adapterData ? this.createMainCommand(adapterData) : undefined;
+    const commands = [...(adapterData.commands ?? []), mainCommand];
 
-    for (const command of [...(adapterData.commands ?? []), mainCommand]) {
+    for (const command of commands) {
       if (!command) continue;
       const { commandData, execute } = command;
       if (this.commands.has(commandData.name)) throw new Error(`Command '${commandData.name}' already exists`);
       const commandDataTrans = this.translateCommandData(commandData);
       this.commands.set(commandData.name, {
         commandData: commandDataTrans,
+        moduleName,
         execute: execute.bind(discordAdapter),
       });
       this.commandDataList.push(commandDataTrans);
     }
+    return commands;
   }
 
   private translateCommandData<T extends ApplicationCommandData>(data: T): T {

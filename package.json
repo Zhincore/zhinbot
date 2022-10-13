@@ -15,7 +15,8 @@
     "dev:dry": "DRY_RUN=true nodemon --exec ts-node -r tsconfig-paths/register src/main.ts",
     "check": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "generateDocs": "ts-node -r tsconfig-paths/register scripts/generateDocs/index.ts"
   },
   "dependencies": {
     "@discordjs/voice": "^0.13.0",
