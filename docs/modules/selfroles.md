@@ -14,7 +14,7 @@ Show all self-roles of the guild
 
 Show info about a self-roles item
 
-#### Message option: selfroles show item
+#### /selfroles show item
 
 Name of the self-roles item
 
@@ -22,7 +22,7 @@ Name of the self-roles item
 
 Create a new self-roles
 
-#### Message option: selfroles create name
+#### /selfroles create name
 
 Name of the self-roles item
 
@@ -30,7 +30,7 @@ Name of the self-roles item
 
 Delete a self-roles item
 
-#### Message option: selfroles delete item
+#### /selfroles delete item
 
 Name of the self-roles item
 
@@ -38,11 +38,11 @@ Name of the self-roles item
 
 Send/edit the self-roles message
 
-#### Message option: selfroles render item
+#### /selfroles render item
 
 Name of the self-roles item
 
-### User option: selfroles role
+### /selfroles role
 
 Edit roles of a self-roles item
 
@@ -50,19 +50,19 @@ Edit roles of a self-roles item
 
 Add or change a role
 
-##### Message option: selfroles role set item
+##### /selfroles role set item
 
 Name of the self-roles item
 
-##### undefinedselfroles role set role
+##### /selfroles role set role
 
 The role to add/change
 
-##### Message option: selfroles role set emoji
+##### /selfroles role set emoji
 
 Emoji to assign to the role
 
-##### Message option: selfroles role set description
+##### /selfroles role set description
 
 Description of the role
 
@@ -70,15 +70,15 @@ Description of the role
 
 Remove a role from self-roles
 
-##### Message option: selfroles role remove item
+##### /selfroles role remove item
 
 Name of the self-roles item
 
-##### undefinedselfroles role remove role
+##### /selfroles role remove role
 
 The role to remove
 
-### User option: selfroles edit
+### /selfroles edit
 
 Edit a self-roles item
 
@@ -86,11 +86,11 @@ Edit a self-roles item
 
 Edit the '⁨name⁩' field
 
-##### Message option: selfroles edit name item
+##### /selfroles edit name item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit name value
+##### /selfroles edit name value
 
 The name of the self-roles item (used as an id)
 
@@ -98,11 +98,11 @@ The name of the self-roles item (used as an id)
 
 Edit the '⁨title⁩' field
 
-##### Message option: selfroles edit title item
+##### /selfroles edit title item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit title value
+##### /selfroles edit title value
 
 The title of the embed
 
@@ -110,11 +110,11 @@ The title of the embed
 
 Edit the '⁨color⁩' field
 
-##### Message option: selfroles edit color item
+##### /selfroles edit color item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit color value
+##### /selfroles edit color value
 
 Color of the embed (color name/hex/whatever)
 
@@ -122,11 +122,11 @@ Color of the embed (color name/hex/whatever)
 
 Edit the '⁨message⁩' field
 
-##### Message option: selfroles edit message item
+##### /selfroles edit message item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit message value
+##### /selfroles edit message value
 
 Message to show above the embed
 
@@ -134,11 +134,11 @@ Message to show above the embed
 
 Edit the '⁨showhelp⁩' field
 
-##### Message option: selfroles edit showhelp item
+##### /selfroles edit showhelp item
 
 Name of the self-roles item
 
-##### undefinedselfroles edit showhelp value
+##### /selfroles edit showhelp value
 
 Whether to show hint on how to use the self-roles
 
@@ -146,11 +146,11 @@ Whether to show hint on how to use the self-roles
 
 Edit the '⁨showroles⁩' field
 
-##### Message option: selfroles edit showroles item
+##### /selfroles edit showroles item
 
 Name of the self-roles item
 
-##### undefinedselfroles edit showroles value
+##### /selfroles edit showroles value
 
 Whether to show list of roles in the embed
 
@@ -158,11 +158,11 @@ Whether to show list of roles in the embed
 
 Edit the '⁨showname⁩' field
 
-##### Message option: selfroles edit showname item
+##### /selfroles edit showname item
 
 Name of the self-roles item
 
-##### undefinedselfroles edit showname value
+##### /selfroles edit showname value
 
 Whether to show name (id) of the self-roles item in the embed
 
@@ -170,11 +170,11 @@ Whether to show name (id) of the self-roles item in the embed
 
 Edit the '⁨channel⁩' field
 
-##### Message option: selfroles edit channel item
+##### /selfroles edit channel item
 
 Name of the self-roles item
 
-##### undefinedselfroles edit channel value
+##### /selfroles edit channel value
 
 The channel of the self-roled embed
 
@@ -182,11 +182,11 @@ The channel of the self-roled embed
 
 Edit the '⁨description⁩' field
 
-##### Message option: selfroles edit description item
+##### /selfroles edit description item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit description value
+##### /selfroles edit description value
 
 Description to show in the embed
 
@@ -194,10 +194,10 @@ Description to show in the embed
 
 Edit the '⁨messageid⁩' field
 
-##### Message option: selfroles edit messageid item
+##### /selfroles edit messageid item
 
 Name of the self-roles item
 
-##### Message option: selfroles edit messageid value
+##### /selfroles edit messageid value
 
 !Advanced! Change id of the tracked message

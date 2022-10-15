@@ -10,7 +10,7 @@ Save your birthday or see birthdays of others
 
 Save your birthday so we can notify everyone when it comes!
 
-#### Message option: birthday set date
+#### /birthday set date
 
 The date of your birthday. For example `16 Oct` or `16/10` or `16.10.` etc.
 
@@ -30,7 +30,7 @@ Delete your birthday from the database
 
 Configure the birthday alerts
 
-### User option: birthdayconf set
+### /birthdayconf set
 
 Update birthday module alerts
 
@@ -38,7 +38,7 @@ Update birthday module alerts
 
 The time at which to announce birthdays. E.g. `9:00am` or `16:00`
 
-##### Message option: birthdayconf set time time
+##### /birthdayconf set time time
 
 The time at which to announce birthdays. E.g. `9:00am` or `16:00`
 

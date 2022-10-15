@@ -6,7 +6,7 @@ Allows the bot to play music from various sources in VC
 
 Play music in your voice chat
 
-### Message option: play query
+### /play query
 
 URL or name of the song to play
 

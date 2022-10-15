@@ -25,7 +25,7 @@ export function getMarkdown(module: IBotModule<any>, commands: ApplicationComman
   return output.join("\n");
 }
 
-function traverseData(subcommands: SubData[], trace: string[] = []) {
+function traverseData(subcommands: SubData[], trace: string[] = [], rootType?: ApplicationCommandType) {
   const output: string[] = [];
   let isOptions = false;
 
@@ -35,14 +35,15 @@ function traverseData(subcommands: SubData[], trace: string[] = []) {
   }
 
   for (const subcommand of subcommands) {
+    const type = rootType ?? (subcommand.type as ApplicationCommandType);
     if (isOptions) {
       output.push(getOption(subcommand));
     } else {
       const localTrace = [...trace, subcommand.name];
-      output.push(...getHeadline(subcommand, localTrace));
+      output.push(...getHeadline(type, subcommand, localTrace));
 
       if ("options" in subcommand && subcommand.options && subcommand.options.length) {
-        output.push(...traverseData(subcommand.options, localTrace));
+        output.push(...traverseData(subcommand.options, localTrace, type));
       }
     }
   }
@@ -52,12 +53,12 @@ function traverseData(subcommands: SubData[], trace: string[] = []) {
   return output;
 }
 
-function getHeadline(data: SubData, trace: string[]) {
+function getHeadline(type: ApplicationCommandType, data: SubData, trace: string[]) {
   const prefix = {
     [ApplicationCommandType.ChatInput]: "/",
     [ApplicationCommandType.User]: "User option: ",
     [ApplicationCommandType.Message]: "Message option: ",
-  }[data.type as 1];
+  }[type];
   const output = [`${"#".repeat(trace.length + 1)} ${prefix}${trace.join(" ")}`];
   if ("description" in data && data.description) output.push("", data.description);
   output.push("");
