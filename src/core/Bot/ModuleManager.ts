@@ -183,7 +183,7 @@ export class ModuleManager {
 
       return {
         ...subdata,
-        name: translateProp(nameKey, false, subdata.name),
+        name: translateProp(nameKey, false) ?? subdata.name,
         nameLocalizations: translateProp(nameKey, true, subdata.nameLocalizations),
         description: isChat ? translateProp(dscKey, false, chatSubdata?.description) : undefined,
         descriptionLocalizations: isChat

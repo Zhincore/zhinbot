@@ -173,16 +173,16 @@ cmd-selfroles-role-remove-role-dsc = The role to remove
 # /selfroles edit
 cmd-selfroles-edit-dsc = Edit a self-roles item
 cmd-selfroles-edit--dsc = Edit the '{$fieldName}' field
-cmd-selfroles-edit-name-dsc = The name of the self-roles item (used as an id)
-cmd-selfroles-edit-title-dsc = The title of the embed
-cmd-selfroles-edit-color-dsc = Color of the embed (color name/hex/whatever)
-cmd-selfroles-edit-message-dsc = Message to show above the embed
-cmd-selfroles-edit-showhelp-dsc = Whether to show hint on how to use the self-roles
-cmd-selfroles-edit-showroles-dsc = Whether to show list of roles in the embed
-cmd-selfroles-edit-showname-dsc = Whether to show name (id) of the self-roles item in the embed
-cmd-selfroles-edit-channel-dsc = The channel of the self-roled embed
-cmd-selfroles-edit-description-dsc = Description to show in the embed
-cmd-selfroles-edit-messageid-dsc = !Advanced! Change id of the tracked message
+cmd-selfroles-edit-name-value-dsc = The name of the self-roles item (used as an id)
+cmd-selfroles-edit-title-value-dsc = The title of the embed
+cmd-selfroles-edit-color-value-dsc = Color of the embed (color name/hex/whatever)
+cmd-selfroles-edit-message-value-dsc = Message to show above the embed
+cmd-selfroles-edit-showhelp-value-dsc = Whether to show hint on how to use the self-roles
+cmd-selfroles-edit-showroles-value-dsc = Whether to show list of roles in the embed
+cmd-selfroles-edit-showname-value-dsc = Whether to show name (id) of the self-roles item in the embed
+cmd-selfroles-edit-channel-value-dsc = The channel of the self-roled embed
+cmd-selfroles-edit-description-value-dsc = Description to show in the embed
+cmd-selfroles-edit-messageid-value-dsc = !Advanced! Change id of the tracked message
 
 ###
 ### Utils
