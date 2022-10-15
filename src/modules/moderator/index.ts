@@ -5,6 +5,7 @@ import { ModeratorWarnsDiscordAdapter } from "./ModeratorWarns.discord";
 import { AutomodSubModule } from "./Automod";
 
 @BotModule({
+  name: "moderator",
   discordAdapters: [ModeratorDiscordAdapter, ModeratorConfigDiscordAdapter, ModeratorWarnsDiscordAdapter],
   subModules: [AutomodSubModule],
 })

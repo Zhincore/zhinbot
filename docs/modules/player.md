@@ -1,12 +1,14 @@
-# PlayerModule
+# Music player module
+
+Allows the bot to play music from various sources in VC
 
 ## /play
 
 Play music in your voice chat
 
-Options:
+### Message option: play query
 
-- `query` &ndash; String (optional) &ndash; URL or name of the song to play
+URL or name of the song to play
 
 ## /playerchannel
 
@@ -67,4 +69,3 @@ Show the current player queue
 Options:
 
 - `page` &ndash; Integer (optional) &ndash; The page of the queue tho show (first by default)
-

@@ -1,4 +1,6 @@
-# BirthdaysModule
+# Birthdays module
+
+Sends notifications about birthdays of members that saved their birthdate.
 
 ## /birthday
 
@@ -8,9 +10,9 @@ Save your birthday or see birthdays of others
 
 Save your birthday so we can notify everyone when it comes!
 
-Options:
+#### Message option: birthday set date
 
-- `date` &ndash; String (required) &ndash; The date of your birthday. For example `16 Oct` or `16/10` or `16.10.` etc.
+The date of your birthday. For example `16 Oct` or `16/10` or `16.10.` etc.
 
 ### /birthday get
 
@@ -24,12 +26,11 @@ Options:
 
 Delete your birthday from the database
 
-
 ## /birthdayconf
 
 Configure the birthday alerts
 
-### /birthdayconf set
+### User option: birthdayconf set
 
 Update birthday module alerts
 
@@ -37,9 +38,9 @@ Update birthday module alerts
 
 The time at which to announce birthdays. E.g. `9:00am` or `16:00`
 
-Options:
+##### Message option: birthdayconf set time time
 
-- `time` &ndash; String (optional) &ndash; The time at which to announce birthdays. E.g. `9:00am` or `16:00`
+The time at which to announce birthdays. E.g. `9:00am` or `16:00`
 
 #### /birthdayconf set channel
 
@@ -57,9 +58,6 @@ Options:
 
 - `ping` &ndash; Role (optional) &ndash; A role to ping in each birthday annoucements. Nothing to ping noone.
 
-
 ### /birthdayconf show
 
 Show current birthday module settings.
-
-

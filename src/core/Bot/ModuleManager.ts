@@ -13,7 +13,7 @@ import { IDiscordCommand } from "../decorators";
 import { Bot } from "./";
 
 export interface DiscordCommandRecord extends IDiscordCommand {
-  moduleName: string;
+  moduleData: Decorators.IBotModule<any>;
 }
 
 export class ModuleManager {
@@ -93,16 +93,21 @@ export class ModuleManager {
       }
       this.bot.container.get(BotModule);
 
+      moduleData.nameFriendly =
+        this.bot.trans.translate("module-" + moduleData.name, {}, [], true) ?? moduleData.nameFriendly;
+      moduleData.description =
+        this.bot.trans.translate("module-" + moduleData.name + "-dsc", {}, [], true) ?? moduleData.description;
+
       if (moduleData.services) moduleData.services.forEach((Service) => this.bot.container.get(Service));
       if (moduleData.subModules) this.register(moduleData.subModules);
       if (moduleData.discordAdapters) {
-        moduleData.discordAdapters.forEach((adapter) => this.parseAdapterCommands(adapter, BotModule.name));
+        moduleData.discordAdapters.forEach((adapter) => this.parseAdapterCommands(adapter, moduleData));
       }
       this.modules.add(moduleData);
     }
   }
 
-  private parseAdapterCommands(DiscordAdapter: Constructable<any>, moduleName: string) {
+  private parseAdapterCommands(DiscordAdapter: Constructable<any>, moduleData: Decorators.IBotModule<any>) {
     const discordAdapter = this.bot.container.get(DiscordAdapter);
     const adapterData = Decorators.getDiscordAdapterData(discordAdapter, this.bot);
     if (!adapterData) {
@@ -148,7 +153,7 @@ export class ModuleManager {
       const commandDataTrans = this.translateCommandData(commandData);
       this.commands.set(commandData.name, {
         commandData: commandDataTrans,
-        moduleName,
+        moduleData,
         execute: execute.bind(discordAdapter),
       });
       this.commandDataList.push(commandDataTrans);

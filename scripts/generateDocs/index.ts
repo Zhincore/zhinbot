@@ -11,10 +11,10 @@ async function main() {
   await fs.mkdir(target, { recursive: true });
 
   const promises: Promise<void>[] = [];
-  for (const [moduleName, commands] of commandMap.entries()) {
-    const doc = getMarkdown(moduleName, commands);
-    promises.push(fs.writeFile(Path.join(target, moduleName + ".md"), doc, "utf-8"));
-    console.log(`Wrote '${moduleName}' docs.`);
+  for (const [module, commands] of commandMap.entries()) {
+    const doc = getMarkdown(module, commands);
+    promises.push(fs.writeFile(Path.join(target, module.name + ".md"), doc, "utf-8"));
+    console.log(`Wrote '${module.name}' docs.`);
   }
 
   await Promise.all(promises);

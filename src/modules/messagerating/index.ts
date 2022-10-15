@@ -1,5 +1,5 @@
 import { BotModule } from "@core/decorators";
 import { MessageRatingDiscordAdapter } from "./MessageRating.discord";
 
-@BotModule({ discordAdapters: [MessageRatingDiscordAdapter] })
+@BotModule({ name: "messageRating", discordAdapters: [MessageRatingDiscordAdapter] })
 export class MessageRatingModule {}

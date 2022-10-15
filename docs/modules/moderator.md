@@ -1,4 +1,6 @@
-# ModeratorModule
+# Moderator module
+
+Commands for moderation of server
 
 ## /timeout
 
@@ -27,7 +29,6 @@ Options:
 
 Show configuration
 
-
 ## /warn
 
 Warn a member
@@ -45,4 +46,3 @@ Options:
 
 - `member` &ndash; User (required) &ndash; The member to show warnings of
 - `page` &ndash; Integer (optional) &ndash; Page of the warning list to show (first by default)
-

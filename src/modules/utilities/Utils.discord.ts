@@ -3,7 +3,7 @@ import ms from "ms";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 
 @DiscordAdapter()
-export class UtilsDiscordAdapter {
+export class UtilitiesDiscordAdapter {
   @DiscordCommand({
     defaultMemberPermissions: PermissionFlagsBits.SendMessages,
   })

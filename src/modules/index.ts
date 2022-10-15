@@ -4,7 +4,7 @@ import { MessageRatingModule } from "./messagerating";
 import { ModeratorModule } from "./moderator";
 import { PlayerModule } from "./player";
 import { SelfRolesModule } from "./selfroles";
-import { UtilsModule } from "./utils";
+import { UtilitiesModule } from "./utilities";
 
 export default [
   // ActivitiesModule,
@@ -13,5 +13,5 @@ export default [
   ModeratorModule,
   PlayerModule,
   SelfRolesModule,
-  UtilsModule,
+  UtilitiesModule,
 ];

@@ -4,6 +4,9 @@
 ### Birthdays
 ###
 
+module-birthdays = Birthdays module
+module-birthdays-dsc = Sends notifications about birthdays of members that saved their birthdate.
+
 # /birthday
 cmd-birthday-dsc = Save your birthday or see birthdays of others
 
@@ -63,6 +66,9 @@ birthdays-alert-message = { RANDOM_INDEX(4) ->
 ### Message ratings
 ###
 
+module-messageRating = Message rating module (WIP)
+module-messageRating-dsc = Allows members to like/dislike messages to give points to their authors
+
 cmd-like = Like this message
 cmd-dislike = Dislike this message
 
@@ -73,6 +79,9 @@ cmd-rating-member-dsc = The member to show rating of (you if not specified)
 ###
 ### Moderator
 ###
+
+module-moderator = Moderator module
+module-moderator-dsc = Commands for moderation of server
 
 # /timeout
 cmd-timeout-dsc = Timeout a member for a custom amount of time
@@ -101,6 +110,9 @@ cmd-warns-page-dsc = Page of the warning list to show (first by default)
 ###
 ### Player
 ###
+
+module-player = Music player module
+module-player-dsc = Allows the bot to play music from various sources in VC
 
 # /play
 cmd-play-dsc = Play music in your voice chat
@@ -143,7 +155,11 @@ cmd-queue-page-dsc = The page of the queue tho show (first by default)
 ### Selfroles
 ###
 
+module-selfroles = Self-roles module
+module-selfroles-dsc = Allow your members to give themselves roles
+
 cmd-selfroles--item-dsc = Name of the self-roles item
+
 # /selfroles
 cmd-selfroles-dsc = Allow your members to give themselves roles
 # /selfroles list
@@ -187,6 +203,9 @@ cmd-selfroles-edit-messageid-value-dsc = !Advanced! Change id of the tracked mes
 ###
 ### Utils
 ###
+
+module-utilities = Utilities module
+module-utilities-dsc = Bot utility comands primarily for the maintainer 
 
 # /ping
 cmd-ping-dsc = Replies with "Pong!"
