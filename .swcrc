@@ -12,8 +12,12 @@
     },
     "baseUrl": "./",
     "paths": {
-      "~/*": ["./dist/*"],
-      "@core/*": ["./dist/core/*"]
+      "~/*": [
+        "./dist/*"
+      ],
+      "@core/*": [
+        "./dist/core/*"
+      ]
     },
     "externalHelpers": true,
     "loose": true,

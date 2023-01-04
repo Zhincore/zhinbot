@@ -148,12 +148,9 @@ export class SelfRolesDiscordAdapter {
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           { ...ID_ARG },
-          {
-            name: "role",
-            type: ApplicationCommandOptionType.Role,
-            required: true,
-          },
-          { name: "emoji", type: ApplicationCommandOptionType.String },
+          { name: "role", type: ApplicationCommandOptionType.Role, required: true },
+          { name: "emoji", type: ApplicationCommandOptionType.String, required: true },
+          { name: "label", type: ApplicationCommandOptionType.String, description: "Additional label for the role" },
           { name: "description", type: ApplicationCommandOptionType.String },
         ],
       },
@@ -171,20 +168,18 @@ export class SelfRolesDiscordAdapter {
 
     if (cmd === "set") {
       await interaction.deferReply({ ephemeral: true });
-      let emoji = interaction.options.getString("emoji", false);
-      if (emoji) {
-        emoji = this.bot.serializeEmoji(emoji);
-        if (!emoji) throw "The provided emoji is not valid";
-      }
 
+      const emoji = this.bot.serializeEmoji(interaction.options.getString("emoji", true));
+      if (!emoji) throw "The provided emoji is not valid";
       const description = interaction.options.getString("description", false);
-      const result = await this.service.setRole(
-        interaction.guildId,
-        itemName,
-        role.id,
-        emoji || undefined,
-        description ?? undefined,
-      );
+      const label = interaction.options.getString("label", false);
+
+      const result = await this.service.setRole(interaction.guildId, itemName, {
+        emoji,
+        roleId: role.id,
+        description,
+        label,
+      });
 
       return interaction.editReply(result ? "Role added/changed" : "Failed to add/change role");
     } else if (cmd === "remove") {

@@ -102,9 +102,10 @@ model SelfRolesItem {
   title       String  @default("Choose your role")
   description String?
   message     String?
+  multiSelect Boolean @default(true)
   showHelp    Boolean @default(true)
-  showName    Boolean @default(false)
   showRoles   Boolean @default(true)
+  showName    Boolean @default(false)
 
   roles SelfRolesRole[]
 
@@ -113,7 +114,8 @@ model SelfRolesItem {
 
 model SelfRolesRole {
   roleId      String
-  emoji       String?
+  emoji       String
+  label       String?
   description String?
 
   item     SelfRolesItem @relation(fields: [guildId, itemName], references: [guildId, name], onDelete: Cascade)

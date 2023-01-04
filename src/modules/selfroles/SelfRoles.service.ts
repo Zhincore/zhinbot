@@ -1,5 +1,5 @@
 import Discord, { Snowflake } from "discord.js";
-import { SelfRolesItem, SelfRolesRole } from "@prisma/client";
+import { SelfRolesItem, SelfRolesRole, Prisma } from "@prisma/client";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
 import { PrismaService } from "~/services/Prisma.service";
@@ -129,10 +129,9 @@ export class SelfRolesService {
 
     if (field === "messageId") {
       await this.prisma.selfRolesItem
-        .findUnique({
+        .findUniqueOrThrow({
           where: { guildId_name: { guildId, name } },
           select: { messageId: true, channelId: true },
-          rejectOnNotFound: true,
         })
         .then(async ({ messageId, channelId }) => {
           if (messageId === value || !messageId) return;
@@ -184,10 +183,9 @@ export class SelfRolesService {
 
   async conditionalRender(guildId: Snowflake, name: string) {
     return this.prisma.selfRolesItem
-      .findUnique({
+      .findUniqueOrThrow({
         where: { guildId_name: { guildId, name } },
         select: { messageId: true },
-        rejectOnNotFound: true,
       })
       .then(({ messageId }) => {
         if (messageId) return this.render(guildId, name);
@@ -268,54 +266,45 @@ export class SelfRolesService {
 
   private generateEmbed(item: SelfRolesItem & { roles: SelfRolesRole[] }, guild: Discord.Guild) {
     const roles = item.roles
-      .filter((i) => i.emoji)
       .map((role) => ({
         ...role,
         emoji: role.emoji,
-        role: this.bot.resolveRole(role.roleId, guild),
-      }));
+        role: this.bot.resolveRole(role.roleId, guild)!,
+      }))
+      .filter((i) => i.role);
+
+    const helpText =
+      "React with emoji to recieve the role assigned to it, remove the reaction to lose the role. " +
+      (item.multiSelect
+        ? "You can choose multiple roles from this list."
+        : "You can choose only one role from this list.");
 
     const embed = new Discord.EmbedBuilder()
       .setTitle(item.title || "Choose your role")
       .setColor(item.color)
-      .setDescription(
-        (item.description ? item.description + "\n" : "") +
-          (item.showHelp
-            ? "React with emoji to recieve the role assigned to it, remove the reaction to lose the role.\n"
-            : "") +
-          (item.showHelp || item.description ? "\n" : "") +
-          (item.showRoles
-            ? roles
-                .map(
-                  ({ emoji, role, description }) =>
-                    `${this.bot.resolveEmoji(emoji!)} - ${role}` + (description ? ` - ${description}` : ""),
-                )
-                .join("\n")
-            : "") +
-          "",
-      )
-      .setFooter(
-        item.showName
-          ? {
-              text: `Name: ${item.name}`,
-            }
-          : null,
+      .setFooter({
+        text: [item.showHelp && helpText, item.showName && `Embed name: ${item.name}`].filter((v) => v).join(" | "),
+      });
+
+    if (item.description) embed.setDescription(item.description);
+    if (item.showRoles) {
+      embed.addFields(
+        roles.map(({ emoji, role, label, description }) => ({
+          name: this.bot.resolveEmoji(emoji!) + " " + (label || role.name),
+          value: [role, description].filter((v) => v).join(" - "),
+          inline: true,
+        })),
       );
+    }
 
     return { embed, roles };
   }
 
-  async setRole(guildId: Snowflake, itemName: string, roleId: Snowflake, emoji?: string, description?: string) {
-    const data = {
-      emoji: emoji,
-      roleId,
-      description: description,
-    };
-
+  async setRole(guildId: Snowflake, itemName: string, data: Omit<Prisma.SelfRolesRoleCreateInput, "item">) {
     return this.prisma.selfRolesRole
       .upsert({
         where: {
-          guildId_itemName_roleId: { guildId, itemName, roleId },
+          guildId_itemName_roleId: { guildId, itemName, roleId: data.roleId },
         },
         create: {
           ...data,
