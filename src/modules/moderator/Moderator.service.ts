@@ -36,7 +36,7 @@ export class ModeratorService {
         logChannel,
         new EmbedBuilder()
           .setTitle("Nickname change")
-          .setDescription(`${newMember} has changed their nickname:`)
+          .setDescription(`Nickname of ${newMember} has been changed:`)
           .setFields([
             { name: "Previous nickname", value: oldMember.nickname || "*none*", inline: true },
             { name: "New nickname", value: newMember.nickname || "*none*", inline: true },
@@ -49,6 +49,7 @@ export class ModeratorService {
       if (!logChannel) return;
       if (oldMessage.partial) oldMessage = await oldMessage.fetch();
       if (newMessage.partial) newMessage = await newMessage.fetch();
+      if (oldMessage.content == newMessage.content) return;
       await this.sendLog(
         logChannel,
         new EmbedBuilder()
