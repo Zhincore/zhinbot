@@ -23,7 +23,72 @@ export class ModeratorService {
   // private readonly logger = this.bot.getLogger("Moderator");
   private readonly guildConfigs = new Cache<Prisma.ModConfig>(ms("30m"));
 
-  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
+  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
+    this.registerLogging();
+  }
+
+  private async registerLogging() {
+    this.bot.on("guildMemberUpdate", async (oldMember, newMember) => {
+      if (oldMember.nickname == newMember.nickname) return;
+      const logChannel = await this.getLogChannel(newMember.guild.id);
+      if (!logChannel) return;
+      await this.sendLog(
+        logChannel,
+        new EmbedBuilder()
+          .setTitle("Nickname change")
+          .setDescription(`${newMember} has changed their nickname:`)
+          .setFields([
+            { name: "Previous nickname", value: oldMember.nickname || "*none*", inline: true },
+            { name: "New nickname", value: newMember.nickname || "*none*", inline: true },
+          ]),
+      );
+    });
+
+    this.bot.on("messageUpdate", async (oldMessage, newMessage) => {
+      const logChannel = await this.getLogChannel(newMessage.guild?.id);
+      if (!logChannel) return;
+      if (oldMessage.partial) oldMessage = await oldMessage.fetch();
+      if (newMessage.partial) newMessage = await newMessage.fetch();
+      await this.sendLog(
+        logChannel,
+        new EmbedBuilder()
+          .setTitle(`A message has been edited`)
+          .setDescription(`${newMessage.member} has edited their message:`)
+          .setFields([
+            { name: "Previous content", value: oldMessage.content || "*none*" },
+            { name: "New content", value: newMessage.content || "*none*" },
+          ]),
+      );
+    });
+
+    this.bot.on("messageDelete", async (message) => {
+      const logChannel = await this.getLogChannel(message.guild?.id);
+      if (!logChannel) return;
+      if (message.partial) message = await message.fetch();
+      await this.sendLog(
+        logChannel,
+        new EmbedBuilder()
+          .setTitle(`A message has been deleted`)
+          .setDescription(`A message from ${message.member} has been deleted:`)
+          .setFields([
+            { name: "Content", value: message.content || "*none*" },
+            { name: "Number of attachments", value: message.attachments.size + "", inline: true },
+          ]),
+      );
+    });
+  }
+
+  private async sendLog(logChannel: TextChannel, embedBuilder: EmbedBuilder) {
+    await logChannel.send({
+      embeds: [embedBuilder.setColor(this.config.color)],
+    });
+  }
+
+  private async getLogChannel(guildId?: Snowflake) {
+    if (!guildId) return;
+    const { logChannel } = await this.getGuildConfig(guildId);
+    return this.bot.fetchChannel<TextChannel>(logChannel);
+  }
 
   private async announce(message: MessageCreateOptions, userId: Snowflake, channelId: Snowflake, guild: Guild) {
     const send = (channel: TextChannel | DMChannel | null): any => {
@@ -53,6 +118,11 @@ export class ModeratorService {
     return config;
   }
 
+  async setLoggerChannel(guildId: Snowflake, channelId?: Snowflake) {
+    const config = await this.getGuildConfig(guildId);
+    return this.setGuildConfig(guildId, { ...config, logChannel: channelId || null });
+  }
+
   async setGuildConfig(guildId: Snowflake, config: Omit<ModConfig, "guild">) {
     const data = {
       ...config,
@@ -79,7 +149,7 @@ export class ModeratorService {
     // If member has less warns than minimal penalty, return
     if (warns.length < warnPenalties[0].count) return;
 
-    let penalty: typeof warnPenalties[number] | undefined;
+    let penalty: (typeof warnPenalties)[number] | undefined;
     let count = 0;
     for (const _penalty of warnPenalties.reverse()) {
       count = 0;

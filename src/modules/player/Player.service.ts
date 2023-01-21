@@ -48,7 +48,7 @@ export class PlayerService {
         if (!updateChannel && updateChannelId) updateChannel = await this.getUpdateChannel(updateChannelId);
         if (!updateChannel) throw "Failed to get update channel";
 
-        const player = new Player(this.config, this.songCache)
+        const player = new Player(this.config, this.songCache, this.playerLogger)
           .on("destroyed", this.getDestroyHandler(guildId))
           .on("timeout", this.getTimeoutHandler(guildId))
           .on("queueEnd", this.getQueueEndHandler(guildId))

@@ -8,11 +8,6 @@ defaultLocale = "en-US"
 ##
 [modules]
 
-# Activities module
-[modules.activities]
-
-youtube = "880218394199220334"
-
 # Birthdays module
 [modules.birthdays]
 

@@ -16,11 +16,6 @@ const SCHEMA = defineValidationSchema({
   },
   modules: {
     $$type: "object",
-    activities: {
-      type: "record",
-      key: "string",
-      value: "string",
-    },
     birthdays: {
       $$type: "object",
       images: {
@@ -64,13 +59,14 @@ export class Config implements IConfig {
   color = 0x63a6cb;
   defaultLocale: IConfig["defaultLocale"] = "en-US";
 
+  apiPort: number | null = parseInt(env("API_PORT", "")) || null;
+
   auth = {
     databaseUrl: env("DATABASE_URL", null) ?? undefined,
     discordToken: env("DISCORD_TOKEN"),
   };
 
   modules: IConfig["modules"] = {
-    activities: {},
     birthdays: {
       images: [],
     },

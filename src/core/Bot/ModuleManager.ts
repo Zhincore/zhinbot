@@ -174,7 +174,7 @@ export class ModuleManager {
       if (value) {
         if (typeof value === "string" && value.startsWith("t:")) key = value.substring(2);
         else {
-          this.logger.silly(`Translation key '${key}' got replaced by explicit value and not translated.`);
+          this.logger.debug(`Translation key '${key}' got replaced by explicit value and not translated.`);
           return value;
         }
       }

@@ -70,9 +70,10 @@ model ModConfig {
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String @unique
 
-  automod Boolean @default(false)
+  logChannel String?
 
-  automodDisabledFilters Json @default("[]")
+  automod                Boolean @default(false)
+  automodDisabledFilters Json    @default("[]")
 }
 
 model Warning {

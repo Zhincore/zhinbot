@@ -1,21 +1,32 @@
 import EventEmitter from "events";
+import { spawn } from "child_process";
+import { PassThrough } from "stream";
 import ms from "ms";
 import { BaseGuildVoiceChannel } from "discord.js";
 import { VoiceConnection, DiscordGatewayAdapterCreator, NoSubscriberBehavior } from "@discordjs/voice";
 import * as Voice from "@discordjs/voice";
-import youtubedl, { YtResponse } from "youtube-dl-exec";
+import YTDLP from "yt-dlp-wrap";
+import { Logger } from "winston";
 import { Cache } from "~/utils/Cache";
 import { Config } from "~/Config";
+import { YtResponse } from "./YTDLP.types";
 
 const SONG_DELAY = ms("5s");
+const YTDLP_OPTS = [
+  ["--format", "bestaudio/best"],
+  ["--audio-format", "opus"],
+  "--geo-bypass",
+  ["--cookies", "./.player-cookies.txt"],
+].flat();
 
 export type { YtResponse };
-export type YTQueryResponse = YtResponse | { _type: "playlist"; entries: YtResponse[] };
+export type YTQueryResponse = (YtResponse & { _type?: "video" }) | { _type: "playlist"; entries: YtResponse[] };
 
 export class Player extends EventEmitter {
+  private readonly ytdlp = new YTDLP();
   readonly player = Voice.createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
   private connection?: VoiceConnection;
-  private fetchPromise: Promise<any> = Promise.resolve();
+  private fetchPromise: Promise<YTQueryResponse | string> = Promise.resolve("");
   private timeout?: NodeJS.Timeout;
   private lastSongTimestamp = 0;
   private preloadedResource?: Voice.AudioResource<YtResponse>;
@@ -25,7 +36,11 @@ export class Player extends EventEmitter {
   loop = false;
   alone = false;
 
-  constructor(private readonly config: Config, private readonly cache: Cache<Promise<YTQueryResponse>>) {
+  constructor(
+    private readonly config: Config,
+    private readonly cache: Cache<Promise<YTQueryResponse>>,
+    private readonly logger: Logger,
+  ) {
     super();
 
     this.player.on("stateChange", (oldState, state) => {
@@ -154,8 +169,26 @@ export class Player extends EventEmitter {
       return this.preloadedResource;
     }
     // Otherwise load a new one
-    return Voice.createAudioResource<YtResponse>(song.url, {
-      inputType: Voice.StreamType.WebmOpus,
+    // TODO: file enede prematurely
+    const ffmpeg = spawn(
+      "ffmpeg",
+      [
+        "-hide_banner",
+        ["-loglevel", "error"],
+        "-re",
+        ["-i", song.url],
+        ["-f", "opus"],
+        "-vn",
+        ["-map", "0:a"],
+        "-",
+      ].flat(),
+    );
+    ffmpeg.stderr.on("data", (d) => this.logger.debug("[FFMPEG] " + d));
+    const stream = new PassThrough();
+    ffmpeg.stdout.pipe(stream);
+
+    return Voice.createAudioResource<YtResponse>(stream, {
+      inputType: Voice.StreamType.OggOpus,
       metadata: song,
     });
   }
@@ -201,30 +234,28 @@ export class Player extends EventEmitter {
       query = "ytsearch:" + query;
     }
 
-    const song = await (this.fetchPromise = this.fetchPromise
+    this.fetchPromise = this.fetchPromise
       .then(() => {
         let promise = this.cache.get(query);
         if (!promise) {
-          promise = youtubedl(query, {
-            dumpSingleJson: true,
-            extractAudio: true,
-            audioFormat: "opus",
-            noCheckCertificates: true,
-            noWarnings: true,
-            markWatched: false,
-            geoBypass: true,
-            cookies: "./.player-cookies.txt",
-          }) as Promise<YTQueryResponse>;
+          promise = this.ytdlp
+            .getVideoInfo(["--dump-single-json", ...YTDLP_OPTS, query].flat())
+            .then((r: YTQueryResponse | YTQueryResponse[]) => {
+              return Array.isArray(r) ? r[0] : r;
+            });
           this.cache.set(query, promise);
         }
         return promise;
       })
-      .catch(() => {
-        throw "Failed to load song";
-      }));
+      .catch((err) => {
+        this.logger.debug(err);
+        return "Failed to load song";
+      });
+    const song = await this.fetchPromise;
 
     if (this.destroyed) return;
-    if ("_type" in song) {
+    if (typeof song == "string") throw song;
+    if ("_type" in song && song._type == "playlist") {
       song.entries.forEach((entry) => this.addSong(entry));
     } else {
       this.addSong(song);

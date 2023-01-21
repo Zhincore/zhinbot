@@ -83,6 +83,10 @@ cmd-rating-member-dsc = The member to show rating of (you if not specified)
 module-moderator = Moderator module
 module-moderator-dsc = Commands for moderation of server
 
+# /logging
+cmd-logging-dsc = Setup logging of events on the server
+cmd-logging-channel-dsc = Channel where to send logs
+
 # /timeout
 cmd-timeout-dsc = Timeout a member for a custom amount of time
 cmd-timeout-member-dsc = The member to timeout

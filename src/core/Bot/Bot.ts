@@ -29,6 +29,7 @@ export class Bot extends Discord.Client {
         Discord.GatewayIntentBits.GuildMessages,
         Discord.GatewayIntentBits.GuildMessageReactions,
         Discord.GatewayIntentBits.GuildVoiceStates,
+        Discord.GatewayIntentBits.MessageContent,
       ],
     });
 

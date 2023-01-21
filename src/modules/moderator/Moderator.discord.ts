@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction } from "discord.js";
 import ms from "ms";
 import { DiscordAdapter, DiscordCommand } from "@core/decorators";
 import { ModeratorService } from "./Moderator.service";
@@ -6,6 +6,23 @@ import { ModeratorService } from "./Moderator.service";
 @DiscordAdapter()
 export class ModeratorDiscordAdapter {
   constructor(private readonly service: ModeratorService) {}
+
+  @DiscordCommand({
+    options: [
+      {
+        name: "channel",
+        type: ApplicationCommandOptionType.Channel,
+        channel_types: [ChannelType.GuildText],
+      },
+    ],
+  })
+  async logging(interaction: ChatInputCommandInteraction<"cached">) {
+    await this.service.setLoggerChannel(interaction.guildId, interaction.options.getChannel("channel", false)?.id);
+    return interaction.reply({
+      ephemeral: true,
+      content: "Successfully updated logger chanel",
+    });
+  }
 
   @DiscordCommand({
     options: [
