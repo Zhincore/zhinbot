@@ -12,7 +12,7 @@ export class ModeratorDiscordAdapter {
       {
         name: "channel",
         type: ApplicationCommandOptionType.Channel,
-        channel_types: [ChannelType.GuildText],
+        channel_types: [ChannelType.GuildText, ChannelType.PublicThread],
       },
     ],
   })
