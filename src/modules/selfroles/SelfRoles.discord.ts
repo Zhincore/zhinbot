@@ -75,7 +75,13 @@ export class SelfRolesDiscordAdapter {
 
   @DiscordHandler(ROLES_CHOOSEN_ID)
   async assignRoles(interaction: Discord.StringSelectMenuInteraction<"cached">, t: TranslateFn) {
-    await interaction.member.roles.add(interaction.values);
+    const unselectedRoles = interaction.component.options
+      .map((v) => v.value)
+      .filter((v) => interaction.values.includes(v));
+
+    await interaction.member.roles.add(interaction.values, "Self-roles");
+    await interaction.member.roles.remove(unselectedRoles, "Self-roles");
+
     const selfroles = await this.service.getAll(interaction.guildId);
 
     return interaction.update({

@@ -181,7 +181,10 @@ export class SelfRolesConfigDiscordAdapter {
 
     await this.service.edit(interaction.guildId, name, "name", newname);
 
-    return interaction.reply("Successfully renamed selfroles item");
+    return interaction.reply({
+      ephemeral: true,
+      content: "Successfully renamed selfroles item",
+    });
   }
 
   @DiscordSubcommand({
@@ -193,6 +196,9 @@ export class SelfRolesConfigDiscordAdapter {
 
     await this.service.edit(interaction.guildId, name, "multiSelect", allow);
 
-    return interaction.reply(`Successfully ${allow ? "allowed" : "disabled"} multi-select`);
+    return interaction.reply({
+      ephemeral: true,
+      content: `Successfully ${allow ? "allowed" : "disabled"} multi-select`,
+    });
   }
 }
