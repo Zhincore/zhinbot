@@ -1,11 +1,5 @@
 import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
-import {
-  pushToMetaArray,
-  IInteractionHandler,
-  CustomCommandData,
-  CustomSubData,
-  CustomCommandOptionData,
-} from "./_utils";
+import { pushToMetaArray, IInteractionHandler, CustomCommandData, CustomSubData } from "./_utils";
 
 const mappingSymbol = Symbol("mappingAutocompleters");
 const symbol = Symbol("autocompleters");
@@ -42,7 +36,7 @@ export function parseAutocompleters(
 ): any {
   if (!("options" in commandData)) return commandData;
 
-  for (const option of commandData.options as CustomCommandOptionData[]) {
+  for (const option of commandData.options as CustomSubData[]) {
     if ("options" in option) {
       parseAutocompleters(target, option, commandData.name);
     } else if (option.autocomplete) {

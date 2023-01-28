@@ -93,29 +93,20 @@ model Warning {
 
 // ## Self-roles ##
 model SelfRolesItem {
-  name      String
-  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId   String
-  channelId String?
-  messageId String? @unique
+  name    String
+  emoji   String?
+  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId String
 
-  color       Int     @default(0)
-  title       String  @default("Choose your role")
-  description String?
-  message     String?
-  multiSelect Boolean @default(true)
-  showHelp    Boolean @default(true)
-  showRoles   Boolean @default(true)
-  showName    Boolean @default(false)
-
-  roles SelfRolesRole[]
+  multiSelect Boolean         @default(true)
+  roles       SelfRolesRole[]
 
   @@id([guildId, name])
 }
 
 model SelfRolesRole {
   roleId      String
-  emoji       String
+  emoji       String?
   label       String?
   description String?
 

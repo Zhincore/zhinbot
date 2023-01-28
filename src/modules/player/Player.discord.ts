@@ -68,7 +68,7 @@ export class PlayerDiscordAdapter {
   async playing(interaction: ChatInputCommandInteraction<"cached">) {
     const player = await this.getPlayer(interaction);
 
-    if (!player.currentSong) throw "Nothing is currently playing";
+    if (!player.currentSong) return interaction.reply({ ephemeral: true, content: "Nothing is currently playing" });
 
     return interaction.reply({
       embeds: [this.service.createSongEmbed(player.currentSong)],
@@ -131,7 +131,7 @@ export class PlayerDiscordAdapter {
   @DiscordCommand({ defaultMemberPermissions: PermissionFlagsBits.Speak })
   async join(interaction: ChatInputCommandInteraction<"cached">) {
     const voice = await this.service.getUserVoice(interaction.guildId, interaction.user.id);
-    if (!voice) throw "You are not in a voice channel";
+    if (!voice) return interaction.reply({ ephemeral: true, content: "You are not in a voice channel" });
 
     const player = await this.getPlayer(interaction, false);
     player.join(voice);
@@ -255,7 +255,7 @@ export class PlayerDiscordAdapter {
     } else if (cmd === "loop") {
       player.loop = !player.loop;
       activity = `turned queue looping ${player.loop ? "on" : "off"}`;
-    } else throw "Unknown control command";
+    } else throw new Error("Unknown control command");
 
     return interaction.reply(`${interaction.user} ${activity}`);
   }

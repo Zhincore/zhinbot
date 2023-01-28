@@ -1,226 +1,86 @@
-import Discord, { ApplicationCommandOptionType, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
-import Color from "color";
-import { Bot } from "@core/Bot";
-import { table } from "@core/utils";
-import { DiscordAdapter, DiscordAutocompleter, DiscordSubcommand, DiscordHandler } from "@core/decorators";
-import { CustomCommandOptionData } from "~/core/decorators/DiscordAdapter/_utils";
-import { SelfRolesService } from "./SelfRoles.service";
-import { editableFields, editableFieldNameToField } from "./editableFields";
+import { SelfRolesItem } from "@prisma/client";
+import Discord, { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from "discord.js";
+import { DiscordAdapter, DiscordCommand, DiscordHandler, type TranslateFn } from "~/core";
+import { SelfRolesItemRoles, SelfRolesService } from "./SelfRoles.service";
 
-export const ROLE_ASSIGN_ID = "selfroles.assign";
-export const DESTROY_BTN_ID = "selfroles.delete";
-const ID_ARG: CustomCommandOptionData = {
-  name: "item",
-  type: ApplicationCommandOptionType.String,
-  description: "t:cmd-selfroles--item-dsc",
-  required: true,
-  autocomplete: "item",
-};
+const ROLE_CHOOSER_ID = "selfroles.category";
+const ROLES_CHOOSEN_ID = "selfroles.roles";
 
-@DiscordAdapter({
-  supercomand: {
-    name: "selfroles",
-  },
-})
+@DiscordAdapter()
 export class SelfRolesDiscordAdapter {
-  constructor(private readonly service: SelfRolesService, private readonly bot: Bot) {}
+  constructor(private readonly service: SelfRolesService) {}
 
-  @DiscordAutocompleter("item")
-  async ItemAutocomplete(interaction: Discord.AutocompleteInteraction<"cached">) {
-    const query = interaction.options.getFocused();
-    return interaction.respond(
-      await this.service.search(interaction.guildId, query + "").then((arr) =>
-        arr.map((v) => ({
-          name: v.name,
-          value: v.name,
-        })),
+  getCategoryButtons(selfroles: SelfRolesItem[]) {
+    return new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
+      components: selfroles.map(
+        (item) =>
+          new ButtonBuilder({
+            customId: ROLE_CHOOSER_ID + ":" + item.name,
+            label: item.name,
+            emoji: item.emoji || undefined,
+            style: ButtonStyle.Secondary,
+          }),
       ),
-    );
-  }
-
-  @DiscordSubcommand({})
-  async list(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    const result = await this.service.list(interaction.guildId);
-    return interaction.reply({ content: table(result), ephemeral: true });
-  }
-
-  @DiscordSubcommand({
-    options: [{ ...ID_ARG }],
-  })
-  async show(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    const name = interaction.options.getString("item", true);
-    const result = await this.service.get(interaction.guildId, name);
-    const guild = await this.bot.guilds.fetch(interaction.guildId);
-
-    return interaction.reply({
-      content: result
-        ? "```yaml\n" +
-          Object.entries(result)
-            .filter(([field]) => field in editableFields)
-            .map(
-              ([field, value]) =>
-                `${field}: ${value}${
-                  field in editableFields ? " # " + editableFields[field as keyof typeof editableFields]!.type : ""
-                }`,
-            )
-            .join("\n") +
-          "\n" +
-          "roles:\n" +
-          result.roles
-            .map((role) =>
-              [
-                `  - role: ${this.bot.resolveRole(role.roleId, guild)}`,
-                `    emoji: ${role.emoji}`,
-                `    description: ${role.description}`,
-              ].join("\n"),
-            )
-            .join("\n") +
-          "\n```"
-        : "Item not found",
-      ephemeral: true,
-      components: result
-        ? [
-            new Discord.ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new Discord.ButtonBuilder()
-                .setStyle(ButtonStyle.Danger)
-                .setCustomId(DESTROY_BTN_ID + ":" + name)
-                .setLabel("Delete"),
-            ),
-          ]
-        : [],
     });
   }
 
-  @DiscordSubcommand({
-    options: [{ ...ID_ARG, name: "name" }],
-  })
-  async create(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    const name = interaction.options.getString("name", true);
-    const id = await this.service.create(interaction.guildId, name);
-    return interaction.reply({ content: `Created new selfroles item with name \`${id}\`!`, ephemeral: true });
-  }
-
-  @DiscordSubcommand({
-    options: [{ ...ID_ARG }],
-  })
-  async delete(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    const name = interaction.options.getString("item", true);
-    const result = await this.service.destroy(interaction.guildId, name);
-
-    return interaction.reply({
-      content: result ? "Successfully destroyed selfroles item" : "Destroying selfroles item failed",
-      ephemeral: true,
+  async getRoleSelector(item: SelfRolesItemRoles, member: Discord.GuildMember, placeholder: string) {
+    return new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
+      components: [
+        new StringSelectMenuBuilder({
+          custom_id: ROLES_CHOOSEN_ID,
+          max_values: item.multiSelect ? item.roles.length : 1,
+          placeholder: placeholder,
+          options: item.roles.map((role) => ({
+            label: role.label || role.role.name,
+            value: role.roleId,
+            emoji: role.emoji || undefined,
+            description: role.description || undefined,
+            default: member.roles.cache.has(role.roleId),
+          })),
+        }),
+      ],
     });
   }
 
-  @DiscordHandler(DESTROY_BTN_ID)
-  async destroyButton(interaction: Discord.ButtonInteraction<"cached">) {
-    const name = interaction.customId.split(":")[1];
-    if (!name) return;
-    const result = await this.service.destroy(interaction.guildId, name);
+  @DiscordCommand({})
+  async roles(interaction: Discord.ChatInputCommandInteraction<"cached">, t: TranslateFn) {
+    const selfroles = await this.service.getAll(interaction.guildId);
 
-    if (result) {
-      return interaction.update({ content: `Item with name ${name} destroyed!`, components: [] });
-    } else {
+    if (!selfroles) {
       return interaction.reply({
-        content: "Destroying selfroles item failed",
         ephemeral: true,
+        content: t("selfroles-roles-noitems"),
       });
     }
+
+    return interaction.reply({
+      ephemeral: true,
+      content: t("selfroles-roles-choosecategory") + ":",
+      components: [this.getCategoryButtons(selfroles)],
+    });
   }
 
-  @DiscordSubcommand({
-    options: [{ ...ID_ARG }],
-  })
-  async render(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    await interaction.deferReply({ ephemeral: true });
-    const name = interaction.options.getString("item", true);
-    const result = await this.service.render(interaction.guildId, name);
+  @DiscordHandler(ROLE_CHOOSER_ID)
+  async roleSelector(interaction: Discord.ButtonInteraction<"cached">, t: TranslateFn) {
+    const name = interaction.customId.split(":")[1];
+    const item = await this.service.get(interaction.guildId, name);
+    if (!item) throw new Error(`Selfroles ${name} don't exist`);
 
-    return interaction.editReply(result ? "Successfully (re)rendered item" : "Failed (re)rendering item");
+    return interaction.update({
+      content: t("selfroles-roles-chooseroles"),
+      components: [await this.getRoleSelector(item, interaction.member, t("selfroles-roles-chooseroles"))],
+    });
   }
 
-  @DiscordSubcommand({
-    type: ApplicationCommandOptionType.SubcommandGroup,
-    options: [
-      {
-        name: "set",
-        type: ApplicationCommandOptionType.Subcommand,
-        options: [
-          { ...ID_ARG },
-          { name: "role", type: ApplicationCommandOptionType.Role, required: true },
-          { name: "emoji", type: ApplicationCommandOptionType.String, required: true },
-          { name: "label", type: ApplicationCommandOptionType.String, description: "Additional label for the role" },
-          { name: "description", type: ApplicationCommandOptionType.String },
-        ],
-      },
-      {
-        name: "remove",
-        type: ApplicationCommandOptionType.Subcommand,
-        options: [{ ...ID_ARG }, { name: "role", type: ApplicationCommandOptionType.Role, required: true }],
-      },
-    ],
-  })
-  async role(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    const cmd = interaction.options.getSubcommand(true);
-    const itemName = interaction.options.getString("item", true);
-    const role = interaction.options.getRole("role", true);
+  @DiscordHandler(ROLES_CHOOSEN_ID)
+  async assignRoles(interaction: Discord.StringSelectMenuInteraction<"cached">, t: TranslateFn) {
+    await interaction.member.roles.add(interaction.values);
+    const selfroles = await this.service.getAll(interaction.guildId);
 
-    if (cmd === "set") {
-      await interaction.deferReply({ ephemeral: true });
-
-      const emoji = this.bot.serializeEmoji(interaction.options.getString("emoji", true));
-      if (!emoji) throw "The provided emoji is not valid";
-      const description = interaction.options.getString("description", false);
-      const label = interaction.options.getString("label", false);
-
-      const result = await this.service.setRole(interaction.guildId, itemName, {
-        emoji,
-        roleId: role.id,
-        description,
-        label,
-      });
-
-      return interaction.editReply(result ? "Role added/changed" : "Failed to add/change role");
-    } else if (cmd === "remove") {
-      await interaction.deferReply({ ephemeral: true });
-      const result = await this.service.removeRole(interaction.guildId, itemName, role.id);
-      return interaction.editReply(result ? "Role removed" : "Failed to remove role");
-    }
-
-    return interaction.reply({ content: "Unknown subcommand", ephemeral: true });
-  }
-
-  @DiscordSubcommand((b) => ({
-    type: ApplicationCommandOptionType.SubcommandGroup,
-    options: Object.values(editableFields).map((field) => ({
-      name: field.name,
-      description: b.trans.t(`cmd-selfroles-edit--dsc`, { fieldName: field.name }),
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [{ ...ID_ARG }, { ...field, name: "value" }],
-    })),
-  }))
-  async edit(interaction: Discord.ChatInputCommandInteraction<"cached">) {
-    await interaction.deferReply({ ephemeral: true });
-    const fieldName = interaction.options.getSubcommand(true);
-    const dbfield = editableFieldNameToField[fieldName];
-    const field = editableFields[dbfield];
-    if (!field) throw new Error(`Unknown field ${fieldName} (${dbfield})`);
-    const name = interaction.options.getString("item", true);
-    const value = interaction.options.get("value", field.required)!;
-
-    let _value: any;
-
-    if (fieldName === "color") {
-      _value = Color(value.value as string).rgbNumber();
-    } else if (value.type === ApplicationCommandOptionType.Channel) {
-      _value = value.channel!.id;
-    } else {
-      _value = value.value;
-    }
-
-    const result = await this.service.edit(interaction.guildId, name, dbfield, _value);
-
-    return interaction.editReply(result ? "Successfully edited" : "Editing failed");
+    return interaction.update({
+      content: "**" + t("selfroles-roles-rolesassigned") + "**\n\n" + t("selfroles-roles-choosecategory") + ":",
+      components: [this.getCategoryButtons(selfroles)],
+    });
   }
 }

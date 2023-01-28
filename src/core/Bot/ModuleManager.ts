@@ -32,7 +32,7 @@ export class ModuleManager {
 
     bot.once("ready", (bot): Promise<any> => Promise.all(bot.guilds.cache.map(this.updateGuildCommands.bind(this))));
 
-    bot.on("interactionCreate", async (interaction) => {
+    bot.on("interactionCreate", async (interaction: Discord.Interaction) => {
       let handler: Decorators.IInteractionHandler<any> | undefined;
 
       if (interaction.isMessageComponent()) {
@@ -45,8 +45,8 @@ export class ModuleManager {
         const id = Decorators.getAutocompleterId(
           subcmdGroup ?? subcmd ?? interaction.commandName,
           interaction.options.getFocused(true).name,
-          subcmd ? interaction.commandName : undefined,
-          subcmd ?? undefined,
+          subcmd || subcmdGroup ? interaction.commandName : undefined,
+          (subcmdGroup && subcmd) || undefined,
         );
         handler = this.autocompleters.get(id);
       }
@@ -54,7 +54,7 @@ export class ModuleManager {
       try {
         if (!handler) throw new Error("Recieved unexpected interaction");
 
-        await handler.execute(interaction);
+        await handler.execute(interaction, this.bot.trans.getTranslate(interaction.locale));
       } catch (err) {
         if (typeof err !== "string") this.logger.error(err);
         await this.sendError(interaction, err);
@@ -74,10 +74,10 @@ export class ModuleManager {
           else await interaction.reply({ content: String(err), ephemeral: true });
         } else await interaction.followUp({ content: String(err), ephemeral: true });
       } else if (interaction.isAutocomplete()) {
-        if (interaction.responded) throw "AutocompleteInteraction was already responded to";
+        if (interaction.responded) throw new Error("AutocompleteInteraction was already responded to");
         await interaction.respond([]);
       } else {
-        throw "Cannot respond to this interaction";
+        throw new Error("Cannot respond to this interaction");
       }
     } catch (_err) {
       this.logger.error("While sending error another error was thrown:", _err);

@@ -162,6 +162,13 @@ cmd-queue-page-dsc = The page of the queue tho show (first by default)
 module-selfroles = Self-roles module
 module-selfroles-dsc = Allow your members to give themselves roles
 
+# /roles
+cmd-roles-dsc = Choose roles for yourself
+selfroles-roles-noitems = This server has no self-roles
+selfroles-roles-choosecategory = You can choose roles from these categories
+selfroles-roles-chooseroles = Choose your roles
+selfroles-roles-rolesassigned = Your chosen roles have been successfully assigned to you!
+
 cmd-selfroles--item-dsc = Name of the self-roles item
 
 # /selfroles
@@ -184,25 +191,20 @@ cmd-selfroles-role-dsc = Edit roles of a self-roles item
 cmd-selfroles-role-set-dsc = Add or change a role
 cmd-selfroles-role-set-role-dsc = The role to add/change
 cmd-selfroles-role-set-emoji-dsc = Emoji to assign to the role
+cmd-selfroles-role-set-label-dsc = Additional label for the role
 cmd-selfroles-role-set-description-dsc = Description of the role
 
 # /selfroles role remove
 cmd-selfroles-role-remove-dsc = Remove a role from self-roles
 cmd-selfroles-role-remove-role-dsc = The role to remove
 
-# /selfroles edit
-cmd-selfroles-edit-dsc = Edit a self-roles item
-cmd-selfroles-edit--dsc = Edit the '{$fieldName}' field
-cmd-selfroles-edit-name-value-dsc = The name of the self-roles item (used as an id)
-cmd-selfroles-edit-title-value-dsc = The title of the embed
-cmd-selfroles-edit-color-value-dsc = Color of the embed (color name/hex/whatever)
-cmd-selfroles-edit-message-value-dsc = Message to show above the embed
-cmd-selfroles-edit-showhelp-value-dsc = Whether to show hint on how to use the self-roles
-cmd-selfroles-edit-showroles-value-dsc = Whether to show list of roles in the embed
-cmd-selfroles-edit-showname-value-dsc = Whether to show name (id) of the self-roles item in the embed
-cmd-selfroles-edit-channel-value-dsc = The channel of the self-roled embed
-cmd-selfroles-edit-description-value-dsc = Description to show in the embed
-cmd-selfroles-edit-messageid-value-dsc = !Advanced! Change id of the tracked message
+# /selfroles rename
+cmd-selfroles-rename-dsc = Rename a selfroles item
+cmd-selfroles-rename-newname-dsc = The new name for the item
+
+# /selfroles multiselect
+cmd-selfroles-multiselect-dsc = Change Change whether or not can user select multiple roles from a selfroles category
+cmd-selfroles-multiselect-allow-dsc = Whether or not can user select multiple roles from this selfroles category
 
 ###
 ### Utils

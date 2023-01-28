@@ -1,9 +1,10 @@
 import Discord, { BaseInteraction } from "discord.js";
 import { Bot } from "@core/Bot";
 import { Optional, Replace } from "@core/utils";
+import { TranslateFn } from "~/core/Translation.service";
 
 export type IInteractionHandler<TInteraction extends BaseInteraction> = {
-  execute: (interaction: TInteraction) => any | Promise<any>;
+  execute: (interaction: TInteraction, translate: TranslateFn) => any | Promise<any>;
 };
 
 export type AnnotWithBot<T> = ((bot: Bot) => T) | T;
@@ -39,6 +40,9 @@ export type CustomSubGroupData = ToCustomData<Discord.ApplicationCommandSubGroup
 
 export function pushToMetaArray(symbol: symbol, item: any, target: any) {
   let array = Reflect.getMetadata(symbol, target);
-  if (!array) Reflect.defineMetadata(symbol, (array = []), target);
+  if (!array) {
+    array = [];
+    Reflect.defineMetadata(symbol, array, target);
+  }
   array.push(item);
 }

@@ -7,6 +7,12 @@ import { Logger } from "winston";
 import { Service } from "./decorators";
 import { Bot } from "./Bot";
 
+export type TranslateFn = <Strict extends boolean = false>(
+  pattern: string,
+  args?: Record<string, FluentVariable>,
+  strict?: Strict,
+) => Strict extends true ? string | undefined : string;
+
 @Service()
 export class TranslationService {
   private readonly logger: Logger;
@@ -74,19 +80,27 @@ export class TranslationService {
     locale?: LocaleString | LocaleString[],
     strict?: Strict,
   ): Strict extends true ? string | undefined : string {
-    const locales = Array.isArray(locale) ? [...locale] : locale ? [locale] : [];
+    const locales = Array.isArray(locale) ? [...locale] : [locale!].filter((v) => v);
     if (!strict || !locales.length) locales.push(this.defaultLocale);
 
-    const bundle = this.localeBoundles.get(locales.shift()!);
-    if (bundle) {
-      const message = bundle.getMessage(pattern);
-      if (message?.value) {
-        return bundle.formatPattern(message.value, args);
-      }
-    }
+    const tryTranslate = (): string | undefined => {
+      const chosenLocale = locales.shift();
+      if (!chosenLocale) return;
 
-    // Try to fallback
-    if (locales.length) return this.translate(pattern, args, locales);
+      const bundle = this.localeBoundles.get(chosenLocale);
+      if (bundle) {
+        const message = bundle.getMessage(pattern);
+        if (message?.value) {
+          return bundle.formatPattern(message.value, args);
+        }
+      }
+
+      // Try to fallback
+      return tryTranslate();
+    };
+
+    const result = tryTranslate();
+    if (result) return result;
 
     if (!strict) {
       this.logger.warn(new Error(`Requested pattern '${pattern}' was not found.`));
@@ -97,8 +111,7 @@ export class TranslationService {
 
   t = this.translate;
 
-  getTranslate(locale?: LocaleString | LocaleString[]) {
-    return <Strict extends boolean = false>(pattern: string, args?: Record<string, FluentVariable>, strict?: Strict) =>
-      this.translate<Strict>(pattern, args, locale, strict);
+  getTranslate(locale?: LocaleString | LocaleString[]): TranslateFn {
+    return (pattern, args, strict) => this.translate(pattern, args, locale, strict);
   }
 }
