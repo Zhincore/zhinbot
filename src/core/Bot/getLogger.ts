@@ -36,7 +36,11 @@ export function getLogger(journalServiceName?: string) {
     level: process.env.LOG_LEVEL ?? (isProd ? "info" : "debug"),
     levels: Winston.config.npm.levels,
     defaultMeta: {},
-    format: Winston.format.combine(Winston.format.splat(), Winston.format.printf(printfTemplateFunction)),
+    format: Winston.format.combine(
+      Winston.format.errors({ stack: true }),
+      Winston.format.splat(),
+      Winston.format.printf(printfTemplateFunction),
+    ),
     transports: [
       new Winston.transports.Console({
         handleExceptions: true,

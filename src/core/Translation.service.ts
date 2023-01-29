@@ -7,9 +7,10 @@ import { Logger } from "winston";
 import { Service } from "./decorators";
 import { Bot } from "./Bot";
 
+type SupportedVariable = FluentVariable | boolean | undefined | null;
 export type TranslateFn = <Strict extends boolean = false>(
   pattern: string,
-  args?: Record<string, FluentVariable>,
+  args?: Record<string, SupportedVariable>,
   strict?: Strict,
 ) => Strict extends true ? string | undefined : string;
 
@@ -65,7 +66,7 @@ export class TranslationService {
     return Array.from(this.localeBoundles.keys()) as LocaleString[];
   }
 
-  getTranslations(pattern: string, args?: Record<string, FluentVariable> | null, skipDefault = false) {
+  getTranslations(pattern: string, args?: Record<string, SupportedVariable> | null, skipDefault = false) {
     return this.getLocales().reduce((obj, locale) => {
       if (skipDefault && locale == this.defaultLocale) return obj;
       const msg = this.translate(pattern, args, locale, true);
@@ -74,14 +75,28 @@ export class TranslationService {
     }, {} as Record<LocaleString, string>);
   }
 
+  transformVariables(args: Record<string, SupportedVariable>): Record<string, FluentVariable> {
+    const output: Record<string, FluentVariable> = {};
+    for (const [key, value] of Object.entries(args)) {
+      if (value === null || value === undefined || typeof value == "boolean") {
+        output[key] = String(value);
+      } else {
+        output[key] = value;
+      }
+    }
+    return output;
+  }
+
   translate<Strict extends boolean = false>(
     pattern: string,
-    args?: Record<string, FluentVariable> | null,
-    locale?: LocaleString | LocaleString[],
+    args?: Record<string, SupportedVariable> | null,
+    locale?: LocaleString | (LocaleString | undefined)[],
     strict?: Strict,
   ): Strict extends true ? string | undefined : string {
-    const locales = Array.isArray(locale) ? [...locale] : [locale!].filter((v) => v);
+    const locales = (Array.isArray(locale) ? [...locale] : [locale]).filter((v) => v);
     if (!strict || !locales.length) locales.push(this.defaultLocale);
+
+    const fluentArgs = args ? this.transformVariables(args) : undefined;
 
     const tryTranslate = (): string | undefined => {
       const chosenLocale = locales.shift();
@@ -91,7 +106,7 @@ export class TranslationService {
       if (bundle) {
         const message = bundle.getMessage(pattern);
         if (message?.value) {
-          return bundle.formatPattern(message.value, args);
+          return bundle.formatPattern(message.value, fluentArgs);
         }
       }
 
@@ -111,7 +126,7 @@ export class TranslationService {
 
   t = this.translate;
 
-  getTranslate(locale?: LocaleString | LocaleString[]): TranslateFn {
+  getTranslate(locale?: LocaleString | (LocaleString | undefined)[]): TranslateFn {
     return (pattern, args, strict) => this.translate(pattern, args, locale, strict);
   }
 }

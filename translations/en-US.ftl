@@ -1,5 +1,14 @@
 -bot-name = ZhinBot
 
+name = name
+description = description
+emoji = emoji
+multiselect = multiselect
+allowed = allowed
+disabled = disabled
+role = role
+roles = roles
+
 ###
 ### Birthdays
 ###
@@ -166,45 +175,58 @@ module-selfroles-dsc = Allow your members to give themselves roles
 cmd-roles-dsc = Choose roles for yourself
 selfroles-roles-noitems = This server has no self-roles
 selfroles-roles-choosecategory = You can choose roles from these categories
-selfroles-roles-chooseroles = Choose your roles
-selfroles-roles-rolesassigned = Your chosen roles have been successfully assigned to you!
+selfroles-roles-chooseroles = Bellow you can select roles from the { $category } category
+selfroles-roles-rolesupdated = Your roles have been updated!
 
-cmd-selfroles--item-dsc = Name of the self-roles item
+cmd-selfroles--category-dsc = Name of the self-roles category
+selfroles-category-notfound = Category { $name } not found
 
 # /selfroles
 cmd-selfroles-dsc = Allow your members to give themselves roles
+
 # /selfroles list
-cmd-selfroles-list-dsc = Show all self-roles of the guild
+cmd-selfroles-list-dsc = Show all self-roles categories of this guild
+
 # /selfroles show
-cmd-selfroles-show-dsc = Show info about a self-roles item
+cmd-selfroles-show-dsc = Show info about a self-roles category
+
 # /selfroles create
-cmd-selfroles-create-dsc = Create a new self-roles
+cmd-selfroles-create-dsc = Create a new self-roles category
+cmd-selfroles-create-emoji-dsc = Emoji for the category
+cmd-selfroles-create-multiselect-dsc = Whether or not to allow members to choose multiple roles from the category
+selfroles-created-category = Created a new self-roles category { $name }
+
 # /selfroles delete
-cmd-selfroles-delete-dsc = Delete a self-roles item
-# /selfroles render
-cmd-selfroles-render-dsc = Send/edit the self-roles message
+cmd-selfroles-delete-dsc = Delete a self-roles category
+selfroles-deleted = Successfully deleted self-roles category
 
 # /selfroles role
-cmd-selfroles-role-dsc = Edit roles of a self-roles item
-
+cmd-selfroles-role-dsc = Edit roles of a self-roles category
 # /selfroles role set
-cmd-selfroles-role-set-dsc = Add or change a role
+cmd-selfroles-role-set-dsc = Add or change a role in a self-roles category
 cmd-selfroles-role-set-role-dsc = The role to add/change
 cmd-selfroles-role-set-emoji-dsc = Emoji to assign to the role
 cmd-selfroles-role-set-label-dsc = Additional label for the role
 cmd-selfroles-role-set-description-dsc = Description of the role
-
+selfroles-role-updated = Role added/updated
 # /selfroles role remove
-cmd-selfroles-role-remove-dsc = Remove a role from self-roles
+cmd-selfroles-role-remove-dsc = Remove a role from a self-roles category
 cmd-selfroles-role-remove-role-dsc = The role to remove
+selfroles-role-removed = Role removed from category
+selfroles-role-notfound = Role not found in the category
 
-# /selfroles rename
-cmd-selfroles-rename-dsc = Rename a selfroles item
-cmd-selfroles-rename-newname-dsc = The new name for the item
-
-# /selfroles multiselect
-cmd-selfroles-multiselect-dsc = Change Change whether or not can user select multiple roles from a selfroles category
-cmd-selfroles-multiselect-allow-dsc = Whether or not can user select multiple roles from this selfroles category
+# /selfroles edit
+cmd-selfroles-edit-dsc = Edit a self-roles category
+# /selfroles edit rename
+cmd-selfroles-edit-rename-dsc = Rename a self-roles category
+cmd-selfroles-edit-rename-newname-dsc = The new name for the category
+# /selfroles edit multiselect
+cmd-selfroles-edit-multiselect-dsc = Change whether or not can user select multiple roles from a selfroles category
+cmd-selfroles-edit-multiselect-allow-dsc = Whether or not can user select multiple roles from this selfroles category
+# /selfroles edit emoji
+cmd-selfroles-edit-emoji-dsc = Change the emoji of a self-roles category
+cmd-selfroles-edit-emoji-emoji-dsc = The new emoji of the category or nothing for none
+selfroles-edit-changed = Successfully changed { $key } to { $value }
 
 ###
 ### Utils

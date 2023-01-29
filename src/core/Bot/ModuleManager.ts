@@ -170,15 +170,20 @@ export class ModuleManager {
       key: string,
       record: boolean,
       value?: string | Partial<Record<LocaleString, string | null>>,
+      fallback?: string,
     ) => {
       if (value) {
-        if (typeof value === "string" && value.startsWith("t:")) key = value.substring(2);
-        else {
+        if (typeof value === "string" && value.startsWith("t:")) {
+          key = value.substring(2);
+          value = undefined;
+        } else {
           this.logger.debug(`Translation key '${key}' got replaced by explicit value and not translated.`);
-          return value;
         }
       }
-      return record ? trans.getTranslations(key, {}, true) : trans.translate(key, {}, [], true);
+      if (!value) value = record ? trans.getTranslations(key, {}, true) : trans.translate(key, {}, [], true);
+
+      if (!value && !fallback) this.logger.warn(`Couldn't find translation for ${key}`);
+      return value || fallback;
     };
     const traverse = <P extends ApplicationCommandOption | ApplicationCommandData>(subdata: P, supname?: string): P => {
       const keyPrefix = ["cmd", supname, subdata.name];
@@ -188,7 +193,7 @@ export class ModuleManager {
 
       return {
         ...subdata,
-        name: translateProp(nameKey, false) ?? subdata.name,
+        name: translateProp(nameKey, false, undefined, subdata.name),
         nameLocalizations: translateProp(nameKey, true, subdata.nameLocalizations),
         description: isChat ? translateProp(dscKey, false, chatSubdata?.description) : undefined,
         descriptionLocalizations: isChat
@@ -217,6 +222,8 @@ export class ModuleManager {
   }
 
   private createMainCommand(adapterData: Decorators.IDiscordAdapter) {
+    const trans = this.bot.trans;
+
     if (adapterData && adapterData.supercomand && adapterData.subcommands) {
       return {
         commandData: {
@@ -229,7 +236,8 @@ export class ModuleManager {
           const subcommand = interaction.options.getSubcommandGroup(false) || interaction.options.getSubcommand(true);
 
           const command = adapterData.subcommands!.find((subcmd) => subcmd.commandData.name == subcommand);
-          if (command) return command.execute.apply(this, [interaction]);
+          const t = trans.getTranslate([interaction.locale, interaction.guild?.preferredLocale]);
+          if (command) return command.execute.apply(this, [interaction, t]);
         },
       } as Decorators.IDiscordCommand;
     }

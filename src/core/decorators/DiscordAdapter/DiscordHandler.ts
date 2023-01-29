@@ -1,9 +1,10 @@
 import { MessageComponentInteraction } from "discord.js";
+import { TranslateFn } from "@core";
 import { pushToMetaArray, IInteractionHandler } from "./_utils";
 
 const symbol = Symbol("handlers");
 
-export type DiscordHandlerExecutor = (interaction: MessageComponentInteraction) => Promise<void>;
+export type DiscordHandlerExecutor = (interaction: MessageComponentInteraction, t: TranslateFn) => Promise<void>;
 export interface IDiscordHandler extends IInteractionHandler<MessageComponentInteraction> {
   /**
    * customId of the MessageComponent to handle, it's up to you to make it unique across the whole bot

@@ -3,8 +3,12 @@ import Discord, { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenu
 import { DiscordAdapter, DiscordCommand, DiscordHandler, type TranslateFn } from "~/core";
 import { SelfRolesItemRoles, SelfRolesService } from "./SelfRoles.service";
 
+const NEW_SELECTOR_ID = "selfroles.newSelector";
+const CATEGORIES_ID = "selfroles.categories";
 const ROLE_CHOOSER_ID = "selfroles.category";
 const ROLES_CHOOSEN_ID = "selfroles.roles";
+
+const CHOOSECATEGORY_KEY = "selfroles-roles-choosecategory";
 
 @DiscordAdapter()
 export class SelfRolesDiscordAdapter {
@@ -28,7 +32,7 @@ export class SelfRolesDiscordAdapter {
     return new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
       components: [
         new StringSelectMenuBuilder({
-          custom_id: ROLES_CHOOSEN_ID,
+          custom_id: ROLES_CHOOSEN_ID + ":" + item.name,
           max_values: item.multiSelect ? item.roles.length : 1,
           placeholder: placeholder,
           options: item.roles.map((role) => ({
@@ -43,7 +47,10 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  @DiscordCommand({})
+  @DiscordHandler(NEW_SELECTOR_ID)
+  @DiscordCommand({
+    defaultMemberPermissions: Discord.PermissionFlagsBits.AddReactions,
+  })
   async roles(interaction: Discord.ChatInputCommandInteraction<"cached">, t: TranslateFn) {
     const selfroles = await this.service.getAll(interaction.guildId);
 
@@ -56,7 +63,7 @@ export class SelfRolesDiscordAdapter {
 
     return interaction.reply({
       ephemeral: true,
-      content: t("selfroles-roles-choosecategory") + ":",
+      content: t(CHOOSECATEGORY_KEY) + ":",
       components: [this.getCategoryButtons(selfroles)],
     });
   }
@@ -68,13 +75,30 @@ export class SelfRolesDiscordAdapter {
     if (!item) throw new Error(`Selfroles ${name} don't exist`);
 
     return interaction.update({
-      content: t("selfroles-roles-chooseroles"),
-      components: [await this.getRoleSelector(item, interaction.member, t("selfroles-roles-chooseroles"))],
+      content: t("selfroles-roles-chooseroles", { category: name }),
+      components: [
+        await this.getRoleSelector(item, interaction.member, t("selfroles-roles-chooseroles", { category: name })),
+        new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
+          components: [
+            new ButtonBuilder({
+              customId: CATEGORIES_ID,
+              label: "Go back",
+              style: ButtonStyle.Secondary,
+            }),
+          ],
+        }),
+      ],
     });
   }
 
   @DiscordHandler(ROLES_CHOOSEN_ID)
   async assignRoles(interaction: Discord.StringSelectMenuInteraction<"cached">, t: TranslateFn) {
+    const name = interaction.customId.split(":")[1];
+    const item = await this.service.get(interaction.guildId, name);
+    if (!item || interaction.values.some((r) => item.roles.findIndex((a) => a.roleId == r) == -1)) {
+      return interaction.update({ components: [], content: "This self-roles is outdated use new one." });
+    }
+
     const unselectedRoles = interaction.component.options
       .map((v) => v.value)
       .filter((v) => !interaction.values.includes(v));
@@ -85,7 +109,17 @@ export class SelfRolesDiscordAdapter {
     const selfroles = await this.service.getAll(interaction.guildId);
 
     return interaction.update({
-      content: "**" + t("selfroles-roles-rolesassigned") + "**\n\n" + t("selfroles-roles-choosecategory") + ":",
+      content: "**" + t("selfroles-roles-rolesupdated") + "**\n\n" + t(CHOOSECATEGORY_KEY) + ":",
+      components: [this.getCategoryButtons(selfroles)],
+    });
+  }
+
+  @DiscordHandler(CATEGORIES_ID)
+  async goBack(interaction: Discord.StringSelectMenuInteraction<"cached">, t: TranslateFn) {
+    const selfroles = await this.service.getAll(interaction.guildId);
+
+    return interaction.update({
+      content: t(CHOOSECATEGORY_KEY) + ":",
       components: [this.getCategoryButtons(selfroles)],
     });
   }

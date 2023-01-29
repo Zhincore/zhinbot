@@ -1,6 +1,5 @@
 import { ApplicationCommandData, ApplicationCommandType, Interaction } from "discord.js";
-import { Bot } from "~/core/Bot";
-import { Optional } from "@core/utils";
+import { Optional, Bot, type TranslateFn } from "@core/index";
 import { pushToMetaArray, IInteractionHandler, AnnotWithBot, CustomCommandData } from "./_utils";
 import { parseAutocompleters } from "./DiscordAutocompleter";
 
@@ -8,7 +7,7 @@ const symbol = Symbol("commands");
 
 export type DiscordCommandData = Optional<CustomCommandData, "name">;
 
-export type DiscordCommandExecutor = (interaction: Interaction) => Promise<void>;
+export type DiscordCommandExecutor = (interaction: Interaction, t: TranslateFn) => Promise<void>;
 
 export interface IDiscordCommand extends IInteractionHandler<Interaction> {
   commandData: ApplicationCommandData;
@@ -24,7 +23,6 @@ export function DiscordCommand(data: AnnotWithBot<DiscordCommandData>): MethodDe
       commandData: parseAutocompleters(target, {
         type: ApplicationCommandType.ChatInput,
         name: method.toString(),
-        defaultMemberPermissions: "0",
         ...(typeof data === "function" ? data(bot) : data),
       }),
       execute: target[method as keyof typeof target] as DiscordCommandExecutor,

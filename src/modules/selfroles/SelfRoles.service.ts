@@ -88,17 +88,19 @@ export class SelfRolesService {
     });
   }
 
-  async create(guildId: Snowflake, name: string) {
+  async create(guildId: Snowflake, name: string, emoji?: string | null, multiSelect?: boolean) {
     const item = await this.prisma.selfRolesItem.create({
       data: {
         name,
+        emoji,
+        multiSelect,
         guild: { connect: { id: guildId } },
       },
     });
     return item.name;
   }
 
-  async destroy(guildId: Snowflake, name: string) {
+  async delete(guildId: Snowflake, name: string) {
     const item = await this.get(guildId, name);
     if (!item) return null;
 
