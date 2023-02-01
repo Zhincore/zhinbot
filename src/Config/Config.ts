@@ -35,6 +35,7 @@ const SCHEMA = defineValidationSchema({
     },
     moderation: {
       $$type: "object",
+      logMsgEditThreshold: "number",
       warnPenalties: {
         type: "array",
         items: {
@@ -79,6 +80,7 @@ export class Config implements IConfig {
       },
     },
     moderation: {
+      logMsgEditThreshold: 0.5,
       warnPenalties: [],
     },
   };

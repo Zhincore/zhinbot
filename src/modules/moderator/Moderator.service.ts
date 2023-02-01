@@ -47,19 +47,27 @@ export class ModeratorService {
     this.bot.on("messageUpdate", async (oldMessage, newMessage) => {
       const logChannel = await this.getLogChannel(newMessage.guild?.id);
       if (!logChannel) return;
+
       if (oldMessage.partial) oldMessage = await oldMessage.fetch();
       if (newMessage.partial) newMessage = await newMessage.fetch();
-      if (oldMessage.content == newMessage.content) return;
-      await this.sendLog(
-        logChannel,
-        new EmbedBuilder()
-          .setTitle(`A message has been edited`)
-          .setDescription(`${newMessage.member} has edited their message:`)
-          .setFields([
-            { name: "Previous content", value: oldMessage.content || "*none*" },
-            { name: "New content", value: newMessage.content || "*none*" },
-          ]),
-      );
+
+      const { logMsgEditThreshold } = this.config.modules.moderation;
+
+      if (
+        oldMessage.content != newMessage.content &&
+        this.getMessageChanged(oldMessage.content, newMessage.content) > logMsgEditThreshold
+      ) {
+        await this.sendLog(
+          logChannel,
+          new EmbedBuilder()
+            .setTitle(`A message has been edited`)
+            .setDescription(`${newMessage.member} has edited their message:`)
+            .setFields([
+              { name: "Previous content", value: oldMessage.content || "*none*" },
+              { name: "New content", value: newMessage.content || "*none*" },
+            ]),
+        );
+      }
     });
 
     this.bot.on("messageDelete", async (message) => {
@@ -77,6 +85,15 @@ export class ModeratorService {
           ]),
       );
     });
+  }
+
+  private getMessageChanged(oldMsg: string, newMsg: string) {
+    const maxLen = Math.max(oldMsg.length, newMsg.length);
+    let distance = 0;
+    for (let i = 0; i < maxLen; i++) {
+      if (oldMsg[i] != newMsg[i]) distance++;
+    }
+    return distance / maxLen;
   }
 
   private async sendLog(logChannel: TextChannel, embedBuilder: EmbedBuilder) {
