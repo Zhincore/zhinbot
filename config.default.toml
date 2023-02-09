@@ -31,6 +31,8 @@ songCache = { ttl = "48h", size = 2048 }
 # Moderation module
 [modules.moderation]
 
+logMsgEditThreshold = 0.25
+
 warnPenalties = [
   { count = 2, perTime = "1h", duration = "30m" },
   { count = 3, perTime = "12h", duration = "2h" },

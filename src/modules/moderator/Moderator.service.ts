@@ -7,6 +7,7 @@ import Discord, {
   MessageCreateOptions,
   EmbedBuilder,
 } from "discord.js";
+import levenshtein from "js-levenshtein";
 import ms from "ms";
 import { Service } from "@core/decorators";
 import { Bot } from "@core/Bot";
@@ -52,20 +53,25 @@ export class ModeratorService {
       if (newMessage.partial) newMessage = await newMessage.fetch();
 
       const { logMsgEditThreshold } = this.config.modules.moderation;
+      const maxLen = Math.max(oldMessage.content.length, newMessage.content.length);
+      const distance = levenshtein(oldMessage.content, newMessage.content);
+      const distancePer = distance / maxLen;
 
-      if (
-        oldMessage.content != newMessage.content &&
-        this.getMessageChanged(oldMessage.content, newMessage.content) > logMsgEditThreshold
-      ) {
+      if (distancePer > logMsgEditThreshold) {
         await this.sendLog(
           logChannel,
           new EmbedBuilder()
             .setTitle(`A message has been edited`)
-            .setDescription(`${newMessage.member} has edited their message:`)
+            .setDescription(`${newMessage.member} has edited their message in ${newMessage.channel}:`)
             .setFields([
               { name: "Previous content", value: oldMessage.content || "*none*" },
               { name: "New content", value: newMessage.content || "*none*" },
-            ]),
+            ])
+            .setFooter({
+              text: `Levenshtein distance = ${distance} (${(distancePer * 100).toFixed(2)}%) > ${(
+                logMsgEditThreshold * 100
+              ).toFixed(2)}%`,
+            }),
         );
       }
     });
@@ -74,26 +80,18 @@ export class ModeratorService {
       const logChannel = await this.getLogChannel(message.guild?.id);
       if (!logChannel) return;
       if (message.partial) message = await message.fetch();
-      await this.sendLog(
-        logChannel,
-        new EmbedBuilder()
-          .setTitle(`A message has been deleted`)
-          .setDescription(`A message from ${message.member} has been deleted:`)
-          .setFields([
-            { name: "Content", value: message.content || "*none*" },
-            { name: "Number of attachments", value: message.attachments.size + "", inline: true },
-          ]),
-      );
-    });
-  }
 
-  private getMessageChanged(oldMsg: string, newMsg: string) {
-    const maxLen = Math.max(oldMsg.length, newMsg.length);
-    let distance = 0;
-    for (let i = 0; i < maxLen; i++) {
-      if (oldMsg[i] != newMsg[i]) distance++;
-    }
-    return distance / maxLen;
+      const embed = new EmbedBuilder()
+        .setTitle(`A message has been deleted`)
+        .setDescription(`A message from ${message.member} has been deleted in ${message.channel}:`)
+        .setFields({ name: "Content", value: message.content || "*none*" });
+
+      if (message.attachments.size) {
+        embed.addFields({ name: "Number of attachments", value: message.attachments.size + "", inline: true });
+      }
+
+      await this.sendLog(logChannel, embed);
+    });
   }
 
   private async sendLog(logChannel: TextChannel, embedBuilder: EmbedBuilder) {
@@ -169,7 +167,8 @@ export class ModeratorService {
 
     let penalty: (typeof warnPenalties)[number] | undefined;
     let count = 0;
-    for (const _penalty of warnPenalties.reverse()) {
+    warnPenalties.reverse();
+    for (const _penalty of warnPenalties) {
       count = 0;
       for (const warn of warns) {
         if (time - warn.timestamp.valueOf() <= _penalty.perTime) count++;
