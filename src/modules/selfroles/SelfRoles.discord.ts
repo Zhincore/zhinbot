@@ -3,10 +3,10 @@ import Discord, { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenu
 import { DiscordAdapter, DiscordCommand, DiscordHandler, type TranslateFn } from "~/core";
 import { SelfRolesItemRoles, SelfRolesService } from "./SelfRoles.service";
 
-const NEW_SELECTOR_ID = "selfroles.newSelector";
-const CATEGORIES_ID = "selfroles.categories";
-const ROLE_CHOOSER_ID = "selfroles.category";
-const ROLES_CHOOSEN_ID = "selfroles.roles";
+const ROLES_ID = "selfroles.roles";
+const SHOW_CATEGORIES_ID = "selfroles.categories";
+const SHOW_CATEGORY_ID = "selfroles.category";
+const ROLES_CHOOSEN_ID = "selfroles.chosen";
 
 const CHOOSECATEGORY_KEY = "selfroles-roles-choosecategory";
 
@@ -14,12 +14,12 @@ const CHOOSECATEGORY_KEY = "selfroles-roles-choosecategory";
 export class SelfRolesDiscordAdapter {
   constructor(private readonly service: SelfRolesService) {}
 
-  getCategoryButtons(selfroles: SelfRolesItem[]) {
+  private getCategoryButtons(selfroles: SelfRolesItem[]) {
     return new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
       components: selfroles.map(
         (item) =>
           new ButtonBuilder({
-            customId: ROLE_CHOOSER_ID + ":" + item.name,
+            customId: SHOW_CATEGORY_ID + ":" + item.name,
             label: item.name,
             emoji: item.emoji || undefined,
             style: ButtonStyle.Secondary,
@@ -28,7 +28,7 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  async getRoleSelector(item: SelfRolesItemRoles, member: Discord.GuildMember, placeholder: string) {
+  private async getRoleSelector(item: SelfRolesItemRoles, member: Discord.GuildMember, placeholder: string) {
     return new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
       components: [
         new StringSelectMenuBuilder({
@@ -47,7 +47,35 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  @DiscordHandler(NEW_SELECTOR_ID)
+  @DiscordCommand({
+    options: [
+      {
+        name: "channel",
+        type: Discord.ApplicationCommandOptionType.Channel,
+        channel_types: [Discord.ChannelType.GuildText],
+      },
+      { name: "message", type: Discord.ApplicationCommandOptionType.String },
+      { name: "label", type: Discord.ApplicationCommandOptionType.String },
+    ],
+  })
+  async createRolesButton(interaction: Discord.ChatInputCommandInteraction<"cached">, t: TranslateFn) {
+    let channel = interaction.options.getChannel("channel", false);
+    const message = interaction.options.getString("message", false);
+
+    if (!channel) channel = interaction.channel!;
+    if (channel.type != Discord.ChannelType.GuildText) throw new Error("Channel is not text");
+
+    await channel.send({
+      content: message,
+    });
+
+    return interaction.reply({
+      ephemeral: true,
+      content: t("selfroles-created-roles-button"),
+    });
+  }
+
+  @DiscordHandler(ROLES_ID)
   @DiscordCommand({
     defaultMemberPermissions: Discord.PermissionFlagsBits.AddReactions,
   })
@@ -68,7 +96,7 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  @DiscordHandler(ROLE_CHOOSER_ID)
+  @DiscordHandler(SHOW_CATEGORY_ID)
   async roleSelector(interaction: Discord.ButtonInteraction<"cached">, t: TranslateFn) {
     const name = interaction.customId.split(":")[1];
     const item = await this.service.get(interaction.guildId, name);
@@ -81,7 +109,7 @@ export class SelfRolesDiscordAdapter {
         new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
           components: [
             new ButtonBuilder({
-              customId: CATEGORIES_ID,
+              customId: SHOW_CATEGORIES_ID,
               label: "Go back",
               style: ButtonStyle.Secondary,
             }),
@@ -114,7 +142,7 @@ export class SelfRolesDiscordAdapter {
     });
   }
 
-  @DiscordHandler(CATEGORIES_ID)
+  @DiscordHandler(SHOW_CATEGORIES_ID)
   async goBack(interaction: Discord.StringSelectMenuInteraction<"cached">, t: TranslateFn) {
     const selfroles = await this.service.getAll(interaction.guildId);
 
