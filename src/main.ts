@@ -1,12 +1,13 @@
-import "./prestart";
+import "./prestart.js";
 import "reflect-metadata";
-import { addExitCallback } from "catch-exit";
-import { bootstrap } from "./bootstrap";
+import exitHook from "exit-hook";
+import { Routes } from "discord.js";
+import { bootstrap } from "./bootstrap.js";
 
 async function main() {
   const { bot, config, logger } = await bootstrap();
 
-  addExitCallback(() => {
+  exitHook(() => {
     bot.destroy();
   });
 
@@ -17,6 +18,8 @@ async function main() {
   } else {
     logger.debug("Running in dry mode, not logging in");
   }
+
+  bot.rest.get(Routes.guildMemberVerification("908018496988938291")).then(console.log);
 
   logger.debug("Done.");
 }

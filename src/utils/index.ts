@@ -1,4 +1,4 @@
-export * from "./ErrnoException";
+export * from "./ErrnoException.js";
 
 export function getDurationString(length: number, float = false) {
   const hours = Math.trunc(length / 3600);

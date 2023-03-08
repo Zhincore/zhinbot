@@ -1,7 +1,7 @@
 import Discord, { BaseInteraction } from "discord.js";
-import { Bot } from "@core/Bot";
+import { Bot } from "@core/Bot/index.js";
 import { Optional, Replace } from "@core/utils";
-import { TranslateFn } from "~/core/Translation.service";
+import { TranslateFn } from "~/core/Translation.service.js";
 
 export type IInteractionHandler<TInteraction extends BaseInteraction> = {
   execute: (interaction: TInteraction, translate: TranslateFn) => any | Promise<any>;

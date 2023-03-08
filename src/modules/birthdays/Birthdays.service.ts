@@ -1,12 +1,12 @@
 import { EmbedBuilder, GuildMember, Snowflake, TextBasedChannel } from "discord.js";
 import * as chrono from "chrono-node";
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { PrismaService } from "~/services/Prisma.service";
-import { Schedule } from "~/utils/Schedule";
-import { Config } from "~/Config";
-import { TranslationService } from "~/core/Translation.service";
-import { chooseRandom, dateToUTC } from "~/utils";
+import { Service } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { PrismaService } from "~/services/Prisma.service.js";
+import { Schedule } from "~/utils/Schedule.js";
+import { Config } from "~/Config/index.js";
+import { TranslationService } from "~/core/Translation.service.js";
+import { chooseRandom, dateToUTC } from "~/utils/index.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 const GUILD_SELECT = {

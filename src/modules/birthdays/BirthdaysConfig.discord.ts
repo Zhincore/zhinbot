@@ -5,10 +5,10 @@ import {
   EmbedBuilder,
   TextChannel,
 } from "discord.js";
-import { DiscordAdapter, DiscordSubcommand } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { Config } from "~/Config";
-import { BirthdaysService } from "./Birthdays.service";
+import { DiscordAdapter, DiscordSubcommand } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { Config } from "~/Config/index.js";
+import { BirthdaysService } from "./Birthdays.service.js";
 
 @DiscordAdapter({
   supercomand: {

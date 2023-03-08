@@ -1,5 +1,5 @@
 import Discord, { AutocompleteInteraction, APIApplicationCommandOptionChoice } from "discord.js";
-import { pushToMetaArray, IInteractionHandler, CustomCommandData, CustomSubData } from "./_utils";
+import { pushToMetaArray, IInteractionHandler, CustomCommandData, CustomSubData } from "./_utils.js";
 
 const mappingSymbol = Symbol("mappingAutocompleters");
 const symbol = Symbol("autocompleters");

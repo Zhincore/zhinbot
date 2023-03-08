@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { Bot } from "@core/Bot";
-import { DiscordCommandExecutor } from "./DiscordCommand";
+import { Bot } from "@core/Bot/index.js";
+import { DiscordCommandExecutor } from "./DiscordCommand.js";
 import {
   pushToMetaArray,
   IInteractionHandler,
@@ -9,8 +9,8 @@ import {
   CustomSubGroupData,
   CustomCommandOptionData,
   CustomSubData,
-} from "./_utils";
-import { parseAutocompleters } from "./DiscordAutocompleter";
+} from "./_utils.js";
+import { parseAutocompleters } from "./DiscordAutocompleter.js";
 
 const symbol = Symbol("subcommands");
 

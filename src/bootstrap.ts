@@ -1,7 +1,7 @@
 import type { TemplatedApp } from "uWebSockets.js";
-import { Bot } from "@core/Bot";
-import { Config } from "./Config";
-import modules from "./modules";
+import { Bot } from "@core/Bot/index.js";
+import { Config } from "./Config/index.js";
+import modules from "./modules/index.js";
 
 export async function bootstrap() {
   console.log("Loading configuration...");

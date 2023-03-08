@@ -1,2 +1,2 @@
-export * from "./Bot";
-export type { DiscordCommandRecord } from "./ModuleManager";
+export * from "./Bot.js";
+export type { DiscordCommandRecord } from "./ModuleManager.js";

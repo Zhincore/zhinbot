@@ -1,8 +1,8 @@
 import Discord, { Snowflake } from "discord.js";
 import { SelfRolesItem, SelfRolesRole, Prisma } from "@prisma/client";
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { PrismaService } from "~/services/Prisma.service";
+import { Service } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { PrismaService } from "~/services/Prisma.service.js";
 
 export type ItemPreview = {
   name: string;

@@ -8,9 +8,9 @@ import Discord, {
 } from "discord.js";
 import { Constructable } from "typedi";
 import { Logger } from "winston";
-import * as Decorators from "../decorators";
-import { IDiscordCommand } from "../decorators";
-import { Bot } from "./";
+import * as Decorators from "../decorators/index.js";
+import { IDiscordCommand } from "../decorators/index.js";
+import { Bot } from "./index.js";
 
 export interface DiscordCommandRecord extends IDiscordCommand {
   moduleData: Decorators.IBotModule<any>;

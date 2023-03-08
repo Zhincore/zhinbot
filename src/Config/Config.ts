@@ -3,9 +3,9 @@ import TOML from "@ltd/j-toml";
 import Validator from "fastest-validator";
 import ms from "ms";
 import { Locale, LocaleString } from "discord.js";
-import { Service } from "@core/decorators";
-import { isErrno } from "../utils";
-import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromValidationSchema";
+import { Service } from "@core/decorators/index.js";
+import { isErrno } from "~/utils/index.js";
+import { defineValidationSchema, TypeFromValidationSchema } from "./TypeFromValidationSchema.js";
 
 const SCHEMA = defineValidationSchema({
   color: "number",

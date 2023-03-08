@@ -1,7 +1,7 @@
 import { ApplicationCommandData, ApplicationCommandType, Interaction } from "discord.js";
-import { Optional, Bot, type TranslateFn } from "@core/index";
-import { pushToMetaArray, IInteractionHandler, AnnotWithBot, CustomCommandData } from "./_utils";
-import { parseAutocompleters } from "./DiscordAutocompleter";
+import { Optional, Bot, type TranslateFn } from "@core/index.js";
+import { pushToMetaArray, IInteractionHandler, AnnotWithBot, CustomCommandData } from "./_utils.js";
+import { parseAutocompleters } from "./DiscordAutocompleter.js";
 
 const symbol = Symbol("commands");
 

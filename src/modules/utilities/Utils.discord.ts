@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import ms from "ms";
-import { DiscordAdapter, DiscordCommand } from "@core/decorators";
+import { DiscordAdapter, DiscordCommand } from "@core/decorators/index.js";
 
 @DiscordAdapter()
 export class UtilitiesDiscordAdapter {

@@ -1,7 +1,7 @@
 import * as chrono from "chrono-node";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js";
-import { DiscordAdapter, DiscordSubcommand } from "@core/decorators";
-import { BirthdaysService } from "./Birthdays.service";
+import { DiscordAdapter, DiscordSubcommand } from "@core/decorators/index.js";
+import { BirthdaysService } from "./Birthdays.service.js";
 
 @DiscordAdapter({
   supercomand: {

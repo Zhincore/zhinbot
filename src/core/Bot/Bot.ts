@@ -2,9 +2,9 @@ import Discord, { Snowflake, DiscordAPIError, LocaleString } from "discord.js";
 import { Container, Service } from "typedi";
 import emojiRegex from "emoji-regex";
 import { Logger } from "winston";
-import { TranslationService } from "../Translation.service";
-import { getLogger } from "./getLogger";
-import { ModuleManager } from "./ModuleManager";
+import { TranslationService } from "../Translation.service.js";
+import { getLogger } from "./getLogger.js";
+import { ModuleManager } from "./ModuleManager.js";
 
 type BotSettings = {
   defaultLocale?: LocaleString;

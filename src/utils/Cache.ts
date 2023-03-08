@@ -1,4 +1,4 @@
-import { DecayingReference } from "./DecayingReference";
+import { DecayingReference } from "./DecayingReference.js";
 
 export class Cache<T> {
   private readonly map = new Map<string, DecayingReference<T>>();

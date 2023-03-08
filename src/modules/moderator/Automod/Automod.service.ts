@@ -1,8 +1,8 @@
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { ModeratorService } from "~/modules/moderator/Moderator.service";
-import { AutomodFilter } from "./filters/AutomodFilter";
-import Filters from "./filters";
+import { Service } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { ModeratorService } from "~/modules/moderator/Moderator.service.js";
+import { AutomodFilter } from "./filters/AutomodFilter.js";
+import Filters from "./filters/index.js";
 
 @Service()
 export class AutomodService {

@@ -1,8 +1,8 @@
 import Discord, { ApplicationCommandOptionType } from "discord.js";
-import { Bot, table, type TranslateFn } from "@core/index";
-import { DiscordAdapter, DiscordAutocompleter, DiscordSubcommand } from "@core/decorators";
+import { Bot, table, type TranslateFn } from "@core/index.js";
+import { DiscordAdapter, DiscordAutocompleter, DiscordSubcommand } from "@core/decorators/index.js";
 import { CustomCommandOptionData } from "~/core/decorators/DiscordAdapter/_utils";
-import { SelfRolesService } from "./SelfRoles.service";
+import { SelfRolesService } from "./SelfRoles.service.js";
 
 const CATEGORY_AUTOCOM = "selfroles.category";
 

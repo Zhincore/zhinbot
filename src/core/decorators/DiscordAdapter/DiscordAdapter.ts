@@ -1,16 +1,16 @@
 import { ChatInputApplicationCommandData } from "discord.js";
 import { Service } from "typedi";
-import { Bot } from "@core/Bot";
+import { Bot } from "@core/Bot/index.js";
 import {
   getAutocompleters,
   getAutocompleterMappings,
   IAutocompleter,
   IAutocompleterMapping,
-} from "./DiscordAutocompleter";
-import { getDiscordCommands, IDiscordCommand } from "./DiscordCommand";
-import { getDiscordSubcommands, IDiscordSubcommand } from "./DiscordSubcommand";
-import { getDiscordHandlers, IDiscordHandler } from "./DiscordHandler";
-import { AnnotWithBot, RemoveTranslated } from "./_utils";
+} from "./DiscordAutocompleter.js";
+import { getDiscordCommands, IDiscordCommand } from "./DiscordCommand.js";
+import { getDiscordSubcommands, IDiscordSubcommand } from "./DiscordSubcommand.js";
+import { getDiscordHandlers, IDiscordHandler } from "./DiscordHandler.js";
+import { AnnotWithBot, RemoveTranslated } from "./_utils.js";
 
 const symbol = Symbol("discordAdapter");
 

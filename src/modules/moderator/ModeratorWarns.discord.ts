@@ -5,9 +5,9 @@ import Discord, {
   ApplicationCommandOptionType,
   ButtonStyle,
 } from "discord.js";
-import { Bot } from "@core/Bot";
-import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
-import { ModeratorService } from "./Moderator.service";
+import { Bot } from "@core/Bot/index.js";
+import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators/index.js";
+import { ModeratorService } from "./Moderator.service.js";
 
 const WARNS_PAGE_ID = "warns";
 

@@ -1,7 +1,7 @@
 import { SelfRolesItem } from "@prisma/client";
 import Discord, { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from "discord.js";
-import { DiscordAdapter, DiscordCommand, DiscordHandler, type TranslateFn } from "~/core";
-import { SelfRolesItemRoles, SelfRolesService } from "./SelfRoles.service";
+import { DiscordAdapter, DiscordCommand, DiscordHandler, type TranslateFn } from "@core/index.js";
+import { SelfRolesItemRoles, SelfRolesService } from "./SelfRoles.service.js";
 
 const ROLES_ID = "selfroles.roles";
 const SHOW_CATEGORIES_ID = "selfroles.categories";

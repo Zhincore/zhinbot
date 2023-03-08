@@ -1,5 +1,5 @@
-import { BotModule } from "@core/decorators";
-import { PlayerDiscordAdapter } from "./Player.discord";
+import { BotModule } from "@core/decorators/index.js";
+import { PlayerDiscordAdapter } from "./Player.discord.js";
 
 @BotModule({ name: "player", discordAdapters: [PlayerDiscordAdapter] })
 export class PlayerModule {}

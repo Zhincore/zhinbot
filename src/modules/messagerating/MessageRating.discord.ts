@@ -5,8 +5,8 @@ import {
   MessageContextMenuCommandInteraction,
   PermissionFlagsBits,
 } from "discord.js";
-import { DiscordAdapter, DiscordCommand } from "@core/decorators";
-import { MessageRatingService } from "./MessageRating.service";
+import { DiscordAdapter, DiscordCommand } from "@core/decorators/index.js";
+import { MessageRatingService } from "./MessageRating.service.js";
 
 @DiscordAdapter()
 export class MessageRatingDiscordAdapter {

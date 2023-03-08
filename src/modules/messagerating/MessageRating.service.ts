@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { Service } from "@core/decorators";
-import { PrismaService } from "~/services/Prisma.service";
+import { Service } from "@core/decorators/index.js";
+import { PrismaService } from "~/services/Prisma.service.js";
 
 @Service()
 export class MessageRatingService {

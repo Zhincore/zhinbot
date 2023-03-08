@@ -9,9 +9,9 @@ import {
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
-import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators";
-import { getDurationString } from "~/utils";
-import { PlayerService } from "./Player.service";
+import { DiscordAdapter, DiscordCommand, DiscordHandler } from "@core/decorators/index.js";
+import { getDurationString } from "~/utils/index.js";
+import { PlayerService } from "./Player.service.js";
 
 const QUEUE_PAGE_ID = "player.queue";
 const CONTROL_ID = "player";

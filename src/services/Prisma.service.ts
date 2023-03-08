@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { Config } from "~/Config";
+import { Service } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { Config } from "~/Config/index.js";
 
 export { default as Prisma } from "@prisma/client";
 

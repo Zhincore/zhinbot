@@ -4,8 +4,8 @@ import { FluentBundle, FluentFunction, FluentNumber, FluentResource, FluentVaria
 import { Locale } from "discord.js";
 import type { LocaleString } from "discord.js";
 import { Logger } from "winston";
-import { Service } from "./decorators";
-import { Bot } from "./Bot";
+import { Service } from "./decorators/index.js";
+import type { Bot } from "./Bot/index.js";
 
 type SupportedVariable = FluentVariable | boolean | undefined | null;
 export type TranslateFn = <Strict extends boolean = false>(

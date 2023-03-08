@@ -9,11 +9,11 @@ import Discord, {
 } from "discord.js";
 import levenshtein from "js-levenshtein";
 import ms from "ms";
-import { Service } from "@core/decorators";
-import { Bot } from "@core/Bot";
-import { Config } from "~/Config";
-import { Cache } from "~/utils/Cache";
-import { PrismaService, Prisma } from "~/services/Prisma.service";
+import { Service } from "@core/decorators/index.js";
+import { Bot } from "@core/Bot/index.js";
+import { Config } from "~/Config/index.js";
+import { Cache } from "~/utils/Cache.js";
+import { PrismaService, Prisma } from "~/services/Prisma.service.js";
 
 const TIMEOUT_ERR = "Unable to timeout this member, their rank is probbably higher than mine.";
 

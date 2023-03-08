@@ -7,9 +7,9 @@ import { VoiceConnection, DiscordGatewayAdapterCreator, NoSubscriberBehavior } f
 import * as Voice from "@discordjs/voice";
 import YTDLP from "yt-dlp-wrap";
 import { Logger } from "winston";
-import { Cache } from "~/utils/Cache";
-import { Config } from "~/Config";
-import { YtResponse } from "./YTDLP.types";
+import { Cache } from "~/utils/Cache.js";
+import { Config } from "~/Config/index.js";
+import { YtResponse } from "./YTDLP.types.js";
 
 const SONG_DELAY = ms("5s");
 const YTDLP_OPTS = [

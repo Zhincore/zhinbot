@@ -1,6 +1,6 @@
 import { MessageComponentInteraction } from "discord.js";
 import { TranslateFn } from "@core";
-import { pushToMetaArray, IInteractionHandler } from "./_utils";
+import { pushToMetaArray, IInteractionHandler } from "./_utils.js";
 
 const symbol = Symbol("handlers");
 

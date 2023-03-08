@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChannelType, ChatInputCommandInteraction } from "discord.js";
 import ms from "ms";
-import { DiscordAdapter, DiscordCommand } from "@core/decorators";
-import { ModeratorService } from "./Moderator.service";
+import { DiscordAdapter, DiscordCommand } from "@core/decorators/index.js";
+import { ModeratorService } from "./Moderator.service.js";
 
 @DiscordAdapter()
 export class ModeratorDiscordAdapter {

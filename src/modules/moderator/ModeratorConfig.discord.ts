@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import YAML from "yaml";
-import { DiscordAdapter, DiscordCommand } from "@core/decorators";
-import { ModeratorService, ModConfig } from "./Moderator.service";
+import { DiscordAdapter, DiscordCommand } from "@core/decorators/index.js";
+import { ModeratorService, ModConfig } from "./Moderator.service.js";
 
 @DiscordAdapter()
 export class ModeratorConfigDiscordAdapter {
