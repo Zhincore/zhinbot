@@ -75,6 +75,7 @@ export class SelfRolesDiscordAdapter {
             new ButtonBuilder({
               customId: SHOW_CATEGORIES_ID,
               label: label || t("selfroles-roles-button"),
+              style: ButtonStyle.Primary,
             }),
           ],
         }),
