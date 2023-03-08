@@ -48,6 +48,7 @@ export class SelfRolesDiscordAdapter {
   }
 
   @DiscordCommand({
+    name: "rolesbutton",
     options: [
       {
         name: "channel",
