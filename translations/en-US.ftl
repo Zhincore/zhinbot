@@ -171,11 +171,11 @@ cmd-queue-page-dsc = The page of the queue tho show (first by default)
 module-selfroles = Self-roles module
 module-selfroles-dsc = Allow your members to give themselves roles
 
-# /createRolesButton
-cmd-createRolesButton-dsc = Creates a button allowign users to easily trigger self-roles selection
-cmd-createRolesButton-channel-dsc = The channel to send the button to (current by default)
-cmd-createRolesButton-message-dsc = Message to send alongside the button (none by default)
-cmd-createRolesButton-label-dsc = Label of the button ("{selfroles-roles-button}" by default)
+# /rolesbutton
+cmd-rolesbutton-dsc = Creates a button allowign users to easily trigger self-roles selection
+cmd-rolesbutton-channel-dsc = The channel to send the button to (current by default)
+cmd-rolesbutton-message-dsc = Message to send alongside the button (none by default)
+cmd-rolesbutton-label-dsc = Label of the button ("{selfroles-roles-button}" by default)
 selfroles-created-roles-button = Successfully created roles button.
 selfroles-roles-button = Choose roles
 
