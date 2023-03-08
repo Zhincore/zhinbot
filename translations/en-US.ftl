@@ -184,6 +184,7 @@ cmd-roles-dsc = Choose roles for yourself
 selfroles-roles-noitems = This server has no self-roles
 selfroles-roles-choosecategory = You can choose roles from these categories
 selfroles-roles-chooseroles = Bellow you can select roles from the { $category } category
+selfroles-outdated = This self-roles is outdated, use new one
 selfroles-roles-rolesupdated = Your roles have been updated!
 
 cmd-selfroles--category-dsc = Name of the self-roles category

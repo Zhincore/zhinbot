@@ -60,13 +60,24 @@ export class SelfRolesDiscordAdapter {
   })
   async createRolesButton(interaction: Discord.ChatInputCommandInteraction<"cached">, t: TranslateFn) {
     let channel = interaction.options.getChannel("channel", false);
+    const label = interaction.options.getString("label", false);
     const message = interaction.options.getString("message", false);
 
     if (!channel) channel = interaction.channel!;
     if (channel.type != Discord.ChannelType.GuildText) throw new Error("Channel is not text");
 
     await channel.send({
-      content: message,
+      content: message ?? undefined,
+      components: [
+        new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
+          components: [
+            new ButtonBuilder({
+              customId: SHOW_CATEGORIES_ID,
+              label: label || t("selfroles-roles-button"),
+            }),
+          ],
+        }),
+      ],
     });
 
     return interaction.reply({
@@ -124,7 +135,7 @@ export class SelfRolesDiscordAdapter {
     const name = interaction.customId.split(":")[1];
     const item = await this.service.get(interaction.guildId, name);
     if (!item || interaction.values.some((r) => item.roles.findIndex((a) => a.roleId == r) == -1)) {
-      return interaction.update({ components: [], content: "This self-roles is outdated use new one." });
+      return interaction.update({ components: [], content: t("selfroles-outdated") });
     }
 
     const unselectedRoles = interaction.component.options
