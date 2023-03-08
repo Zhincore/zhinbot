@@ -73,7 +73,7 @@ export class SelfRolesDiscordAdapter {
         new ActionRowBuilder<Discord.MessageActionRowComponentBuilder>({
           components: [
             new ButtonBuilder({
-              customId: SHOW_CATEGORIES_ID,
+              customId: ROLES_ID,
               label: label || t("selfroles-roles-button"),
               style: ButtonStyle.Primary,
             }),
