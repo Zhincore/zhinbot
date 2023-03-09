@@ -2,7 +2,6 @@ lockfileVersion: 5.4
 
 specifiers:
   '@discordjs/opus': ^0.9.0
-  '@discordjs/rest': ^1.5.0
   '@discordjs/voice': ^0.14.0
   '@fluent/bundle': ^0.17.1
   '@ltd/j-toml': ^1.38.0
@@ -56,7 +55,6 @@ specifiers:
 
 dependencies:
   '@discordjs/opus': 0.9.0
-  '@discordjs/rest': 1.5.0
   '@discordjs/voice': 0.14.0_whx5bvgbec4dkimfbdnx3j5nye
   '@fluent/bundle': 0.17.1
   '@ltd/j-toml': 1.38.0

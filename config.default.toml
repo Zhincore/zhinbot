@@ -8,36 +8,42 @@ defaultLocale = "en-US"
 ##
 [modules]
 
-# Birthdays module
-[modules.birthdays]
+  # Birthdays module
+  [modules.birthdays]
 
-images = [
-  # Sourced from https://twitter.com/IKEAsame/status/1215976200813699072
-  "https://pbs.twimg.com/media/EOAD3dAUcAACa5C?format=jpg",
-  "https://pbs.twimg.com/media/EOAD38DVUAADiIm?format=jpg",
-  "https://pbs.twimg.com/media/EOAD4bMVUAEhmLm?format=jpg",
-  "https://pbs.twimg.com/media/EOAD5SNUEAA9yww?format=jpg",
-  "https://pbs.twimg.com/media/EOAD51hUcAIyhpd?format=jpg"
-]
+    images = [
+      # Sourced from https://twitter.com/IKEAsame/status/1215976200813699072
+      "https://pbs.twimg.com/media/EOAD3dAUcAACa5C?format=jpg",
+      "https://pbs.twimg.com/media/EOAD38DVUAADiIm?format=jpg",
+      "https://pbs.twimg.com/media/EOAD4bMVUAEhmLm?format=jpg",
+      "https://pbs.twimg.com/media/EOAD5SNUEAA9yww?format=jpg",
+      "https://pbs.twimg.com/media/EOAD51hUcAIyhpd?format=jpg"
+    ]
 
-# Player module
-[modules.player]
+  # Player module
+  [modules.player]
 
-maxQueueLength = 256
-timeout = "15m"
+    maxQueueLength = 256
+    timeout = "15m"
 
-songCache = { ttl = "48h", size = 2048 }
+    songCache = { ttl = "48h", size = 2048 }
 
-# Moderation module
-[modules.moderation]
+  # Moderation module
+  [modules.moderation]
 
-logMsgEditThreshold = 0.25
+    warnPenalties = [
+      { count = 2, perTime = "1h", duration = "30m" },
+      { count = 3, perTime = "12h", duration = "2h" },
+      { count = 6, perTime = "24h", duration = "7d" },
+    ]
 
-warnPenalties = [
-  { count = 2, perTime = "1h", duration = "30m" },
-  { count = 3, perTime = "12h", duration = "2h" },
-  { count = 6, perTime = "24h", duration = "7d" },
-]
+    [modules.moderation.logging]
+      logNickname = true
+      logDeleted = true
+      logEdited = false
+      editThreshold = 0.25
+      
+
 
 ## !!!
 ## Advanced section 

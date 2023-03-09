@@ -35,7 +35,13 @@ const SCHEMA = defineValidationSchema({
     },
     moderation: {
       $$type: "object",
-      logMsgEditThreshold: "number",
+      logging: {
+        $$type: "object",
+        logNickname: "boolean",
+        logDeleted: "boolean",
+        logEdited: "boolean",
+        editThreshold: "number",
+      },
       warnPenalties: {
         type: "array",
         items: {

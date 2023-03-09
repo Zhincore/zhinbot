@@ -7,7 +7,6 @@ import Discord, {
   MessageCreateOptions,
   EmbedBuilder,
 } from "discord.js";
-import levenshtein from "js-levenshtein";
 import ms from "ms";
 import { Service } from "@core/decorators/index.js";
 import { Bot } from "@core/Bot/index.js";
@@ -24,87 +23,7 @@ export class ModeratorService {
   // private readonly logger = this.bot.getLogger("Moderator");
   private readonly guildConfigs = new Cache<Prisma.ModConfig>(ms("30m"));
 
-  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
-    this.registerLogging();
-  }
-
-  private async registerLogging() {
-    this.bot.on("guildMemberUpdate", async (oldMember, newMember) => {
-      if (oldMember.nickname == newMember.nickname) return;
-      const logChannel = await this.getLogChannel(newMember.guild.id);
-      if (!logChannel) return;
-      await this.sendLog(
-        logChannel,
-        new EmbedBuilder()
-          .setTitle("Nickname change")
-          .setDescription(`Nickname of ${newMember} has been changed:`)
-          .setFields([
-            { name: "Previous nickname", value: oldMember.nickname || "*none*", inline: true },
-            { name: "New nickname", value: newMember.nickname || "*none*", inline: true },
-          ]),
-      );
-    });
-
-    this.bot.on("messageUpdate", async (oldMessage, newMessage) => {
-      const logChannel = await this.getLogChannel(newMessage.guild?.id);
-      if (!logChannel) return;
-
-      if (oldMessage.partial) oldMessage = await oldMessage.fetch();
-      if (newMessage.partial) newMessage = await newMessage.fetch();
-
-      const { logMsgEditThreshold } = this.config.modules.moderation;
-      const maxLen = Math.max(oldMessage.content.length, newMessage.content.length);
-      const distance = levenshtein(oldMessage.content, newMessage.content);
-      const distancePer = distance / maxLen;
-
-      if (distancePer > logMsgEditThreshold) {
-        await this.sendLog(
-          logChannel,
-          new EmbedBuilder()
-            .setTitle(`A message has been edited`)
-            .setDescription(`${newMessage.member} has edited their message in ${newMessage.channel}:`)
-            .setFields([
-              { name: "Previous content", value: oldMessage.content || "*none*" },
-              { name: "New content", value: newMessage.content || "*none*" },
-            ])
-            .setFooter({
-              text: `Levenshtein distance = ${distance} (${(distancePer * 100).toFixed(2)}%) > ${(
-                logMsgEditThreshold * 100
-              ).toFixed(2)}%`,
-            }),
-        );
-      }
-    });
-
-    this.bot.on("messageDelete", async (message) => {
-      const logChannel = await this.getLogChannel(message.guild?.id);
-      if (!logChannel) return;
-      if (message.partial) message = await message.fetch();
-
-      const embed = new EmbedBuilder()
-        .setTitle(`A message has been deleted`)
-        .setDescription(`A message from ${message.member} has been deleted in ${message.channel}:`)
-        .setFields({ name: "Content", value: message.content || "*none*" });
-
-      if (message.attachments.size) {
-        embed.addFields({ name: "Number of attachments", value: message.attachments.size + "", inline: true });
-      }
-
-      await this.sendLog(logChannel, embed);
-    });
-  }
-
-  private async sendLog(logChannel: TextChannel, embedBuilder: EmbedBuilder) {
-    await logChannel.send({
-      embeds: [embedBuilder.setColor(this.config.color)],
-    });
-  }
-
-  private async getLogChannel(guildId?: Snowflake) {
-    if (!guildId) return;
-    const { logChannel } = await this.getGuildConfig(guildId);
-    return this.bot.fetchChannel<TextChannel>(logChannel);
-  }
+  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
 
   private async announce(message: MessageCreateOptions, userId: Snowflake, channelId: Snowflake, guild: Guild) {
     const send = (channel: TextChannel | DMChannel | null): any => {
