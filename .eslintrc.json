@@ -9,8 +9,16 @@
     "jest": true,
     "node": true
   },
-  "plugins": ["@typescript-eslint", "sonarjs", "import"],
-  "extends": ["plugin:@typescript-eslint/recommended", "plugin:sonarjs/recommended", "plugin:prettier/recommended"],
+  "plugins": [
+    "@typescript-eslint",
+    "sonarjs",
+    "import"
+  ],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:prettier/recommended"
+  ],
   "settings": {
     "import/internal-regex": "^(~|\\$)",
     "import/resolver": {
@@ -18,13 +26,30 @@
     }
   },
   "rules": {
-    "import/order": ["warn", { "groups": ["builtin", "external", "internal", "parent", "sibling"] }],
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling"
+        ]
+      }
+    ],
     "prettier/prettier": "warn",
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_"
+      }
+    ]
   }
 }

@@ -190,6 +190,14 @@ selfroles-roles-rolesupdated = Your roles have been updated!
 cmd-selfroles--category-dsc = Name of the self-roles category
 selfroles-category-notfound = Category { $name } not found
 
+# /autorole
+cmd-autorole-dsc = Give members a role automatically
+cmd-autorole--apply-dsc = Whether or not should we apply the change to all current members
+cmd-autorole-set-dsc = Set role to give to members automatically
+cmd-autorole-set-role-dsc = The role to give or nothing for none
+cmd-autorole-remove-dsc = Remove automatically given role
+cmd-autorole-show-dsc = Show the current autorole
+
 # /selfroles
 cmd-selfroles-dsc = Allow your members to give themselves roles
 

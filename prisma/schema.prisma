@@ -22,6 +22,9 @@ model Guild {
   // Player
   playerChannel String?
 
+  // Selfroles
+  autorole String?
+
   // Modules
   modConfig ModConfig?
   warnings  Warning[]

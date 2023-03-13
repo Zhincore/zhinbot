@@ -1,8 +1,10 @@
 import Discord, { Snowflake } from "discord.js";
 import { SelfRolesItem, SelfRolesRole, Prisma } from "@prisma/client";
+import ms from "ms";
 import { Service } from "@core/decorators/index.js";
 import { Bot } from "@core/Bot/index.js";
 import { PrismaService } from "~/services/Prisma.service.js";
+import { Cache } from "~/utils/Cache.js";
 
 export type ItemPreview = {
   name: string;
@@ -14,33 +16,62 @@ export type SelfRolesItemRoles = SelfRolesItem & {
 
 @Service()
 export class SelfRolesService {
-  private messages = new Map<Snowflake, SelfRolesItem & { roles: SelfRolesRole[] }>();
+  private readonly autoroles = new Cache<Snowflake | null>(ms("30m"));
 
   constructor(private readonly prisma: PrismaService, private readonly bot: Bot) {
-    // React to reactions
-    bot.on("messageReactionAdd", this.getReactionHandler("add"));
-    bot.on("messageReactionRemove", this.getReactionHandler("remove"));
+    bot.on("guildMemberAdd", this.handleAutoMember.bind(this));
+    bot.on("guildMemberUpdate", this.handleAutoMember.bind(this));
   }
 
-  private getReactionHandler(action: "add" | "remove") {
-    return async (
-      reaction: Discord.MessageReaction | Discord.PartialMessageReaction,
-      user: Discord.User | Discord.PartialUser,
-    ): Promise<any> => {
-      if (reaction.partial || user.bot) return;
-      const { message, emoji } = reaction;
-      if (message.partial || !message.guild) return;
+  private async handleAutoMember(
+    member: Discord.GuildMember | Discord.PartialGuildMember,
+    newMember?: Discord.GuildMember,
+  ) {
+    const autorole = await this.getAutorole(member.guild.id);
+    if (!autorole || newMember?.pending || member.pending) return;
+    await member.roles.add(autorole);
+  }
 
-      const item = this.messages.get(reaction.message.id);
-      if (!item) return;
+  async getAutorole(guildId: Snowflake) {
+    let role = this.autoroles.get(guildId);
+    if (role != undefined) return role;
 
-      const role = item.roles.find((r) => this.bot.serializeEmoji(emoji) === r.emoji);
-      if (!role) return reaction.remove();
+    role = await this.prisma.guild
+      .findUnique({ where: { id: guildId }, select: { autorole: true } })
+      .then((d) => d?.autorole);
+    if (role != undefined) this.autoroles.set(guildId, role);
 
-      const member = await message.guild.members.fetch(user.id);
-      if (action === "add") return member.roles.add(role.roleId);
-      return member.roles.remove(role.roleId);
-    };
+    return role;
+  }
+
+  async setAutorole(guildId: Snowflake, role?: Snowflake | null, applyNow?: boolean | null) {
+    const previous = applyNow && (await this.getAutorole(guildId));
+    if (previous == role) return;
+
+    const result = await this.prisma.guild.update({
+      where: { id: guildId },
+      data: { autorole: role ?? null },
+      select: { autorole: true },
+    });
+
+    this.autoroles.set(guildId, result.autorole);
+
+    if (!applyNow || (!previous && !result.autorole)) return;
+
+    const guild = await this.bot.guilds.fetch(guildId);
+    const members = await guild.members.list();
+    const promises: Promise<any>[] = [];
+
+    for (const [_memberId, member] of members) {
+      if (previous) {
+        promises.push(member.roles.remove(previous, "Autorole changed"));
+      }
+      if (result.autorole) {
+        promises.push(member.roles.add(result.autorole, "Autorole changed"));
+      }
+    }
+
+    await Promise.allSettled(promises);
   }
 
   async getAll(guildId: Snowflake) {
