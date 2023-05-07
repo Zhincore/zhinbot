@@ -136,7 +136,7 @@ export class AIService {
     let length = await this.tokenCount(prompt);
 
     // Shorten the history to fit
-    while ((length ?? 0) > maxLen) {
+    while (convo.length > this.config.maxHistory || (length ?? 0) > maxLen) {
       convo.shift();
       prompt = this.generatePrompt(config, botName, convo);
       length = await this.tokenCount(prompt);
