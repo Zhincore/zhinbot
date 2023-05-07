@@ -152,7 +152,7 @@ export class AIService {
     const params = {
       ...this.config.parameters,
       prompt,
-      stopping_strings: ["\n/imagine", "\n###", "\nHuman:", "\nAssistant:", "\nUSER:"],
+      stopping_strings: ["\n"],
     };
 
     const result = await fetch(this.config.baseUrl + "/api/v1/generate", {
