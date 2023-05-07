@@ -117,8 +117,8 @@ export class AIService {
     return this.conversations.set(guildId, await this.fetchHistory(guildConfig.channelId));
   }
 
-  private getDisplayName(member: GuildMember) {
-    return member?.displayName ?? member.user.username;
+  private getDisplayName(msg: Message<true>) {
+    return msg.member?.displayName ?? msg.author.username;
   }
 
   private async reply(guildId: Snowflake) {
@@ -144,7 +144,7 @@ export class AIService {
 
     const participants = new Set<string>();
     for (const msg of convo) {
-      participants.add(this.getDisplayName(msg.member!));
+      participants.add(this.getDisplayName(msg));
     }
 
     const channel = await this.bot.fetchChannel<GuildTextBasedChannel>(config.channelId);
@@ -163,7 +163,7 @@ export class AIService {
   }
 
   private generatePrompt(config: AIConfig, botName: string, convo: Message<true>[]) {
-    const history = convo.map((msg) => `${this.getDisplayName(msg.member!)}: ${msg.cleanContent}`);
+    const history = convo.map((msg) => `${this.getDisplayName(msg)}: ${msg.cleanContent}`);
 
     return (config.context ?? this.config.defaultContext) + "\n\n" + history.join("\n") + "\n" + `${botName}:`;
   }
