@@ -8,46 +8,71 @@ defaultLocale = "en-US"
 ##
 [modules]
 
-  # Birthdays module
-  [modules.birthdays]
+# AI module
+[modules.ai]
+baseUrl = "http://localhost:5000"
+maxHistory = 64
+replyDelay = "15s"
+defaultContext = "A group chat."
 
-    images = [
-      # Sourced from https://twitter.com/IKEAsame/status/1215976200813699072
-      "https://pbs.twimg.com/media/EOAD3dAUcAACa5C?format=jpg",
-      "https://pbs.twimg.com/media/EOAD38DVUAADiIm?format=jpg",
-      "https://pbs.twimg.com/media/EOAD4bMVUAEhmLm?format=jpg",
-      "https://pbs.twimg.com/media/EOAD5SNUEAA9yww?format=jpg",
-      "https://pbs.twimg.com/media/EOAD51hUcAIyhpd?format=jpg"
-    ]
+[modules.ai.parameters]
+max_new_tokens = 200
+seed = -1
+stop_at_newline = true
+# NovelAI-Pleasing Results preset
+do_sample = true
+temperature = 0.44
+top_p = 1
+top_k = 0
+typical_p = 1
+repetition_penalty = 1.15
+encoder_repetition_penalty = 1
+no_repeat_ngram_size = 0
+min_length = 0
+num_beams = 1
+length_penalty = 1
+penalty_alpha = 0
+early_stopping = false
+truncation_length = 1536
+add_bos_token = true
+ban_eos_token = false
+skip_special_tokens = true
 
-  # Player module
-  [modules.player]
+# Birthdays module
+[modules.birthdays]
+images = [
+  # Sourced from https://twitter.com/IKEAsame/status/1215976200813699072
+  "https://pbs.twimg.com/media/EOAD3dAUcAACa5C?format=jpg",
+  "https://pbs.twimg.com/media/EOAD38DVUAADiIm?format=jpg",
+  "https://pbs.twimg.com/media/EOAD4bMVUAEhmLm?format=jpg",
+  "https://pbs.twimg.com/media/EOAD5SNUEAA9yww?format=jpg",
+  "https://pbs.twimg.com/media/EOAD51hUcAIyhpd?format=jpg",
+]
 
-    maxQueueLength = 256
-    timeout = "15m"
+# Player module
+[modules.player]
+maxQueueLength = 256
+timeout = "15m"
 
-    songCache = { ttl = "48h", size = 2048 }
+songCache = { ttl = "48h", size = 2048 }
 
-  # Moderation module
-  [modules.moderation]
+# Moderation module
+[modules.moderation]
+warnPenalties = [
+  { count = 2, perTime = "1h", duration = "30m" },
+  { count = 3, perTime = "12h", duration = "2h" },
+  { count = 6, perTime = "24h", duration = "7d" },
+]
 
-    warnPenalties = [
-      { count = 2, perTime = "1h", duration = "30m" },
-      { count = 3, perTime = "12h", duration = "2h" },
-      { count = 6, perTime = "24h", duration = "7d" },
-    ]
-
-    [modules.moderation.logging]
-      logNickname = true
-      logDeleted = true
-      logEdited = false
-      editThreshold = 0.25
-      
-
+[modules.moderation.logging]
+logNickname = true
+logDeleted = true
+logEdited = false
+editThreshold = 0.25
 
 ## !!!
 ## Advanced section 
 ## !!!
 [system]
 
-#journalIdentifier = 
+#journalIdentifier =

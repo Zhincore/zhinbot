@@ -10,6 +10,14 @@ role = role
 roles = roles
 
 ###
+### AI
+###
+
+cmd-aiconfig-dsc = Configure AI mode
+cmd-aiconfig-channel-dsc = Channel where the AI should be active
+cmd-aiconfig-context-dsc = Context to give the AI
+
+###
 ### Birthdays
 ###
 

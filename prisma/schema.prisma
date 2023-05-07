@@ -28,10 +28,7 @@ model Guild {
   // Modules
   modConfig ModConfig?
   warnings  Warning[]
-  rating    MessageRating[]
-  selfRoles SelfRolesItem[]
-  // effects    EffectItem[]
-  // alerts     AlertsItem[]
+  aiConfig  AIConfig?
 }
 
 model Member {
@@ -39,14 +36,21 @@ model Member {
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
 
-  birthday Birthday?      @relation(fields: [id], references: [userId])
+  birthday Birthday? @relation(fields: [id], references: [userId])
   warnings Warning[]
-  rating   MessageRating?
 
   @@id([guildId, id])
 }
 
 // #### MODULES ####
+
+// ## AI ##
+model AIConfig {
+  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   String  @id
+  context   String?
+  channelId String?
+}
 
 // ## Birthdays ##
 model Birthday {
@@ -54,18 +58,6 @@ model Birthday {
   date   DateTime
 
   members Member[]
-}
-
-// ## Message Rating ##
-model MessageRating {
-  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String
-  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
-  userId  String
-
-  rating Int @default(0)
-
-  @@id([guildId, userId])
 }
 
 // ## Moderator ##
@@ -93,54 +85,3 @@ model Warning {
 
   @@id([guildId, id])
 }
-
-// ## Self-roles ##
-model SelfRolesItem {
-  name    String
-  emoji   String?
-  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String
-
-  multiSelect Boolean         @default(true)
-  roles       SelfRolesRole[]
-
-  @@id([guildId, name])
-}
-
-model SelfRolesRole {
-  roleId      String
-  emoji       String?
-  label       String?
-  description String?
-
-  item     SelfRolesItem @relation(fields: [guildId, itemName], references: [guildId, name], onDelete: Cascade)
-  guildId  String
-  itemName String
-
-  @@id([guildId, itemName, roleId])
-}
-
-// ## Alerts ##
-// model AlertsItem {
-//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-//   guildId   String
-//   type      String
-//   name      String
-//   channelId String
-//   roleId    String?
-//
-//   @@id([guildId, type, name])
-// }
-
-// ## Effects ##
-// model EffectItem {
-//   id        Int     @default(autoincrement())
-//   guild     Guild   @relation(references: [id], fields: [guildId], onDelete: Cascade)
-//   guildId   String
-//   order     Int     @default(0)
-//   pattern   String
-//   response  String
-//   transform String?
-//
-//   @@id([id, guildId])
-// }

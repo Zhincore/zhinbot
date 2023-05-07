@@ -16,6 +16,14 @@ const SCHEMA = defineValidationSchema({
   },
   modules: {
     $$type: "object",
+    ai: {
+      $$type: "object",
+      baseUrl: "string",
+      maxHistory: "number",
+      replyDelay: "ms",
+      defaultContext: "string",
+      parameters: { type: "record", key: "string", value: "any" },
+    },
     birthdays: {
       $$type: "object",
       images: {
@@ -74,6 +82,13 @@ export class Config implements IConfig {
   };
 
   modules: IConfig["modules"] = {
+    ai: {
+      baseUrl: "",
+      defaultContext: "",
+      maxHistory: 16,
+      replyDelay: 0,
+      parameters: {},
+    },
     birthdays: {
       images: [],
     },
@@ -86,7 +101,12 @@ export class Config implements IConfig {
       },
     },
     moderation: {
-      logMsgEditThreshold: 0.5,
+      logging: {
+        logNickname: false,
+        logDeleted: false,
+        logEdited: false,
+        editThreshold: 0.5,
+      },
       warnPenalties: [],
     },
   };
