@@ -118,7 +118,7 @@ export class Config implements IConfig {
   readonly #check = new Validator({
     useNewCustomCheckerFunction: true,
     aliases: {
-      ms: { type: "string", custom: (v: any) => ms(v) },
+      ms: { type: "string", custom: (v: any) => v && ms(v) },
     },
   }).compile(SCHEMA);
 
