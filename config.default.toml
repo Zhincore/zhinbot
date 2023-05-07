@@ -12,7 +12,6 @@ defaultLocale = "en-US"
 [modules.ai]
 baseUrl = "http://localhost:5000"
 maxHistory = 64
-maxRetries = 3
 replyDelay = "10s"
 defaultContext = "A group chat."
 
