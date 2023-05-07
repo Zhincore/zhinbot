@@ -23,7 +23,7 @@ export type { YtResponse };
 export type YTQueryResponse = (YtResponse & { _type?: "video" }) | { _type: "playlist"; entries: YtResponse[] };
 
 export class Player extends EventEmitter {
-  private readonly ytdlp = new YTDLP();
+  private readonly ytdlp = new YTDLP.default();
   readonly player = Voice.createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
   private connection?: VoiceConnection;
   private fetchPromise: Promise<YTQueryResponse | string> = Promise.resolve("");

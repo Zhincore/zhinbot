@@ -1,7 +1,6 @@
 import "./prestart.js";
 import "reflect-metadata";
 import exitHook from "exit-hook";
-import { APIGuildMembershipScreening, RESTGetAPIGuildMemberVerificationResult, Routes } from "discord.js";
 import { bootstrap } from "./bootstrap.js";
 
 async function main() {

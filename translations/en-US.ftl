@@ -72,20 +72,6 @@ birthdays-alert-message = { RANDOM_INDEX(4) ->
 }
 
 ###
-### Message ratings
-###
-
-module-messageRating = Message rating module (WIP)
-module-messageRating-dsc = Allows members to like/dislike messages to give points to their authors
-
-cmd-like = Like this message
-cmd-dislike = Dislike this message
-
-# /rating
-cmd-rating-dsc = Show rating of a member
-cmd-rating-member-dsc = The member to show rating of (you if not specified)
-
-###
 ### Moderator
 ###
 
@@ -163,87 +149,6 @@ cmd-loop-loop-dsc = Whether the queue should loop
 # /queue
 cmd-queue-dsc = Show the current player queue
 cmd-queue-page-dsc = The page of the queue tho show (first by default)
-
-###
-### Selfroles
-###
-
-module-selfroles = Self-roles module
-module-selfroles-dsc = Allow your members to give themselves roles
-
-# /rolesbutton
-cmd-rolesbutton-dsc = Creates a button allowign users to easily trigger self-roles selection
-cmd-rolesbutton-channel-dsc = The channel to send the button to (current by default)
-cmd-rolesbutton-message-dsc = Message to send alongside the button (none by default)
-cmd-rolesbutton-label-dsc = Label of the button ("{selfroles-roles-button}" by default)
-selfroles-created-roles-button = Successfully created roles button.
-selfroles-roles-button = Choose roles
-
-# /roles
-cmd-roles-dsc = Choose roles for yourself
-selfroles-roles-noitems = This server has no self-roles
-selfroles-roles-choosecategory = You can choose roles from these categories
-selfroles-roles-chooseroles = Bellow you can select roles from the { $category } category
-selfroles-outdated = This self-roles is outdated, use new one
-selfroles-roles-rolesupdated = Your roles have been updated!
-
-cmd-selfroles--category-dsc = Name of the self-roles category
-selfroles-category-notfound = Category { $name } not found
-
-# /autorole
-cmd-autorole-dsc = Give members a role automatically
-cmd-autorole--apply-dsc = Whether or not should we apply the change to all current members
-cmd-autorole-set-dsc = Set role to give to members automatically
-cmd-autorole-set-role-dsc = The role to give or nothing for none
-cmd-autorole-remove-dsc = Remove automatically given role
-cmd-autorole-show-dsc = Show the current autorole
-
-# /selfroles
-cmd-selfroles-dsc = Allow your members to give themselves roles
-
-# /selfroles list
-cmd-selfroles-list-dsc = Show all self-roles categories of this guild
-
-# /selfroles show
-cmd-selfroles-show-dsc = Show info about a self-roles category
-
-# /selfroles create
-cmd-selfroles-create-dsc = Create a new self-roles category
-cmd-selfroles-create-emoji-dsc = Emoji for the category
-cmd-selfroles-create-multiselect-dsc = Whether or not to allow members to choose multiple roles from the category
-selfroles-created-category = Created a new self-roles category { $name }
-
-# /selfroles delete
-cmd-selfroles-delete-dsc = Delete a self-roles category
-selfroles-deleted = Successfully deleted self-roles category
-
-# /selfroles role
-cmd-selfroles-role-dsc = Edit roles of a self-roles category
-# /selfroles role set
-cmd-selfroles-role-set-dsc = Add or change a role in a self-roles category
-cmd-selfroles-role-set-role-dsc = The role to add/change
-cmd-selfroles-role-set-emoji-dsc = Emoji to assign to the role
-cmd-selfroles-role-set-label-dsc = Additional label for the role
-cmd-selfroles-role-set-description-dsc = Description of the role
-selfroles-role-updated = Role added/updated
-# /selfroles role remove
-cmd-selfroles-role-remove-dsc = Remove a role from a self-roles category
-cmd-selfroles-role-remove-role-dsc = The role to remove
-selfroles-role-removed = Role removed from category
-selfroles-role-notfound = Role not found in the category
-
-# /selfroles edit
-cmd-selfroles-edit-dsc = Edit a self-roles category
-# /selfroles edit rename
-cmd-selfroles-edit-rename-dsc = Rename a self-roles category
-cmd-selfroles-edit-rename-newname-dsc = The new name for the category
-# /selfroles edit multiselect
-cmd-selfroles-edit-multiselect-dsc = Change whether or not can user select multiple roles from a selfroles category
-cmd-selfroles-edit-multiselect-allow-dsc = Whether or not can user select multiple roles from this selfroles category
-# /selfroles edit emoji
-cmd-selfroles-edit-emoji-dsc = Change the emoji of a self-roles category
-cmd-selfroles-edit-emoji-emoji-dsc = The new emoji of the category or nothing for none
-selfroles-edit-changed = Successfully changed { $key } to { $value }
 
 ###
 ### Utils

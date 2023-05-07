@@ -25,7 +25,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "module": "NodeNext",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
