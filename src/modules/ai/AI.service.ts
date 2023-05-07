@@ -2,7 +2,15 @@ import { Service } from "typedi";
 import fetch from "node-fetch";
 import { Config } from "~/Config/Config.js";
 import { PrismaService } from "~/services/Prisma.service.js";
-import { ChannelType, GuildTextBasedChannel, Message, MessageFlags, MessageType, Snowflake } from "discord.js";
+import {
+  ChannelType,
+  GuildMember,
+  GuildTextBasedChannel,
+  Message,
+  MessageFlags,
+  MessageType,
+  Snowflake,
+} from "discord.js";
 import { Cache } from "~/utils/Cache.js";
 import ms from "ms";
 import { Bot } from "~/core/index.js";
@@ -84,7 +92,7 @@ export class AIService {
 
     for (const message of messages.values()) {
       if (
-        message.cleanContent &&
+        message.cleanContent.trim() &&
         [MessageType.Default, MessageType.Reply].includes(message.type) &&
         !message.flags.has(MessageFlags.Ephemeral)
       ) {
@@ -109,6 +117,10 @@ export class AIService {
     return this.conversations.set(guildId, await this.fetchHistory(guildConfig.channelId));
   }
 
+  private getDisplayName(member: GuildMember) {
+    return member?.displayName ?? member.user.username;
+  }
+
   private async reply(guildId: Snowflake) {
     const convo = await this.getConversation(guildId);
     if (!convo) return;
@@ -121,38 +133,64 @@ export class AIService {
 
     const maxLen = Number(this.config.parameters.truncation_length) - Number(this.config.parameters.max_new_tokens);
     let prompt = this.generatePrompt(config, botName, convo);
+    let length = await this.tokenCount(prompt);
 
     // Shorten the history to fit
-    while (prompt.split(/\s/).length > maxLen) {
+    while ((length ?? 0) > maxLen) {
       convo.shift();
       prompt = this.generatePrompt(config, botName, convo);
+      length = await this.tokenCount(prompt);
+    }
+
+    const participants = new Set<string>();
+    for (const msg of convo) {
+      participants.add(this.getDisplayName(msg.member!));
     }
 
     const channel = await this.bot.fetchChannel<GuildTextBasedChannel>(config.channelId);
     if (!channel) return;
 
-    await channel.sendTyping();
+    const typingInterval = setInterval(async () => await channel.sendTyping(), 10 * 1000);
 
-    const reply = await this.generate(prompt);
+    const reply = await this.generate(
+      prompt,
+      Array.from(participants, (p) => `\n${p}:`),
+    );
+    clearInterval(typingInterval);
     if (!reply) return;
 
     await channel.send(reply);
   }
 
   private generatePrompt(config: AIConfig, botName: string, convo: Message<true>[]) {
-    const history = convo.map((msg) => {
-      const name = msg.member?.displayName ?? msg.author.username;
-      return `${name}: ${msg.cleanContent}`;
-    });
+    const history = convo.map((msg) => `${this.getDisplayName(msg.member!)}: ${msg.cleanContent}`);
 
     return (config.context ?? this.config.defaultContext) + "\n\n" + history.join("\n") + "\n" + `${botName}:`;
   }
 
-  private async generate(prompt: string) {
+  private async tokenCount(prompt: string) {
+    const result = await fetch(this.config.baseUrl + "/api/v1/token-count", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!result.ok) {
+      console.log(result);
+      return;
+    }
+
+    const data = (await result.json()) as { results: [{ tokens: string }] };
+    return Number(data["results"][0]["tokens"]);
+  }
+
+  private async generate(prompt: string, stoppingStrings?: string[]) {
     const params = {
       ...this.config.parameters,
       prompt,
-      stopping_strings: ["\n"],
+      stopping_strings: [...(stoppingStrings ?? []), "\nBOT:", "\nASSISTANT:", "\n/"],
     };
 
     const result = await fetch(this.config.baseUrl + "/api/v1/generate", {
@@ -169,6 +207,6 @@ export class AIService {
     }
 
     const data = (await result.json()) as { results: [{ text: string }] };
-    return data["results"][0]["text"].trim();
+    return data["results"][0]["text"].replace(/\u200b/g, " ").trim();
   }
 }
