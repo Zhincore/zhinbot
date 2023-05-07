@@ -48,8 +48,8 @@ model Member {
 model AIConfig {
   guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId   String  @id
-  context   String?
-  channelId String? @db.VarChar(512)
+  context   String? @db.VarChar(512)
+  channelId String?
 }
 
 // ## Birthdays ##
