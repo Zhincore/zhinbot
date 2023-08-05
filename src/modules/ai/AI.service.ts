@@ -1,20 +1,12 @@
 import { Service } from "typedi";
 import fetch from "node-fetch";
+import { ChannelType, GuildTextBasedChannel, Message, MessageFlags, MessageType, Snowflake } from "discord.js";
+import ms from "ms";
+import { AIConfig } from "@prisma/client";
 import { Config } from "~/Config/Config.js";
 import { PrismaService } from "~/services/Prisma.service.js";
-import {
-  ChannelType,
-  GuildMember,
-  GuildTextBasedChannel,
-  Message,
-  MessageFlags,
-  MessageType,
-  Snowflake,
-} from "discord.js";
 import { Cache } from "~/utils/Cache.js";
-import ms from "ms";
 import { Bot } from "~/core/index.js";
-import { AIConfig } from "@prisma/client";
 
 @Service()
 export class AIService {
@@ -24,7 +16,11 @@ export class AIService {
   private readonly config: Config["modules"]["ai"];
   private readonly serverStatus: { lastCheck: number; online: boolean } = { lastCheck: 0, online: false };
 
-  constructor(private readonly bot: Bot, config: Config, private readonly prisma: PrismaService) {
+  constructor(
+    private readonly bot: Bot,
+    config: Config,
+    private readonly prisma: PrismaService,
+  ) {
     this.config = config.modules.ai;
 
     bot.on("messageCreate", async (msg: Message) => {
@@ -105,7 +101,7 @@ export class AIService {
   }
 
   private async getConversation(guildId: Snowflake, append?: Message<true>) {
-    let convo = this.conversations.get(guildId);
+    const convo = this.conversations.get(guildId);
     if (convo) {
       if (append) convo.push(append);
       return convo;
@@ -131,11 +127,14 @@ export class AIService {
     const member = await this.bot.fetchMember(guildId, this.bot.user!.id);
     const botName = member?.displayName ?? this.bot.user?.username ?? "AI";
 
+    // Fit in the history limit
+    while (convo.length) convo.shift();
+
     const maxLen = Number(this.config.parameters.truncation_length) - Number(this.config.parameters.max_new_tokens);
     let prompt = this.generatePrompt(config, botName, convo);
     let length = await this.tokenCount(prompt);
 
-    // Shorten the history to fit
+    // Shorten the history to fit the context limit
     while (convo.length > this.config.maxHistory || (length ?? 0) > maxLen) {
       convo.shift();
       prompt = this.generatePrompt(config, botName, convo);

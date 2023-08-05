@@ -15,7 +15,11 @@ export class PlayerService {
   private readonly players = new Map<string, { player: Player; updateChannel: TextChannel }>();
   private readonly playerLogger: Logger;
 
-  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {
+  constructor(
+    private readonly bot: Bot,
+    private readonly prisma: PrismaService,
+    private readonly config: Config,
+  ) {
     this.playerLogger = bot.getLogger("Player");
     bot.on("voiceStateUpdate", (oldState, newState) => {
       if (newState.channelId === oldState.channelId) return;

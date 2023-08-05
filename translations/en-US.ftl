@@ -159,6 +159,15 @@ cmd-queue-dsc = Show the current player queue
 cmd-queue-page-dsc = The page of the queue tho show (first by default)
 
 ###
+### Polls
+###
+
+cmd-poll-dsc = Send a poll
+cmd-poll-question-dsc = Question of the poll
+cmd-poll-answers-dsc = Semicolon-separated list of possible answers
+cmd-poll-channel-dsc = Channel to send the poll to
+
+###
 ### Utils
 ###
 

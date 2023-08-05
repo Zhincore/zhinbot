@@ -13,7 +13,10 @@ const WARNS_PAGE_ID = "warns";
 
 @DiscordAdapter()
 export class ModeratorWarnsDiscordAdapter {
-  constructor(private readonly bot: Bot, private readonly service: ModeratorService) {}
+  constructor(
+    private readonly bot: Bot,
+    private readonly service: ModeratorService,
+  ) {}
 
   @DiscordCommand({
     options: [

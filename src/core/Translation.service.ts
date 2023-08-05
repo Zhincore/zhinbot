@@ -22,7 +22,10 @@ export class TranslationService {
     RANDOM_INDEX: ([max]) => new FluentNumber(Math.floor(Math.random() * Number(max))),
   };
 
-  constructor(public defaultLocale: LocaleString = "en-US", bot: Bot) {
+  constructor(
+    public defaultLocale: LocaleString = "en-US",
+    bot: Bot,
+  ) {
     this.logger = bot.getLogger("TranslationService");
   }
 
@@ -67,12 +70,15 @@ export class TranslationService {
   }
 
   getTranslations(pattern: string, args?: Record<string, SupportedVariable> | null, skipDefault = false) {
-    return this.getLocales().reduce((obj, locale) => {
-      if (skipDefault && locale == this.defaultLocale) return obj;
-      const msg = this.translate(pattern, args, locale, true);
-      if (msg) obj[locale] = msg;
-      return obj;
-    }, {} as Record<LocaleString, string>);
+    return this.getLocales().reduce(
+      (obj, locale) => {
+        if (skipDefault && locale == this.defaultLocale) return obj;
+        const msg = this.translate(pattern, args, locale, true);
+        if (msg) obj[locale] = msg;
+        return obj;
+      },
+      {} as Record<LocaleString, string>,
+    );
   }
 
   transformVariables(args: Record<string, SupportedVariable>): Record<string, FluentVariable> {

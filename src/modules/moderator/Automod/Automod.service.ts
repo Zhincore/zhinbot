@@ -9,7 +9,10 @@ export class AutomodService {
   // private readonly logger = this.bot.getLogger("Moderator");
   private readonly filters: AutomodFilter[] = Filters.map((filter) => this.bot.container.get(filter));
 
-  constructor(private readonly bot: Bot, modservice: ModeratorService) {
+  constructor(
+    private readonly bot: Bot,
+    modservice: ModeratorService,
+  ) {
     bot.on("messageCreate", async (message) => {
       if (!message.inGuild() || message.author.id === bot.user!.id) return;
 

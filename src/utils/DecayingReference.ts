@@ -1,7 +1,11 @@
 export class DecayingReference<T> {
   private timeout?: NodeJS.Timeout;
 
-  constructor(private readonly reference: T, private readonly deleteSelf: () => void, private readonly delay: number) {
+  constructor(
+    private readonly reference: T,
+    private readonly deleteSelf: () => void,
+    private readonly delay: number,
+  ) {
     this.getReference();
   }
 

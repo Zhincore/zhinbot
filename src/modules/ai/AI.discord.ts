@@ -1,11 +1,11 @@
-import { DiscordAdapter, DiscordCommand } from "@core/index.js";
-import { AIService } from "./AI.service.js";
 import {
   ApplicationCommandOptionType,
   ChannelType,
   ChatInputCommandInteraction,
   PermissionFlagsBits,
 } from "discord.js";
+import { DiscordAdapter, DiscordCommand } from "@core/index.js";
+import { AIService } from "./AI.service.js";
 
 @DiscordAdapter()
 export class AIDiscordAdapter {

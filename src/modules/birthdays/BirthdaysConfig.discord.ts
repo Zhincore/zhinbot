@@ -16,7 +16,11 @@ import { BirthdaysService } from "./Birthdays.service.js";
   },
 })
 export class BirthdaysConfigDiscordAdapter {
-  constructor(private readonly service: BirthdaysService, private readonly bot: Bot, private readonly config: Config) {}
+  constructor(
+    private readonly service: BirthdaysService,
+    private readonly bot: Bot,
+    private readonly config: Config,
+  ) {}
 
   @DiscordSubcommand({
     type: ApplicationCommandOptionType.SubcommandGroup,

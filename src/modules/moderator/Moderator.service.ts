@@ -23,7 +23,11 @@ export class ModeratorService {
   // private readonly logger = this.bot.getLogger("Moderator");
   private readonly guildConfigs = new Cache<Prisma.ModConfig>(ms("30m"));
 
-  constructor(private readonly bot: Bot, private readonly prisma: PrismaService, private readonly config: Config) {}
+  constructor(
+    private readonly bot: Bot,
+    private readonly prisma: PrismaService,
+    private readonly config: Config,
+  ) {}
 
   private async announce(message: MessageCreateOptions, userId: Snowflake, channelId: Snowflake, guild: Guild) {
     const send = (channel: TextChannel | DMChannel | null): any => {

@@ -3,7 +3,10 @@ import { DecayingReference } from "./DecayingReference.js";
 export class Cache<T> {
   private readonly map = new Map<string, DecayingReference<T>>();
 
-  constructor(private readonly timeout: number, private readonly maxSize?: number) {}
+  constructor(
+    private readonly timeout: number,
+    private readonly maxSize?: number,
+  ) {}
 
   get(key: string): T | undefined {
     const entry = this.map.get(key);
