@@ -26,9 +26,10 @@ model Guild {
   autorole String?
 
   // Modules
+  activity  Activity[]
+  aiConfig  AIConfig?
   modConfig ModConfig?
   warnings  Warning[]
-  aiConfig  AIConfig?
 }
 
 model Member {
@@ -36,13 +37,25 @@ model Member {
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
 
-  birthday Birthday? @relation(fields: [id], references: [userId])
+  activity Activity[]
+  birthday Birthday?  @relation(fields: [id], references: [userId])
   warnings Warning[]
 
   @@id([guildId, id])
 }
 
 // #### MODULES ####
+
+// ## Activity ##
+model Activity {
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   String
+  member    Member   @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  userId    String
+  timestamp DateTime @default(now()) @db.Date
+
+  @@id([guildId, userId, timestamp])
+}
 
 // ## AI ##
 model AIConfig {
