@@ -33,7 +33,10 @@ export class ActivityDiscordAdapter {
     const unit = parsedResult[2];
 
     return interaction.reply({
-      content: t("activity-report-today", { time: t("time-unit-" + unit, { value }) }),
+      content: t("activity-report-today", {
+        subject: member.id == interaction.member.id ? "you" : member.toString(),
+        time: t("time-unit-" + unit, { value }),
+      }),
       ephemeral: true,
     });
   }

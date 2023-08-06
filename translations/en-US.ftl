@@ -61,7 +61,10 @@ cmd-activity-dsc = Find out about your or others activity on this server.
 
 cmd-activity-today-dsc = Find out how long a user (or you) has been active today.
 cmd-activity-today-member-dsc = The member to check, or you by default.
-activity-report-today = You've been active for **{ $time }** today!
+activity-report-today = { $subject ->
+  [you] You have 
+  *[other] {$subject} has 
+  } been active for **{ $time }** today!
 
 ###
 ### Birthdays

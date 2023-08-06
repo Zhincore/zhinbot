@@ -53,6 +53,7 @@ export class BirthdaysService {
     if (+start < +now) start = new Date(+start + DAY);
 
     schedule = new Schedule(() => this.announceBirthdays(guildId).catch(console.error), start, DAY);
+    this.schedules.set(guildId, schedule);
   }
 
   private removeSchedule(guildId: Snowflake) {
@@ -65,7 +66,7 @@ export class BirthdaysService {
   private async announceBirthdays(guildId: Snowflake) {
     const date = this.normaliseDate(new Date());
     const settings = await this.getAlertSettings(guildId);
-    if (!settings || !settings.bdayAlertChannel) return;
+    if (!settings?.bdayAlertChannel) return;
 
     const channel = await this.bot.fetchChannel<TextBasedChannel>(settings.bdayAlertChannel);
     if (!channel) return;
