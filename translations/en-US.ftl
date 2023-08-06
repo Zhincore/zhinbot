@@ -164,8 +164,8 @@ cmd-queue-page-dsc = The page of the queue tho show (first by default)
 
 cmd-poll-dsc = Send a poll
 cmd-poll-question-dsc = Question of the poll
-cmd-poll-answers-dsc = Semicolon-separated list of possible answers
-cmd-poll-channel-dsc = Channel to send the poll to
+cmd-poll-answers-dsc = Semicolon-separated (;) list of possible answers
+cmd-poll-channel-dsc = Channel to send the poll to, the current one by default
 
 ###
 ### Utils

@@ -1,18 +1,16 @@
 import { EmbedBuilder, GuildTextBasedChannel } from "discord.js";
 import { Service } from "typedi";
 import { Config } from "~/Config/Config.js";
-import { Bot } from "~/core/index.js";
 
 const answerEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
 
 @Service()
 export class PollsService {
-  constructor(
-    private readonly config: Config,
-    private readonly bot: Bot,
-  ) {}
+  constructor(private readonly config: Config) {}
 
   async sendPoll(channel: GuildTextBasedChannel, question: string, answers: string[], comment?: string) {
+    if (answers.length > answerEmojis.length) throw new Error("Too many answers");
+
     const message = await channel.send({
       content: comment,
       embeds: [
