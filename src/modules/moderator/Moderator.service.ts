@@ -73,7 +73,7 @@ export class ModeratorService {
       guildId,
       await this.prisma.modConfig.upsert({
         where: { guildId },
-        create: { ...data, guild: { connect: { id: guildId } } },
+        create: { ...data, guild: { connect: { guildId } } },
         update: data,
       }),
     );
@@ -144,11 +144,11 @@ export class ModeratorService {
 
   async warn({ guildId, userId, reason, staffId }: WarningData, channelId: Snowflake) {
     const memberPromise = this.bot.fetchMember(guildId, userId);
-    const memberLink = { guildId, id: userId };
+    const memberLink = { guildId, userId };
     const { id } = await this.prisma.warning.create({
       data: {
-        guild: { connect: { id: guildId } },
-        member: { connectOrCreate: { where: { guildId_id: memberLink }, create: memberLink } },
+        guild: { connect: { guildId } },
+        member: { connectOrCreate: { where: { guildId_userId: memberLink }, create: memberLink } },
         reason,
         staffId,
       },

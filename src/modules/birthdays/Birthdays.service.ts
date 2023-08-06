@@ -33,11 +33,11 @@ export class BirthdaysService {
   private async updateSchedules() {
     const guilds = await this.prisma.guild.findMany({
       where: { bdayAlertTime: { not: null } },
-      select: { bdayAlertTime: true, id: true },
+      select: { bdayAlertTime: true, guildId: true },
     });
 
     for (const guild of guilds) {
-      this.updateSchedule(guild.id, guild.bdayAlertTime!);
+      this.updateSchedule(guild.guildId, guild.bdayAlertTime!);
     }
   }
 
@@ -121,7 +121,7 @@ export class BirthdaysService {
 
   async getAlertSettings(guildId: Snowflake) {
     return this.prisma.guild.findUnique({
-      where: { id: guildId },
+      where: { guildId },
       select: GUILD_SELECT,
     });
   }
@@ -130,7 +130,7 @@ export class BirthdaysService {
     if (settings.time) this.updateSchedule(guildId, settings.time);
 
     return this.prisma.guild.update({
-      where: { id: guildId },
+      where: { guildId },
       data: {
         bdayAlertChannel: settings.channel,
         bdayAlertTime: settings.time,

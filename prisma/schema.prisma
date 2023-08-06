@@ -10,9 +10,9 @@ generator client {
 // #### MAIN ####
 
 model Guild {
-  id String @id
+  guildId String @id
 
-  members Member[]
+  // members Member[]
 
   // Birthdays
   bdayAlertTime    String?
@@ -32,34 +32,34 @@ model Guild {
   warnings  Warning[]
 }
 
-model Member {
-  id      String
-  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String
+// model Member {
+//   guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+//   guildId String
+//   userId  String
 
-  activity Activity[]
-  birthday Birthday?  @relation(fields: [id], references: [userId])
-  warnings Warning[]
+//   activity Activity[]
+//   birthday Birthday?  @relation(fields: [userId], references: [userId])
+//   warnings Warning[]
 
-  @@id([guildId, id])
-}
+//   @@id([guildId, userId])
+// }
 
 // #### MODULES ####
 
 // ## Activity ##
 model Activity {
-  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guild     Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   guildId   String
-  member    Member   @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  // member    Member?  @relation(fields: [guildId, userId], references: [guildId, userId], onDelete: Cascade)
   userId    String
-  timestamp DateTime @default(now()) @db.Date
+  timestamp DateTime
 
   @@id([guildId, userId, timestamp])
 }
 
 // ## AI ##
 model AIConfig {
-  guild     Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guild     Guild   @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   guildId   String  @id
   context   String? @db.VarChar(512)
   channelId String?
@@ -68,14 +68,14 @@ model AIConfig {
 // ## Birthdays ##
 model Birthday {
   userId String   @id
-  date   DateTime
+  date   DateTime @db.Date
 
-  members Member[]
+  // members Member[]
 }
 
 // ## Moderator ##
 model ModConfig {
-  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   guildId String @unique
 
   logChannel String?
@@ -85,10 +85,10 @@ model ModConfig {
 }
 
 model Warning {
-  id      Int     @unique @default(autoincrement())
-  guild   Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  id      Int    @unique @default(autoincrement())
+  guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
   guildId String
-  member  Member? @relation(fields: [guildId, userId], references: [guildId, id], onDelete: Cascade)
+  // member  Member? @relation(fields: [guildId, userId], references: [guildId, userId], onDelete: Cascade)
   userId  String
 
   reason String

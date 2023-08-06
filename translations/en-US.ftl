@@ -9,13 +9,59 @@ disabled = disabled
 role = role
 roles = roles
 
+time-unit-ms = { $value -> 
+  [1] a milisecond
+  *[other] {$value} miliseconds
+}
+time-unit-s = { $value -> 
+  [1] a second
+  *[other] {$value} seconds
+}
+time-unit-m = { $value -> 
+  [1] a minute
+  *[other] {$value} minutes
+}
+time-unit-h = { $value -> 
+  [1] an hour
+  *[other] {$value} hours
+}
+time-unit-d = { $value -> 
+  [1] a day
+  *[other] {$value} days
+}
+time-unit-w = { $value -> 
+  [1] a week
+  *[other] {$value} weeks
+}
+time-unit-y = { $value -> 
+  [1] a year
+  *[other] {$value} years
+}
+
+
 ###
 ### AI
 ###
 
-cmd-aiconfig-dsc = Configure AI mode
-cmd-aiconfig-channel-dsc = Channel where the AI should be active
-cmd-aiconfig-context-dsc = Context to give the AI
+module-ai = AI module
+module-ai-dsc = Allows members to interact with text-generation-webui
+
+cmd-aiconfig-dsc = Configure AI mode.
+cmd-aiconfig-channel-dsc = Channel where the AI should be active.
+cmd-aiconfig-context-dsc = Context to give the AI.
+
+###
+### Activity
+###
+
+module-activity = Activity module
+module-activity-dsc = Tracks and reports how often are users active.
+
+cmd-activity-dsc = Find out about your or others activity on this server.
+
+cmd-activity-today-dsc = Find out how long a user (or you) has been active today.
+cmd-activity-today-member-dsc = The member to check, or you by default.
+activity-report-today = You've been active for **{ $time }** today!
 
 ###
 ### Birthdays

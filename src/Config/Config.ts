@@ -16,6 +16,15 @@ const SCHEMA = defineValidationSchema({
   },
   modules: {
     $$type: "object",
+    activity: {
+      $$type: "object",
+      savePeriod: "ms",
+      activityPeriod: "ms",
+      minVoiceChatMembers: "number",
+      allowMuted: "boolean",
+      allowDeaf: "boolean",
+      allowOthersDeaf: "boolean",
+    },
     ai: {
       $$type: "object",
       baseUrl: "string",
@@ -82,6 +91,14 @@ export class Config implements IConfig {
   };
 
   modules: IConfig["modules"] = {
+    activity: {
+      savePeriod: 0,
+      activityPeriod: 0,
+      minVoiceChatMembers: 0,
+      allowMuted: false,
+      allowDeaf: false,
+      allowOthersDeaf: false,
+    },
     ai: {
       baseUrl: "",
       defaultContext: "",
@@ -115,7 +132,9 @@ export class Config implements IConfig {
     journalIdentifier: undefined,
   };
 
-  readonly #check = new Validator({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore: Validator cannot be instantiated or something, dunno what happened
+  readonly #check: Validator = new Validator({
     useNewCustomCheckerFunction: true,
     aliases: {
       ms: { type: "string", custom: (v: any) => v && ms(v) },

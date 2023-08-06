@@ -8,6 +8,20 @@ defaultLocale = "en-US"
 ##
 [modules]
 
+[modules.activity]
+# How often to save to database
+savePeriod = "5m"
+# How precisely is activity tracked (e.g. "1m" = check every minute if the user is active)
+activityPeriod = "1m"
+# Minimum number of members in a voice chat to consider as active
+minVoiceChatMembers = 2
+# Whether to consider muted memebers in voice chat as active
+allowMuted = true
+# Whether to consider deaf memebers in voice chat as active
+allowDeaf = false
+# Whether to consider deafened people towards the minVoiceChatMembers limit
+allowOthersDeaf = true
+
 # AI module
 [modules.ai]
 baseUrl = "http://localhost:5000"

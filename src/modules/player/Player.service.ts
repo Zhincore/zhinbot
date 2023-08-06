@@ -44,7 +44,7 @@ export class PlayerService {
       if (create) {
         let updateChannel: TextChannel | null = null;
 
-        const guildData = await this.prisma.guild.findUnique({ where: { id: guildId } });
+        const guildData = await this.prisma.guild.findUnique({ where: { guildId } });
         if (guildData && guildData.playerChannel) {
           updateChannel = await this.getUpdateChannel(guildData.playerChannel);
         }
@@ -111,7 +111,7 @@ export class PlayerService {
       throw err;
     }
 
-    await this.prisma.guild.update({ where: { id: guildId }, data: { playerChannel: channelId } });
+    await this.prisma.guild.update({ where: { guildId }, data: { playerChannel: channelId } });
     return true;
   }
 

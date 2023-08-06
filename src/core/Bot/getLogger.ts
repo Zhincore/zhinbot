@@ -48,6 +48,8 @@ export function getLogger(journalServiceName?: string) {
     ],
   });
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore: Validator cannot be instantiated or something, dunno what happened
   if (isProd && journalServiceName) logger.add(new Journald({ identifier: journalServiceName }));
 
   return logger;

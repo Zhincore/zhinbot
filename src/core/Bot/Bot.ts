@@ -66,7 +66,7 @@ export class Bot extends Discord.Client {
 
   destroy() {
     this.logger.info("Logging out...");
-    super.destroy();
+    return super.destroy();
   }
 
   async loadTranslations() {

@@ -1,5 +1,10 @@
 import { BotModule } from "@core/decorators/index.js";
-import { ActivityService } from "./Activity.service.js";
+import { ActivityTrackerService } from "./ActivityTracker.service.js";
+import { ActivityDiscordAdapter } from "./Activity.discord.js";
 
-@BotModule({ name: "activity", services: [ActivityService] })
+@BotModule({
+  name: "activity",
+  services: [ActivityTrackerService],
+  discordAdapters: [ActivityDiscordAdapter],
+})
 export class ActivityModule {}
