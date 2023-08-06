@@ -28,8 +28,9 @@ export class ActivityDiscordAdapter {
     const to = new Date(+from + day);
 
     const result = ms(await this.service.getActivity(interaction.guildId, member.id, from, to));
-    const unit = result.slice(-1);
-    const value = result.slice(0, -1);
+    const parsedResult = /^(\d+)(\w+)$/.exec(result)!;
+    const value = parsedResult[1];
+    const unit = parsedResult[2];
 
     return interaction.reply({
       content: t("activity-report-today", { time: t("time-unit-" + unit, { value }) }),
