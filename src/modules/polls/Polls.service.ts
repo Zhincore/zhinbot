@@ -2,14 +2,18 @@ import { EmbedBuilder, GuildTextBasedChannel } from "discord.js";
 import { Service } from "typedi";
 import { Config } from "~/Config/Config.js";
 
-const answerEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
+function getReactionEmoji(number: number) {
+  if (number > 10 || number < 0) return "";
+  if (number == 10) return "🔟";
+  return number + "\uFE0F\u20E3";
+}
 
 @Service()
 export class PollsService {
   constructor(private readonly config: Config) {}
 
   async sendPoll(channel: GuildTextBasedChannel, question: string, answers: string[], comment?: string) {
-    if (answers.length > answerEmojis.length) throw new Error("Too many answers");
+    if (!getReactionEmoji(answers.length - 1)) throw new Error("Too many answers");
 
     const message = await channel.send({
       content: comment,
@@ -17,12 +21,12 @@ export class PollsService {
         new EmbedBuilder()
           .setTitle(question)
           .setColor(this.config.color)
-          .setDescription(answers.map((v, i) => `${answerEmojis[i]} - ${v}`).join("\n")),
+          .setDescription(answers.map((v, i) => `${getReactionEmoji(i)} - ${v}`).join("\n")),
       ],
     });
 
     for (let i = 0; i < answers.length; i++) {
-      await message.react(`${answerEmojis[i]}`);
+      await message.react(getReactionEmoji(i));
     }
 
     return message;
