@@ -67,6 +67,8 @@ activity-report-today = { $subject ->
   } been active for **{ $time }** today!
 
 cmd-activity-leaderboard-dsc = Show the leaderboard in activity of this server
+activity-leaderboard-title = Top 10 active users
+
 
 ###
 ### Birthdays

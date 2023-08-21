@@ -1,3 +1,6 @@
+import ms from "ms";
+import { TranslateFn } from "~/core/index.js";
+
 export * from "./ErrnoException.js";
 
 export function getDurationString(length: number, float = false) {
@@ -21,4 +24,12 @@ export function chooseRandom<T>(array: T[]): T {
 
 export function isUppercase(str: string) {
   return str && str[0] === str[0].toUpperCase();
+}
+
+export function translateTime(time: number, t: TranslateFn) {
+  const parsedResult = /^(\d+)(\w+)$/.exec(ms(time))!;
+  const value = parsedResult[1];
+  const unit = parsedResult[2];
+
+  return t("time-unit-" + unit, { value });
 }

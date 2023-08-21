@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, PermissionFl
 import ms from "ms";
 import { DiscordAdapter, DiscordSubcommand, type TranslateFn } from "~/core/index.js";
 import { ActivityService } from "./Activity.service.js";
+import { translateTime } from "~/utils/index.js";
 
 @DiscordAdapter({
   supercomand: {
@@ -27,15 +28,12 @@ export class ActivityDiscordAdapter {
     const from = new Date(Math.trunc(Date.now() / day) * day);
     const to = new Date(+from + day);
 
-    const result = ms(await this.service.getActivity(interaction.guildId, member.id, from, to));
-    const parsedResult = /^(\d+)(\w+)$/.exec(result)!;
-    const value = parsedResult[1];
-    const unit = parsedResult[2];
+    const result = await this.service.getActivity(interaction.guildId, member.id, from, to);
 
     return interaction.reply({
       content: t("activity-report-today", {
         subject: member.id == interaction.member.id ? "you" : member.toString(),
-        time: t("time-unit-" + unit, { value }),
+        time: translateTime(result, t),
       }),
       ephemeral: true,
     });
@@ -45,13 +43,13 @@ export class ActivityDiscordAdapter {
   async leaderboard(interaction: ChatInputCommandInteraction<"cached">, t: TranslateFn) {
     const leaderboard = await this.service.getLeaderboard(interaction.guildId);
 
-    let content = "# Top 10\n\n";
+    let content = t("activity-leaderboard-title") + "\n\n";
 
     for (let i = 0; i < leaderboard.length; i++) {
       const row = leaderboard[i];
       const member = await interaction.guild.members.fetch(row.userId);
 
-      content += `${i + 1}. ${member.displayName} (${member.user.globalName}) - ${row._count._all}\n`;
+      content += `${i + 1}. ${member.displayName} (${member.user.tag}) - ${translateTime(row.activity, t)}\n`;
     }
 
     return interaction.reply(content);

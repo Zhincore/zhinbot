@@ -29,12 +29,16 @@ export class ActivityService {
   }
 
   async getLeaderboard(guildId: Snowflake, top = 10) {
-    return this.prisma.activity.groupBy({
+    const leaderboard = await this.prisma.activity.groupBy({
       by: ["userId"],
       where: { guildId },
       orderBy: { _count: { userId: "desc" } },
       take: top,
       _count: { _all: true },
     });
+    return leaderboard.map((v) => ({
+      userId: v.userId,
+      activity: v._count._all * this.config.activityPeriod,
+    }));
   }
 }
