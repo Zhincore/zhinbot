@@ -40,4 +40,20 @@ export class ActivityDiscordAdapter {
       ephemeral: true,
     });
   }
+
+  @DiscordSubcommand({})
+  async leaderboard(interaction: ChatInputCommandInteraction<"cached">, t: TranslateFn) {
+    const leaderboard = await this.service.getLeaderboard(interaction.guildId);
+
+    let content = "# Top 10\n\n";
+
+    for (let i = 0; i < leaderboard.length; i++) {
+      const row = leaderboard[i];
+      const member = await interaction.guild.members.fetch(row.userId);
+
+      content += `${i + 1}. ${member.displayName} (${member.user.globalName}) - ${row._count._all}\n`;
+    }
+
+    return interaction.reply(content);
+  }
 }

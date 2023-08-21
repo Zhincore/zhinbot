@@ -66,6 +66,8 @@ activity-report-today = { $subject ->
   *[other] {$subject} has 
   } been active for **{ $time }** today!
 
+cmd-activity-leaderboard-dsc = Show the leaderboard in activity of this server
+
 ###
 ### Birthdays
 ###

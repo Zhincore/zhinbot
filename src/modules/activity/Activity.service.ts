@@ -27,4 +27,14 @@ export class ActivityService {
     });
     return result._count._all * this.config.activityPeriod;
   }
+
+  async getLeaderboard(guildId: Snowflake, top = 10) {
+    return this.prisma.activity.groupBy({
+      by: ["userId"],
+      where: { guildId },
+      orderBy: { _count: { userId: "desc" } },
+      take: top,
+      _count: { _all: true },
+    });
+  }
 }
