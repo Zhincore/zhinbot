@@ -30,6 +30,7 @@ model Guild {
   aiConfig  AIConfig?
   modConfig ModConfig?
   warnings  Warning[]
+  qotd      Qotd[]
 }
 
 // model Member {
@@ -97,4 +98,36 @@ model Warning {
   timestamp DateTime @default(now())
 
   @@id([guildId, id])
+}
+
+// ## Polls ##
+model Qotd {
+  guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guildId String @id
+
+  time      String?
+  channelId String
+  message   String?
+  questions Question[]
+}
+
+model Question {
+  id      Int    @unique @default(autoincrement())
+  guildId String
+  qotd    Qotd   @relation(fields: [guildId], references: [guildId])
+
+  question String
+  answers  Answer[]
+
+  @@id([guildId, id])
+}
+
+model Answer {
+  id         Int @unique @default(autoincrement())
+  questionId Int
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text     String
+
+  @@id([questionId, id])
 }
