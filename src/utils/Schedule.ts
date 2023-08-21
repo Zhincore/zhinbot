@@ -4,17 +4,17 @@ export class Schedule {
   private destroyed = false;
 
   constructor(
-    public executor: () => unknown | Promise<unknown>,
+    public trigger: () => unknown,
     readonly start: Date | number,
     readonly repeat?: number,
   ) {
-    this.timeout = setTimeout(async () => {
+    this.timeout = setTimeout(() => {
       this.timeout = undefined;
       if (this.destroyed) return;
 
-      if (repeat) this.interval = setInterval(executor, repeat).unref();
+      if (repeat) this.interval = setInterval(trigger, repeat).unref();
 
-      await executor();
+      trigger();
     }, +start - Date.now()).unref();
   }
 

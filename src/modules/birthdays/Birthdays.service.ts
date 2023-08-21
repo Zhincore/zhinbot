@@ -1,14 +1,12 @@
 import { EmbedBuilder, GuildMember, Snowflake, TextBasedChannel } from "discord.js";
-import * as chrono from "chrono-node";
 import { Service } from "@core/decorators/index.js";
 import { Bot } from "@core/Bot/index.js";
 import { PrismaService } from "~/services/Prisma.service.js";
-import { Schedule } from "~/utils/Schedule.js";
 import { Config } from "~/Config/index.js";
 import { TranslationService } from "~/core/Translation.service.js";
 import { chooseRandom, dateToUTC } from "~/utils/index.js";
+import { Scheduler } from "~/utils/Scheduler.js";
 
-const DAY = 24 * 60 * 60 * 1000;
 const GUILD_SELECT = {
   bdayAlertChannel: true,
   bdayAlertTime: true,
@@ -17,7 +15,7 @@ const GUILD_SELECT = {
 
 @Service()
 export class BirthdaysService {
-  private readonly schedules = new Map<Snowflake, Schedule>();
+  private readonly scheduler = new Scheduler((guildId) => this.announceBirthdays(guildId).catch(console.error));
 
   constructor(
     private readonly prisma: PrismaService,
@@ -25,7 +23,7 @@ export class BirthdaysService {
     private readonly bot: Bot,
     private readonly config: Config,
   ) {
-    bot.on("guildDelete", (guild) => this.removeSchedule(guild.id));
+    bot.on("guildDelete", (guild) => this.scheduler.removeSchedule(guild.id));
 
     bot.once("ready", () => this.updateSchedules());
   }
@@ -37,30 +35,8 @@ export class BirthdaysService {
     });
 
     for (const guild of guilds) {
-      this.updateSchedule(guild.guildId, guild.bdayAlertTime!);
+      this.scheduler.updateSchedule(guild.guildId, guild.bdayAlertTime!);
     }
-  }
-
-  private updateSchedule(guildId: Snowflake, time: string) {
-    let schedule = this.schedules.get(guildId);
-    if (schedule) schedule.destroy();
-
-    const now = new Date();
-    let start = chrono.strict.parseDate(time, now);
-    if (!start) throw new Error("Failed to parse schedule time");
-
-    // If the start already happened today, schedule for tomorrow
-    if (+start < +now) start = new Date(+start + DAY);
-
-    schedule = new Schedule(() => this.announceBirthdays(guildId).catch(console.error), start, DAY);
-    this.schedules.set(guildId, schedule);
-  }
-
-  private removeSchedule(guildId: Snowflake) {
-    const schedule = this.schedules.get(guildId);
-    if (!schedule) return;
-    schedule.destroy();
-    this.schedules.delete(guildId);
   }
 
   private async announceBirthdays(guildId: Snowflake) {
@@ -128,7 +104,7 @@ export class BirthdaysService {
   }
 
   async updateAlertSettings(guildId: Snowflake, settings: { time?: string; channel?: Snowflake; ping?: Snowflake }) {
-    if (settings.time) this.updateSchedule(guildId, settings.time);
+    if (settings.time) this.scheduler.updateSchedule(guildId, settings.time);
 
     return this.prisma.guild.update({
       where: { guildId },

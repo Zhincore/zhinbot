@@ -7,7 +7,10 @@ const DAY = 24 * 60 * 60 * 1000;
 export class Scheduler {
   private readonly schedules = new Map<Snowflake, Schedule>();
 
-  constructor(readonly trigger: (guildId: Snowflake) => Promise<void>) {}
+  constructor(
+    readonly trigger: (guildId: Snowflake) => unknown,
+    readonly period = DAY,
+  ) {}
 
   public updateSchedule(guildId: Snowflake, time: string) {
     let schedule = this.schedules.get(guildId);
@@ -17,10 +20,10 @@ export class Scheduler {
     let start = Chrono.strict.parseDate(time, now);
     if (!start) throw new Error("Failed to parse schedule time");
 
-    // If the start already happened today, schedule for tomorrow
-    if (+start < +now) start = new Date(+start + DAY);
+    // If the start already happened today, schedule for next time
+    if (+start < +now) start = new Date(+start + this.period);
 
-    schedule = new Schedule(() => this.trigger(guildId).catch(console.error), start, DAY);
+    schedule = new Schedule(() => this.trigger(guildId), start, this.period);
     this.schedules.set(guildId, schedule);
   }
 
