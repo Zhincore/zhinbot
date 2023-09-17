@@ -31,6 +31,7 @@ export class BirthdaysDiscordAdapter {
         ephemeral: true,
       });
     }
+    console.log(date, this.service.stringifyDate(date));
 
     const result = await this.service.set(interaction.user.id, date);
 

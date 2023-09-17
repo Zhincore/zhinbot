@@ -4,7 +4,7 @@ import { Bot } from "@core/Bot/index.js";
 import { PrismaService } from "~/services/Prisma.service.js";
 import { Config } from "~/Config/index.js";
 import { TranslationService } from "~/core/Translation.service.js";
-import { chooseRandom, dateToUTC } from "~/utils/index.js";
+import { chooseRandom } from "~/utils/index.js";
 import { Scheduler } from "~/utils/Scheduler.js";
 
 const GUILD_SELECT = {
@@ -141,9 +141,8 @@ export class BirthdaysService {
 
   normaliseDate(date: Date) {
     const _date = new Date(0);
-    _date.setMonth(date.getMonth());
-    _date.setDate(date.getDate());
-    return dateToUTC(_date);
+    _date.setUTCMonth(date.getUTCMonth(), date.getUTCDate());
+    return _date;
   }
 
   stringifyDate(date: Date) {
