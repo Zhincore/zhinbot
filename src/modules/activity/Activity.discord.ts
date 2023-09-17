@@ -43,7 +43,7 @@ export class ActivityDiscordAdapter {
   async leaderboard(interaction: ChatInputCommandInteraction<"cached">, t: TranslateFn) {
     const leaderboard = await this.service.getLeaderboard(interaction.guildId);
 
-    let content = t("activity-leaderboard-title") + "\n\n";
+    let content = `## ${t("activity-leaderboard-title")}\n\n`;
 
     for (let i = 0; i < leaderboard.length; i++) {
       const row = leaderboard[i];
